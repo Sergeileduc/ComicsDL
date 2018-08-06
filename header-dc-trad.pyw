@@ -75,14 +75,14 @@ def getCatCovers():
     cat_image_list.append(ImageTk.PhotoImage(cat_pil_list[3]))
     return cat_image_list
 
-def getHeaderCovers():
+def getHeaderCovers(imgurllist):
     #catégories images
     global coverlist
     global imagebytes_list
     global data_stream_list
     global pil_image_list
-    for cover in coverimgurl:
-        imagebytes_list.append(urllib2.urlopen(cover).read())
+    for url in imgurllist:
+        imagebytes_list.append(urllib2.urlopen(url).read())
     for imagebyte in imagebytes_list:
         data_stream_list.append(io.BytesIO(imagebyte))
     for data_stream in data_stream_list:
@@ -100,13 +100,16 @@ def getUrls():
     return
 
 def refresh():
+    coverimgurllist = list()
     html = returnHTML(dctradpage)
     soup = BeautifulSoup(html, 'html.parser')
     headerlist = soup.find_all('span', class_="btn-cover")
     comicslist = soup.select('span.btn-cover a')
     coverlist = soup.select('span.btn-cover img')
     cat_image_list = getCatCovers()
-    getHeaderCovers()
+    for img in coverlist:
+        coverimgurllist.append(img['src'])
+    getHeaderCovers(coverimgurllist)
     getUrls()
     return
 
@@ -117,10 +120,6 @@ comicslist = soup.select('span.btn-cover a')
 coverlist = soup.select('span.btn-cover img')
 
 
-coverimgurl = list()
-for img in coverlist:
-    coverimgurl.append(img['src'])
-
 class DCTradapp(tk.Tk):
     global cat_image_list
     def __init__(self, *args, **kwargs):
@@ -129,7 +128,8 @@ class DCTradapp(tk.Tk):
         self.title("Header DC trad")
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
         cat_image_list = getCatCovers()
-        getHeaderCovers()
+        #getHeaderCovers()
+        refresh()
         getUrls()
         # sidebar
         sidebar = tk.Frame(self, width=200, bg='SteelBlue4', height=500, relief='sunken', borderwidth=2)
