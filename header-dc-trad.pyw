@@ -73,7 +73,7 @@ def getCatCovers():
     cat_image_list.append(ImageTk.PhotoImage(cat_pil_list[1]))
     cat_image_list.append(ImageTk.PhotoImage(cat_pil_list[2]))
     cat_image_list.append(ImageTk.PhotoImage(cat_pil_list[3]))
-    return
+    return cat_image_list
 
 def getHeaderCovers():
     #catégories images
@@ -105,7 +105,7 @@ def refresh():
     headerlist = soup.find_all('span', class_="btn-cover")
     comicslist = soup.select('span.btn-cover a')
     coverlist = soup.select('span.btn-cover img')
-    getCatCovers()
+    cat_image_list = getCatCovers()
     getHeaderCovers()
     getUrls()
     return
@@ -128,7 +128,7 @@ class DCTradapp(tk.Tk):
         self.configure(background='SteelBlue3')
         self.title("Header DC trad")
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
-        getCatCovers()
+        cat_image_list = getCatCovers()
         getHeaderCovers()
         getUrls()
         # sidebar
