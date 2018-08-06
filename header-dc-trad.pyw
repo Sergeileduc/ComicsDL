@@ -89,14 +89,14 @@ def getHeaderCovers(imgurllist):
         photo.append(ImageTk.PhotoImage(image))
     return
 
-def getUrls():
+def getUrls(comicslist):
     global urllist
     for a in comicslist:
         if a.has_attr('href'):
             urllist.append(a['href'])
     return
 
-def refresh():
+def refresh(comicslist):
     coverimgurllist = list()
     html = returnHTML(dctradpage)
     soup = BeautifulSoup(html, 'html.parser')
@@ -107,27 +107,27 @@ def refresh():
     for img in coverlist:
         coverimgurllist.append(img['src'])
     getHeaderCovers(coverimgurllist)
-    getUrls()
+    getUrls(comicslist)
     return
-
-html = returnHTML(dctradpage)
-soup = BeautifulSoup(html, 'html.parser')
-headerlist = soup.find_all('span', class_="btn-cover")
-comicslist = soup.select('span.btn-cover a')
-coverlist = soup.select('span.btn-cover img')
 
 
 class DCTradapp(tk.Tk):
     global cat_image_list
     def __init__(self, *args, **kwargs):
+        html = returnHTML(dctradpage)
+        soup = BeautifulSoup(html, 'html.parser')
+        headerlist = soup.find_all('span', class_="btn-cover")
+        comicslist = soup.select('span.btn-cover a')
+        coverlist = soup.select('span.btn-cover img')
+
         tk.Tk.__init__(self, *args, **kwargs)
         self.configure(background='SteelBlue3')
         self.title("Header DC trad")
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
         cat_image_list = getCatCovers()
         #getHeaderCovers()
-        refresh()
-        getUrls()
+        refresh(comicslist)
+        getUrls(comicslist)
         # sidebar
         sidebar = tk.Frame(self, width=200, bg='SteelBlue4', height=500, relief='sunken', borderwidth=2)
         sidebar.pack(expand=False, fill='both', side='left', anchor='nw')
@@ -142,7 +142,7 @@ class DCTradapp(tk.Tk):
         button4 = tk.Button(sidebar, image=cat_image_list[3],
                             command=lambda: self.show_frame("Marvel"))
         button5 = tk.Button(sidebar, text="Rafraîchir",
-                            command=refresh())
+                            command=refresh(comicslist))
         button1.pack()
         button2.pack()
         button3.pack()
