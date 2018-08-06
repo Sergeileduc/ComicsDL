@@ -74,6 +74,7 @@ def getAllTag(html, tag):
     list = soup.find_all(tag)
     return list
 
+#make images from covers
 def getCatCovers():
     #catégories images
     global cat_image_list
@@ -83,23 +84,6 @@ def getCatCovers():
     return cat_image_list
 
 #make images from images urls
-# def getHeaderCovers(imgurllist):
-#     #catégories images
-#     del photo[:]
-#     imagebytes_list = list()
-#     data_stream_list = list()
-#     pil_image_list = list()
-#     for url in imgurllist:
-#         imagebytes_list.append(urllib2.urlopen(url).read())
-#     for imagebyte in imagebytes_list:
-#         data_stream_list.append(io.BytesIO(imagebyte))
-#     for data_stream in data_stream_list:
-#         pil_image_list.append(Image.open(data_stream))
-#     #cat
-#     for image in pil_image_list:
-#         photo.append(ImageTk.PhotoImage(image))
-#     return
-
 def getHeaderCovers(imgurllist):
     #catégories images
     global photo
@@ -150,27 +134,25 @@ class DCTradapp(tk.Tk):
         refresh(comicslist)
         # sidebar
         try:
-            pil_logo = imagefromurl(refresh_logo_url)
-            imagetk = ImageTk.PhotoImage(pil_logo)
+            cat_image_list.append(ImageTk.PhotoImage(imagefromurl(refresh_logo_url)))
             logo=True
         except:
             logo=False
-        print(logo)
 
         sidebar = tk.Frame(self, width=200, bg='SteelBlue4', height=500, relief='groove', borderwidth=1)
         sidebar.pack(expand=False, fill='both', side='left', anchor='nw')
 
 
-        button1 = tk.Button(sidebar, image=cat_image_list[0],
+        button1 = tk.Button(sidebar, image=cat_image_list[0], bg='SteelBlue4', relief='flat',
                             command=lambda: self.show_frame("DCRebirth"))
-        button2 = tk.Button(sidebar, image=cat_image_list[1],
+        button2 = tk.Button(sidebar, image=cat_image_list[1], bg='SteelBlue4', relief='flat',
                             command=lambda: self.show_frame("DCPage"))
-        button3 = tk.Button(sidebar, image=cat_image_list[2],
+        button3 = tk.Button(sidebar, image=cat_image_list[2], bg='SteelBlue4', relief='flat',
                             command=lambda: self.show_frame("Indes"))
-        button4 = tk.Button(sidebar, image=cat_image_list[3],
+        button4 = tk.Button(sidebar, image=cat_image_list[3], bg='SteelBlue4', relief='flat',
                             command=lambda: self.show_frame("Marvel"))
         if logo:
-            button5 = tk.Button(sidebar, image=imagetk,
+            button5 = tk.Button(sidebar, image=cat_image_list[4], bg='SteelBlue4', relief='flat',
                             command=refresh(comicslist))
         else:
             button5 = tk.Button(sidebar, text="Rafraîchir",
@@ -213,23 +195,23 @@ class DCRebirth(tk.Frame):
         global photo
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        coverA1 = tk.Button(self, image=photo[0], command= lambda: OpenUrl(urllist[0]))
+        coverA1 = tk.Button(self, image=photo[0], bg='SteelBlue3', relief='flat', command= lambda: OpenUrl(urllist[0]))
         coverA1.grid(row=0, column=0)
-        coverA2 = tk.Button(self, image=photo[1], command= lambda: OpenUrl(urllist[1]))
+        coverA2 = tk.Button(self, image=photo[1], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[1]))
         coverA2.grid(row=0, column=1)
-        coverA3 = tk.Button(self, image=photo[2], command= lambda: OpenUrl(urllist[2]))
+        coverA3 = tk.Button(self, image=photo[2], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[2]))
         coverA3.grid(row=0, column=2)
-        coverA4 = tk.Button(self, image=photo[3], command= lambda: OpenUrl(urllist[3]))
+        coverA4 = tk.Button(self, image=photo[3], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[3]))
         coverA4.grid(row=1, column=0)
-        coverA5 = tk.Button(self, image=photo[4], command= lambda: OpenUrl(urllist[4]))
+        coverA5 = tk.Button(self, image=photo[4], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[4]))
         coverA5.grid(row=1, column=1)
-        coverA6 = tk.Button(self, image=photo[5], command= lambda: OpenUrl(urllist[5]))
+        coverA6 = tk.Button(self, image=photo[5], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[5]))
         coverA6.grid(row=1, column=2)
-        coverA7 = tk.Button(self, image=photo[6], command= lambda: OpenUrl(urllist[6]))
+        coverA7 = tk.Button(self, image=photo[6], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[6]))
         coverA7.grid(row=2, column=0)
-        coverA8 = tk.Button(self, image=photo[7], command= lambda: OpenUrl(urllist[7]))
+        coverA8 = tk.Button(self, image=photo[7], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[7]))
         coverA8.grid(row=2, column=1)
-        coverA9 = tk.Button(self, image=photo[8], command= lambda: OpenUrl(urllist[8]))
+        coverA9 = tk.Button(self, image=photo[8], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[8]))
         coverA9.grid(row=2, column=2)
 
 class DCPage(tk.Frame):
@@ -237,23 +219,23 @@ class DCPage(tk.Frame):
         global photo
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        coverA1 = tk.Button(self, image=photo[10], command= lambda: OpenUrl(urllist[10]))
+        coverA1 = tk.Button(self, image=photo[10], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[10]))
         coverA1.grid(row=0, column=0)
-        coverA2 = tk.Button(self, image=photo[11], command= lambda: OpenUrl(urllist[11]))
+        coverA2 = tk.Button(self, image=photo[11], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[11]))
         coverA2.grid(row=0, column=1)
-        coverA3 = tk.Button(self, image=photo[12], command= lambda: OpenUrl(urllist[12]))
+        coverA3 = tk.Button(self, image=photo[12], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[12]))
         coverA3.grid(row=0, column=2)
-        coverA4 = tk.Button(self, image=photo[13], command= lambda: OpenUrl(urllist[13]))
+        coverA4 = tk.Button(self, image=photo[13], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[13]))
         coverA4.grid(row=1, column=0)
-        coverA5 = tk.Button(self, image=photo[14], command= lambda: OpenUrl(urllist[14]))
+        coverA5 = tk.Button(self, image=photo[14], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[14]))
         coverA5.grid(row=1, column=1)
-        coverA6 = tk.Button(self, image=photo[15], command= lambda: OpenUrl(urllist[15]))
+        coverA6 = tk.Button(self, image=photo[15], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[15]))
         coverA6.grid(row=1, column=2)
-        coverA7 = tk.Button(self, image=photo[16], command= lambda: OpenUrl(urllist[16]))
+        coverA7 = tk.Button(self, image=photo[16], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[16]))
         coverA7.grid(row=2, column=0)
-        coverA8 = tk.Button(self, image=photo[17], command= lambda: OpenUrl(urllist[17]))
+        coverA8 = tk.Button(self, image=photo[17], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[17]))
         coverA8.grid(row=2, column=1)
-        coverA9 = tk.Button(self, image=photo[18], command= lambda: OpenUrl(urllist[18]))
+        coverA9 = tk.Button(self, image=photo[18], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[18]))
         coverA9.grid(row=2, column=2)
 
 class Indes(tk.Frame):
@@ -261,23 +243,23 @@ class Indes(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        coverA1 = tk.Button(self, image=photo[20], command= lambda: OpenUrl(urllist[20]))
+        coverA1 = tk.Button(self, image=photo[20], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[20]))
         coverA1.grid(row=0, column=0)
-        coverA2 = tk.Button(self, image=photo[21], command= lambda: OpenUrl(urllist[21]))
+        coverA2 = tk.Button(self, image=photo[21], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[21]))
         coverA2.grid(row=0, column=1)
-        coverA3 = tk.Button(self, image=photo[22], command= lambda: OpenUrl(urllist[22]))
+        coverA3 = tk.Button(self, image=photo[22], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[22]))
         coverA3.grid(row=0, column=2)
-        coverA4 = tk.Button(self, image=photo[23], command= lambda: OpenUrl(urllist[23]))
+        coverA4 = tk.Button(self, image=photo[23], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[23]))
         coverA4.grid(row=1, column=0)
-        coverA5 = tk.Button(self, image=photo[24], command= lambda: OpenUrl(urllist[24]))
+        coverA5 = tk.Button(self, image=photo[24], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[24]))
         coverA5.grid(row=1, column=1)
-        coverA6 = tk.Button(self, image=photo[25], command= lambda: OpenUrl(urllist[25]))
+        coverA6 = tk.Button(self, image=photo[25], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[25]))
         coverA6.grid(row=1, column=2)
-        coverA7 = tk.Button(self, image=photo[26], command= lambda: OpenUrl(urllist[26]))
+        coverA7 = tk.Button(self, image=photo[26], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[26]))
         coverA7.grid(row=2, column=0)
-        coverA8 = tk.Button(self, image=photo[27], command= lambda: OpenUrl(urllist[27]))
+        coverA8 = tk.Button(self, image=photo[27], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[27]))
         coverA8.grid(row=2, column=1)
-        coverA9 = tk.Button(self, image=photo[28], command= lambda: OpenUrl(urllist[28]))
+        coverA9 = tk.Button(self, image=photo[28], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[28]))
         coverA9.grid(row=2, column=2)
 
 class Marvel(tk.Frame):
@@ -285,23 +267,23 @@ class Marvel(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        coverA1 = tk.Button(self, image=photo[30], command= lambda: OpenUrl(urllist[30]))
+        coverA1 = tk.Button(self, image=photo[30], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[30]))
         coverA1.grid(row=0, column=0)
-        coverA2 = tk.Button(self, image=photo[31], command= lambda: OpenUrl(urllist[31]))
+        coverA2 = tk.Button(self, image=photo[31], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[31]))
         coverA2.grid(row=0, column=1)
-        coverA3 = tk.Button(self, image=photo[32], command= lambda: OpenUrl(urllist[32]))
+        coverA3 = tk.Button(self, image=photo[32], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[32]))
         coverA3.grid(row=0, column=2)
-        coverA4 = tk.Button(self, image=photo[33], command= lambda: OpenUrl(urllist[33]))
+        coverA4 = tk.Button(self, image=photo[33], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[33]))
         coverA4.grid(row=1, column=0)
-        coverA5 = tk.Button(self, image=photo[34], command= lambda: OpenUrl(urllist[34]))
+        coverA5 = tk.Button(self, image=photo[34], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[34]))
         coverA5.grid(row=1, column=1)
-        coverA6 = tk.Button(self, image=photo[35], command= lambda: OpenUrl(urllist[35]))
+        coverA6 = tk.Button(self, image=photo[35], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[35]))
         coverA6.grid(row=1, column=2)
-        coverA7 = tk.Button(self, image=photo[36], command= lambda: OpenUrl(urllist[36]))
+        coverA7 = tk.Button(self, image=photo[36], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[36]))
         coverA7.grid(row=2, column=0)
-        coverA8 = tk.Button(self, image=photo[37], command= lambda: OpenUrl(urllist[37]))
+        coverA8 = tk.Button(self, image=photo[37], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[37]))
         coverA8.grid(row=2, column=1)
-        coverA9 = tk.Button(self, image=photo[38], command= lambda: OpenUrl(urllist[38]))
+        coverA9 = tk.Button(self, image=photo[38], bg='SteelBlue3', relief='flat',command= lambda: OpenUrl(urllist[38]))
         coverA9.grid(row=2, column=2)
 
 if __name__ == "__main__":
