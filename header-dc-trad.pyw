@@ -12,13 +12,10 @@ import urllib.request as urllib2
 from bs4 import BeautifulSoup
 import webbrowser
 
-url = 'http://www.dctrad.fr/index.php'
+#url = 'http://www.dctrad.fr/index.php'
 dctradpage = 'http://www.dctrad.fr/index.php'
 coverlist = list()
 urllist = list()
-imagebytes_list = list()
-data_stream_list = list()
-pil_image_list = list()
 photo = list()
 #
 cat_list = ['http://www.dctrad.fr/images/icons/forum/RebirthK.png','http://www.dctrad.fr//images/icons/forum/dccomicsv2.png', 'http://www.dctrad.fr//images/icons/forum/IconindiedctK.png', 'http://www.dctrad.fr/images/icons/forum/MarvelK.png']
@@ -78,9 +75,9 @@ def getCatCovers():
 def getHeaderCovers(imgurllist):
     #catégories images
     global coverlist
-    global imagebytes_list
-    global data_stream_list
-    global pil_image_list
+    imagebytes_list = list()
+    data_stream_list = list()
+    pil_image_list = list()
     for url in imgurllist:
         imagebytes_list.append(urllib2.urlopen(url).read())
     for imagebyte in imagebytes_list:
