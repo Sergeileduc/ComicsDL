@@ -14,14 +14,15 @@ import webbrowser
 
 #url = 'http://www.dctrad.fr/index.php'
 dctradpage = 'http://www.dctrad.fr/index.php'
-coverlist = list()
+#
+cat_img_urls = [
+    'http://www.dctrad.fr/images/icons/forum/RebirthK.png',
+    'http://www.dctrad.fr//images/icons/forum/dccomicsv2.png',
+    'http://www.dctrad.fr//images/icons/forum/IconindiedctK.png',
+    'http://www.dctrad.fr/images/icons/forum/MarvelK.png']
+#shared lists
 urllist = list()
 photo = list()
-#
-cat_list = ['http://www.dctrad.fr/images/icons/forum/RebirthK.png','http://www.dctrad.fr//images/icons/forum/dccomicsv2.png', 'http://www.dctrad.fr//images/icons/forum/IconindiedctK.png', 'http://www.dctrad.fr/images/icons/forum/MarvelK.png']
-cat_byte_list = list()
-cat_data_stream_list = list()
-cat_pil_list = list()
 cat_image_list = list()
 
 #open url
@@ -56,10 +57,10 @@ def getAllTag(html, tag):
 def getCatCovers():
     #catégories images
     global cat_image_list
-    global cat_byte_list
-    global cat_data_stream_list
-    global cat_pil_list
-    for cover in cat_list:
+    cat_byte_list = list()
+    cat_data_stream_list = list()
+    cat_pil_list = list()
+    for cover in cat_img_urls:
         cat_byte_list.append(urllib2.urlopen(cover).read())
     for imagebyte in cat_byte_list:
         cat_data_stream_list.append(io.BytesIO(imagebyte))
@@ -74,7 +75,7 @@ def getCatCovers():
 
 def getHeaderCovers(imgurllist):
     #catégories images
-    global coverlist
+    del photo[:]
     imagebytes_list = list()
     data_stream_list = list()
     pil_image_list = list()
@@ -103,7 +104,6 @@ def refresh(comicslist):
     headerlist = soup.find_all('span', class_="btn-cover")
     comicslist = soup.select('span.btn-cover a')
     coverlist = soup.select('span.btn-cover img')
-    cat_image_list = getCatCovers()
     for img in coverlist:
         coverimgurllist.append(img['src'])
     getHeaderCovers(coverimgurllist)
@@ -127,7 +127,6 @@ class DCTradapp(tk.Tk):
         cat_image_list = getCatCovers()
         #getHeaderCovers()
         refresh(comicslist)
-        getUrls(comicslist)
         # sidebar
         sidebar = tk.Frame(self, width=200, bg='SteelBlue4', height=500, relief='sunken', borderwidth=2)
         sidebar.pack(expand=False, fill='both', side='left', anchor='nw')
