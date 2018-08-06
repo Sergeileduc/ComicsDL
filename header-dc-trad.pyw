@@ -9,21 +9,40 @@ from PIL import Image, ImageTk
 import tkinter as tk
 from tkinter import font as tkfont # python 3
 import urllib.request as urllib2
+import urllib.error
 from bs4 import BeautifulSoup
 import webbrowser
 
-#url = 'http://www.dctrad.fr/index.php'
 dctradpage = 'http://www.dctrad.fr/index.php'
-#
 cat_img_urls = [
     'http://www.dctrad.fr/images/icons/forum/RebirthK.png',
     'http://www.dctrad.fr//images/icons/forum/dccomicsv2.png',
     'http://www.dctrad.fr//images/icons/forum/IconindiedctK.png',
     'http://www.dctrad.fr/images/icons/forum/MarvelK.png']
+refresh_logo_url = 'http://icons.iconarchive.com/icons/graphicloads/100-flat-2/128/arrow-refresh-4-icon.png'
 #shared lists
 urllist = list()
 photo = list()
 cat_image_list = list()
+
+#image from url
+def imagefromurl(url):
+    try:
+        bytes = urllib2.urlopen(url).read()
+    except urllib.error.HTTPError as e:
+        print("Http error in imagefromurl")
+        print (e.fp.read())
+        return
+    try:
+        stream = io.BytesIO(bytes)
+    except IOError as e:
+        print(e)
+        return
+    try:
+        pil_image = Image.open(stream)
+        return pil_image
+    except:
+        print("Error Image.open in imagefromurl")
 
 #open url
 def OpenUrl(url):
@@ -49,6 +68,7 @@ def getTagData(html, tag, classname):
     list = soup.find_all(tag, class_=classname)
     return list
 
+#find all 'tag' in html
 def getAllTag(html, tag):
     soup=BeautifulSoup(html, 'html.parser')
     list = soup.find_all(tag)
@@ -57,46 +77,47 @@ def getAllTag(html, tag):
 def getCatCovers():
     #catégories images
     global cat_image_list
-    cat_byte_list = list()
-    cat_data_stream_list = list()
-    cat_pil_list = list()
-    for cover in cat_img_urls:
-        cat_byte_list.append(urllib2.urlopen(cover).read())
-    for imagebyte in cat_byte_list:
-        cat_data_stream_list.append(io.BytesIO(imagebyte))
-    for data_stream in cat_data_stream_list:
-        cat_pil_list.append(Image.open(data_stream))
-    #cat
-    cat_image_list.append(ImageTk.PhotoImage(cat_pil_list[0]))
-    cat_image_list.append(ImageTk.PhotoImage(cat_pil_list[1]))
-    cat_image_list.append(ImageTk.PhotoImage(cat_pil_list[2]))
-    cat_image_list.append(ImageTk.PhotoImage(cat_pil_list[3]))
+    del cat_image_list[:]
+    for cat in cat_img_urls:
+        cat_image_list.append(ImageTk.PhotoImage(imagefromurl(cat)))
     return cat_image_list
+
+#make images from images urls
+# def getHeaderCovers(imgurllist):
+#     #catégories images
+#     del photo[:]
+#     imagebytes_list = list()
+#     data_stream_list = list()
+#     pil_image_list = list()
+#     for url in imgurllist:
+#         imagebytes_list.append(urllib2.urlopen(url).read())
+#     for imagebyte in imagebytes_list:
+#         data_stream_list.append(io.BytesIO(imagebyte))
+#     for data_stream in data_stream_list:
+#         pil_image_list.append(Image.open(data_stream))
+#     #cat
+#     for image in pil_image_list:
+#         photo.append(ImageTk.PhotoImage(image))
+#     return
 
 def getHeaderCovers(imgurllist):
     #catégories images
+    global photo
     del photo[:]
-    imagebytes_list = list()
-    data_stream_list = list()
-    pil_image_list = list()
     for url in imgurllist:
-        imagebytes_list.append(urllib2.urlopen(url).read())
-    for imagebyte in imagebytes_list:
-        data_stream_list.append(io.BytesIO(imagebyte))
-    for data_stream in data_stream_list:
-        pil_image_list.append(Image.open(data_stream))
-    #cat
-    for image in pil_image_list:
-        photo.append(ImageTk.PhotoImage(image))
+        photo.append(ImageTk.PhotoImage(imagefromurl(url)))
     return
 
+#get publication posts urls
 def getUrls(comicslist):
     global urllist
+    del urllist[:]
     for a in comicslist:
         if a.has_attr('href'):
             urllist.append(a['href'])
     return
 
+#refresh images and urls in the header
 def refresh(comicslist):
     coverimgurllist = list()
     html = returnHTML(dctradpage)
@@ -110,10 +131,10 @@ def refresh(comicslist):
     getUrls(comicslist)
     return
 
-
 class DCTradapp(tk.Tk):
     global cat_image_list
     def __init__(self, *args, **kwargs):
+        logo=False
         html = returnHTML(dctradpage)
         soup = BeautifulSoup(html, 'html.parser')
         headerlist = soup.find_all('span', class_="btn-cover")
@@ -128,7 +149,15 @@ class DCTradapp(tk.Tk):
         #getHeaderCovers()
         refresh(comicslist)
         # sidebar
-        sidebar = tk.Frame(self, width=200, bg='SteelBlue4', height=500, relief='sunken', borderwidth=2)
+        try:
+            pil_logo = imagefromurl(refresh_logo_url)
+            imagetk = ImageTk.PhotoImage(pil_logo)
+            logo=True
+        except:
+            logo=False
+        print(logo)
+
+        sidebar = tk.Frame(self, width=200, bg='SteelBlue4', height=500, relief='groove', borderwidth=1)
         sidebar.pack(expand=False, fill='both', side='left', anchor='nw')
 
 
@@ -140,8 +169,13 @@ class DCTradapp(tk.Tk):
                             command=lambda: self.show_frame("Indes"))
         button4 = tk.Button(sidebar, image=cat_image_list[3],
                             command=lambda: self.show_frame("Marvel"))
-        button5 = tk.Button(sidebar, text="Rafraîchir",
+        if logo:
+            button5 = tk.Button(sidebar, image=imagetk,
                             command=refresh(comicslist))
+        else:
+            button5 = tk.Button(sidebar, text="Rafraîchir",
+                            command=refresh(comicslist))
+
         button1.pack()
         button2.pack()
         button3.pack()
@@ -197,7 +231,6 @@ class DCRebirth(tk.Frame):
         coverA8.grid(row=2, column=1)
         coverA9 = tk.Button(self, image=photo[8], command= lambda: OpenUrl(urllist[8]))
         coverA9.grid(row=2, column=2)
-
 
 class DCPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -270,7 +303,6 @@ class Marvel(tk.Frame):
         coverA8.grid(row=2, column=1)
         coverA9 = tk.Button(self, image=photo[38], command= lambda: OpenUrl(urllist[38]))
         coverA9.grid(row=2, column=2)
-
 
 if __name__ == "__main__":
     app = DCTradapp()
