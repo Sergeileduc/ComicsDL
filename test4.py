@@ -24,3 +24,6 @@ class Application(tk.Frame):
 
 
 Application().start()
+if __name__ == "__main__":
+    app = Application() #constructor, calls method __init__
+    app.start()
