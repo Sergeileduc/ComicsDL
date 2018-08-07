@@ -43,7 +43,8 @@ def replace(string, substitutions):
 # get html from url
 def returnHTML(url):
     hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
-    req = urllib.request.Request(url, headers=hdr)
+    finalurl = urllib.request.urlopen(url).geturl()
+    req = urllib.request.Request(finalurl, headers=hdr)
     try:
         response = urllib.request.urlopen(req)
         html = response.read()
@@ -88,17 +89,19 @@ def namefromurl(url):
 
 #find download link
 def downCom(url):
-    print ("Trying " + url)
+    finalurl = urllib.request.urlopen(url).geturl()
+    print ("Trying " + finalurl)
     zippylink = ''
     flag=False
     try:
-        html = returnHTML(url)
+        html = returnHTML(finalurl)
         downButtons = getTagClassData(html, 'div', 'aio-pulse')
         for button in downButtons:
             if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
                 #downComZippy(button.a['href'])
                 zippylink = button.a['href']
-                downComZippy(zippylink)
+                finalzippy = urllib.request.urlopen(zippylink).geturl()
+                downComZippy(finalzippy)
                 flag=False
             else:
                 flag=True
@@ -196,7 +199,7 @@ class Std_redirector(object):
 class Getcomics(tk.Tk):
     def __init__(self):
         super().__init__()
-        width = 500
+        width = 400
         self.usersearch = tk.StringVar()
         self.choices = ['Recherche par TAG', 'Recherche simple']
         self.mode = tk.StringVar()
@@ -205,23 +208,39 @@ class Getcomics(tk.Tk):
         self.mylist = list()
         self.title("Télécharger sur Getcomics v1")
         self.configure(background='RoyalBlue3')
-        topbar = tk.Frame(self, width=width, bg='RoyalBlue4', height=100, relief='groove', borderwidth=1)
+        #topbar
+        topbar = tk.Frame(self, width=width, height=100, relief='groove', borderwidth=1)
         topbar.pack(expand=False, fill='both', side='top', anchor='n')
-        self.buttonframe = tk.Frame(self, width=width, height=200, bg='RoyalBlue3', relief='groove', borderwidth=0, padx=20, pady=20)
+        topbarleft = tk.Frame(topbar)
+        topbarleft.pack(side='left')
+        topbarcenter = tk.Frame(topbar)
+        topbarcenter.pack(side='top')
+        topbarright = tk.Frame(topbar, bg='SteelBlue4',)
+        topbarright.pack(side='right')
+        #left
+        prevpage = tk.Button(topbarleft, text="page précédente")
+        prevpage.pack()
+        #right
+        nextpage = tk.Button(topbarright, text="page suivante")
+        nextpage.pack()
+        #center
+        messageRecherche = tk.Label(topbarcenter, width=30, text="Rechercher sur Getcomics", justify=tk.CENTER,
+                                    font=("Helvetica", 12))
+        messageRecherche.pack()
+        choice = tk.OptionMenu(topbarcenter, self.mode, *self.choices)
+        choice.pack()
+        search = tk.Entry(topbarcenter, width=30, bg='gray75', textvariable=self.usersearch ,font=("Verdana", 12))
+        search.pack()
+        search.focus_set()
+        #
+        self.buttonframe = tk.Frame(self, width=width, height=200, relief='groove', borderwidth=0, padx=20, pady=20)
         self.buttonframe.pack(expand=True, fill='both', side='top', anchor='n')
-        bottombar = tk.Frame(self, width=width, height=100, bg='RoyalBlue4', relief='groove', borderwidth=1)
+        bottombar = tk.Frame(self, width=width, height=100, relief='groove', borderwidth=1)
         bottombar.pack(expand=False, fill='both', side='bottom', anchor='n')
         self.output_text = tk.Text(bottombar, height=20, bg="black", fg="white")
         self.output_text.pack()
         sys.stdout = Std_redirector(self.output_text)
-        messageRecherche = tk.Label(topbar, width=30, text="Rechercher sur Getcomics", bg='RoyalBlue4', fg='white', justify=tk.CENTER,
-                                    font=("Helvetica", 12))
-        messageRecherche.pack()
-        choice = tk.OptionMenu(topbar, self.mode, *self.choices)
-        choice.pack()
-        search = tk.Entry(topbar, width=30, bg='gray75', textvariable=self.usersearch ,font=("Verdana", 12))
-        search.pack()
-        search.focus_set()
+
         #downCom(test_url)
         search.bind("<Return>", self.searchcomics)
 
