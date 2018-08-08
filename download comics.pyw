@@ -24,7 +24,11 @@ exit_thread= False
 exit_success = False
 
 substitutions1 = {'%2c': '', '%20': ' ', '%28': '(', '%29': ')'}
-substitutions2 = {' (Digital)': '', ' (digital)': '', ' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'', ' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '', ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '', ' (Minutemen-Thoth)':''}
+substitutions2 = {' (Digital)': '', ' (digital)': '',
+' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'',
+' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
+' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
+' (Minutemen-Thoth)':'', ' (Glorith-HD)':''}
 
 #DEBUG:
 #open url
@@ -84,13 +88,15 @@ def getaALLhref(html, tag, classname):
 
 
 def namefromurl(url):
-    return url.replace('https://getcomics.info/', '').replace('marvel/', '').replace('dc/', '').replace('/#comments', '')
+    return url.replace('https://getcomics.info/', '').replace('marvel/', '').replace('dc/', '').replace('other-comics/', '').replace('/#comments', '')
 
 
 #DL all comics in the liste
 def downAllCom(liste):
     for dl in liste:
+        print(dl[0])
         downCom(dl[0])
+    print("Terminé, vous pouvez quitter")
     return
 
 #find download link
@@ -236,11 +242,11 @@ class Getcomics(tk.Tk):
         #topbarright.pack(side='right')
         topbarright.grid(row=0, column=2, ipadx=20)
         #left
-        prevpage = tk.Button(topbarleft, text="page précédente", command=self.prevpage)
+        prevpage = tk.Button(topbarleft, text="page précédente", font=("Verdana", 12), command=self.prevpage)
         prevpage.pack(fill=tk.Y)
         #right
-        nextpage = tk.Button(topbarright, text="page suivante", command=self.nextpage)
-        nextpage.pack()
+        nextpage = tk.Button(topbarright, text="page suivante", font=("Verdana", 12), command=self.nextpage)
+        nextpage.pack(anchor='s')
         #center
         messageRecherche = tk.Label(topbarcenter, width=30, text="Rechercher sur Getcomics", justify=tk.CENTER,
                                     font=("Helvetica", 12))
@@ -266,9 +272,9 @@ class Getcomics(tk.Tk):
         self.dlframe = tk.Frame(MainFrame, relief='groove', borderwidth=0, padx=20, pady=20)
         self.dlframe.pack(side='right', padx=(40,0))
 
-        liste = tk.Label(self.dlframe, text="Liste de téléchargement\n.............")
+        liste = tk.Label(self.dlframe, text="Liste de téléchargement\n.............", font=("Verdana", 12))
         liste.pack(side='top')
-        dlall = tk.Button(self.dlframe, text="Télécharger la liste", command=lambda: self.dlcom(self.downloadlist))
+        dlall = tk.Button(self.dlframe, text="Télécharger la liste", font=("Verdana", 12), command=lambda: self.dlcom(self.downloadlist))
         dlall.pack(side='bottom')
 
 
@@ -299,7 +305,7 @@ class Getcomics(tk.Tk):
         #buttonlist = list()
         for i in self.searchlist:
             url=i[0]
-            newButton = tk.Button(self.buttonframe, text=i[1].replace('-',' '), width=40, bg='RoyalBlue4', fg='white', relief='sunken', bd=0, font=("Verdana", 12))
+            newButton = tk.Button(self.buttonframe, text=i[1].replace('-',' ').title(), width=40, bg='RoyalBlue4', fg='white', relief='sunken', bd=0, font=("Verdana", 12))
             #newButton.config(command= lambda url=url: self.dlcom(url))
             newButton.config(command= lambda button=newButton: self.addtodl(button))
             newButton.pack()
@@ -318,9 +324,17 @@ class Getcomics(tk.Tk):
     def addtodl(self, button):
         index = self.buttonlist.index(button)
         comic = button.cget('text')
-        self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1]))
-        newDL = tk.Label(self.dlframe, text=button.cget('text'))
+        newDL = tk.Button(self.dlframe, text=button.cget('text').title(), relief='flat')
+        newDL.config(command= lambda button=newDL: self.removedl(button))
         newDL.pack()
+        self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1], newDL))
+
+
+    def removedl(self, button):
+        for i in self.downloadlist:
+            if button == i[2]:
+                self.downloadlist.remove(i)
+        button.destroy()
 
 
     def printwidgets(self, widegetlist):
