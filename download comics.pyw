@@ -86,6 +86,13 @@ def getaALLhref(html, tag, classname):
 def namefromurl(url):
     return url.replace('https://getcomics.info/', '').replace('marvel/', '').replace('dc/', '').replace('/#comments', '')
 
+
+#DL all comics in the liste
+def downAllCom(liste):
+    for dl in liste:
+        downCom(dl[0])
+    return
+
 #find download link
 def downCom(url):
     finalurl = urllib.request.urlopen(url).geturl()
@@ -138,10 +145,10 @@ def downComZippy(url):
 # create url name list
 def url_name_list(url):
     urlList = getaALLhref(returnHTML(url), 'li', 'post-meta-comments post-meta-align-left')
-    mylist = list()
+    searchlist = list()
     for url in urlList:
-        mylist.append((url, namefromurl(url)))
-    return mylist
+        searchlist.append((url, namefromurl(url)))
+    return searchlist
 
 def getZippyDL(url, button):
 	print("Found zippyshare : " + url)
@@ -181,13 +188,11 @@ def searchurl(user_search, mode, page):
             url = tagsearch + user_search.lower().replace(' ', '-')
         else:
             url = tagsearch + user_search.lower().replace(' ', '-') + '/page/' + str(page) + '/'
-        print ("URL de recherche getcomics : " + url)
     else:
         if page == 1:
             url = basesearch + '/?s=' + user_search.lower().replace(' ', '+')
         else:
             url = basesearch + '/page/' + str(page) + '/?s=' + user_search.lower().replace(' ', '+')
-        print ("URL de recherche getcomics : " + url)
     return url
 
 class Std_redirector(object):
@@ -201,6 +206,7 @@ class Std_redirector(object):
 
 # our comicsList
 class Getcomics(tk.Tk):
+    deepbg='gray50'
     def __init__(self):
         super().__init__()
         width = 400
@@ -210,21 +216,28 @@ class Getcomics(tk.Tk):
         self.mode = tk.StringVar()
         self.mode.set('Recherche simple')
         self.buttonlist = list()
+        self.searchlist = list()
+        self.downloadlist = list()
         self.mylist = list()
         self.title("Télécharger sur Getcomics v1")
-        self.configure(background='RoyalBlue3')
+        self.configure(background=self.deepbg)
         #topbar
-        topbar = tk.Frame(self, width=width, height=100, relief='groove', borderwidth=1)
-        topbar.pack(expand=False, fill='both', side='top', anchor='n')
+        #topbar = tk.Frame(self, width=width, height=100, relief='groove', borderwidth=1)
+        topbar = tk.Frame(self)
+        #topbar.pack(expand=False, fill='both', side='top', anchor='n')
+        topbar.pack()
         topbarleft = tk.Frame(topbar)
-        topbarleft.pack(side='left')
+        #topbarleft.pack(side='left')
+        topbarleft.grid(row=0, column=0, ipadx=20)
         topbarcenter = tk.Frame(topbar)
-        topbarcenter.pack(side='top')
-        topbarright = tk.Frame(topbar, bg='SteelBlue4',)
-        topbarright.pack(side='right')
+        #topbarcenter.pack(side='top')
+        topbarcenter.grid(row=0, column=1)
+        topbarright = tk.Frame(topbar)
+        #topbarright.pack(side='right')
+        topbarright.grid(row=0, column=2, ipadx=20)
         #left
         prevpage = tk.Button(topbarleft, text="page précédente", command=self.prevpage)
-        prevpage.pack()
+        prevpage.pack(fill=tk.Y)
         #right
         nextpage = tk.Button(topbarright, text="page suivante", command=self.nextpage)
         nextpage.pack()
@@ -238,16 +251,38 @@ class Getcomics(tk.Tk):
         search.pack()
         search.focus_set()
         #
-        self.buttonframe = tk.Frame(self, width=width, height=200, relief='groove', borderwidth=0, padx=20, pady=20)
-        self.buttonframe.pack(expand=True, fill='both', side='top', anchor='n')
+
+        #MainFrame
+        MainFrame = tk.Frame(self, bg=self.deepbg)
+        MainFrame.pack(padx=10, pady=10)
+        #self.buttonframe = tk.Frame(MainFrame, width=width, height=200, relief='groove', borderwidth=0, padx=20, pady=20)
+        self.buttonframe = tk.Frame(MainFrame, relief='groove', borderwidth=0, padx=20, pady=20)
+        #self.buttonframe.pack(expand=True, fill='both', side='top', anchor='n')
+        self.buttonframe.pack(side='left')
+
+        instructions = tk.Label(self.buttonframe, text='Cliquez pour ajouter un élément à votre liste de téléchargement')
+        instructions.pack()
+
+        self.dlframe = tk.Frame(MainFrame, relief='groove', borderwidth=0, padx=20, pady=20)
+        self.dlframe.pack(side='right', padx=(40,0))
+
+        liste = tk.Label(self.dlframe, text="Liste de téléchargement\n.............")
+        liste.pack(side='top')
+        dlall = tk.Button(self.dlframe, text="Télécharger la liste", command=lambda: self.dlcom(self.downloadlist))
+        dlall.pack(side='bottom')
+
+
+        #output console
         bottombar = tk.Frame(self, width=width, height=100, relief='groove', borderwidth=1)
         bottombar.pack(expand=False, fill='both', side='bottom', anchor='n')
-        self.output_text = tk.Text(bottombar, height=20, bg="black", fg="white")
+        self.output_text = tk.Text(bottombar, height=10, bg="black", fg="white")
         self.output_text.pack()
         sys.stdout = Std_redirector(self.output_text)
 
         #downCom(test_url)
         search.bind("<Return>", self.searchcomics)
+
+        self.searchcomics(None)
 
     def destroylist(self, widgetlist):
         for w in widgetlist:
@@ -256,26 +291,37 @@ class Getcomics(tk.Tk):
         pass
 
     def searchcomics(self, event):
-        self.mylist.clear()
+        self.searchlist.clear()
         self.destroylist(self.buttonlist)
         searchmode = self.choices.index(self.mode.get())
-        self.mylist = url_name_list(searchurl(self.usersearch.get(),searchmode, self.page))
+        self.searchlist = url_name_list(searchurl(self.usersearch.get(),searchmode, self.page))
         print(self.mode.get())
         #buttonlist = list()
-        for i in self.mylist:
+        for i in self.searchlist:
             url=i[0]
-            newButton = tk.Button(self.buttonframe, text=i[1], width=40, bg='RoyalBlue4', fg='white', relief='sunken', bd=0, font=("Verdana", 12), command= lambda url=url: self.dlcom(url))
+            newButton = tk.Button(self.buttonframe, text=i[1].replace('-',' '), width=40, bg='RoyalBlue4', fg='white', relief='sunken', bd=0, font=("Verdana", 12))
+            #newButton.config(command= lambda url=url: self.dlcom(url))
+            newButton.config(command= lambda button=newButton: self.addtodl(button))
             newButton.pack()
             #print(i)
             self.buttonlist.append(newButton)
         #self.printwidgets(self.buttonlist)
         return
-    def dlcom(self, url):
+
+    def dlcom(self, liste):
         try:
-            thread1 = threading.Thread(target=downCom, args=[url])
+            thread1 = threading.Thread(target=downAllCom, args=[liste])
             thread1.start()
         except:
             pass
+
+    def addtodl(self, button):
+        index = self.buttonlist.index(button)
+        comic = button.cget('text')
+        self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1]))
+        newDL = tk.Label(self.dlframe, text=button.cget('text'))
+        newDL.pack()
+
 
     def printwidgets(self, widegetlist):
         for w in widegetlist:
@@ -298,13 +344,13 @@ class Getcomics(tk.Tk):
 
 
 
-class StartPage(tk.Frame):
-
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text="Start Page", font=LARGE_FONT)
-        label.pack(pady=10, padx=10)
-
+# class StartPage(tk.Frame):
+#
+#     def __init__(self, parent, controller):
+#         tk.Frame.__init__(self, parent)
+#         label = tk.Label(self, text="Start Page", font=LARGE_FONT)
+#         label.pack(pady=10, padx=10)
+#
 
 if __name__ == "__main__":
     app = Getcomics()  # constructor, calls method __init__
