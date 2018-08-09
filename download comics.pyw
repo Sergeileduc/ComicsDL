@@ -50,7 +50,6 @@ def returnHTML(url):
 
 #def url 2 soup
 def url2soup(url):
-    pass
     try:
         res = requests.get(url)
         res.raise_for_status()

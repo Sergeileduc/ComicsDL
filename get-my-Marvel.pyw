@@ -55,7 +55,6 @@ def returnHTML(url):
 
 #def url 2 soup
 def url2soup(url):
-    pass
     try:
         res = requests.get(url)
         res.raise_for_status()
@@ -102,7 +101,6 @@ def downCom(url):
     zippylink = ''
     flag=False
     try:
-        # html = returnHTML(finalurl)
         soup=url2soup(finalurl)
         downButtons = soup.select("div.aio-pulse > a")
         for button in downButtons:
@@ -157,7 +155,6 @@ def getZippyDL(url, button):
 
 #download from zippyshare
 def downComZippy(url):
-    #zippyHTML = returnHTML(url)
     soup=url2soup(url)
     downButton = soup.select('script[type="text/javascript"]')
     try:
@@ -183,9 +180,8 @@ def getWeeklyComics(mylist):
     print ('Initialisation...')
     print ('Je vais chercher les mots clés :')
     print (mylist)
-    #get latest archive on the current page
-    #htmlMain = returnHTML(getcomicsurl)
 
+    #get latest archive on the current page
     weeklyUrl = findLastWeekly(getcomicsurl)
     soup = url2soup(weeklyUrl)
     interm = soup.select("section.post-contents")
