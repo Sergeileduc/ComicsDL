@@ -10,15 +10,10 @@ import urllib.request
 import urllib.error
 import threading
 from bs4 import BeautifulSoup
-import webbrowser
 
-#getcomicsurl = "https://getcomics.info/tag/dc-week/"
-#getcomicsurl = "http://getcomics.info/tag/marvel-now/"
-#getcomicsurl = "https://getcomics.info/tag/indie-week/"
 url = ''
 basesearch = 'https://getcomics.info'
 tagsearch = 'https://getcomics.info/tag/'
-#basesearch = 'https://getcomics.info/?s=page/1/?s='
 
 exit_thread= False
 exit_success = False
@@ -28,14 +23,8 @@ substitutions2 = {' (Digital)': '', ' (digital)': '',
 ' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'',
 ' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
 ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
-' (Minutemen-Thoth)':'', ' (Glorith-HD)':''}
-
-#DEBUG:
-#open url
-def OpenUrl(url):
-    #webbrowser.open_new(url)
-    webbrowser.open(url, new=0, autoraise=False)
-    return
+' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
+'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':''}
 
 #multiple replace function
 def replace(string, substitutions):
@@ -46,16 +35,30 @@ def replace(string, substitutions):
 # get html from url
 def returnHTML(url):
     hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
-    finalurl = urllib.request.urlopen(url).geturl()
-    req = urllib.request.Request(finalurl, headers=hdr)
     try:
+        finalurl = urllib.request.urlopen(url).geturl()
+        req = urllib.request.Request(finalurl, headers=hdr)
         response = urllib.request.urlopen(req)
         html = response.read()
         return html
+    except ValueError as e:
+        print(e)
+        raise
     except urllib.error.HTTPError as e:
-        print(e.fp.read())
+        print(e)
         raise
 
+#def url 2 soup
+def url2soup(url):
+    pass
+    try:
+        res = requests.get(url)
+        res.raise_for_status()
+        soup = BeautifulSoup(res.text, 'html.parser')
+        return soup
+    except:
+        print("Error")
+        raise
 
 # get beautiful soup
 def getSoup(html):
@@ -64,33 +67,38 @@ def getSoup(html):
 
 
 #get inner html from tag
-def getTagClassData(html, tag, classname):
-	soup = getSoup(html)
-	list = soup.find_all(tag, class_=classname)
-	return list
+# def getTagClassData(html, tag, classname):
+# 	soup = getSoup(html)
+# 	list = soup.find_all(tag, class_=classname)
+# 	return list
 
 #get inner html from tag
-def getTagData(html, tag, attr, name):
-	soup = getSoup(html)
-	list = soup.find_all(tag, {attr: name})
-	return list
+# def getTagData(html, tag, attr, name):
+# 	soup = getSoup(html)
+# 	list = soup.find_all(tag, {attr: name})
+# 	return list
 
 def getresults(url):
     searchlist=list()
-    soup=getSoup(returnHTML(url))
-    interm = soup.find_all('h1', class_='post-title')
-    soup2=getSoup(str(interm))
-    list2=soup2.find_all('a')
-    print(list2)
-    for a in list2:
-        if a.has_attr('href'):
-            searchlist.append(((a['href']), str(a.text)))
-    return searchlist
+    try:
+        # soup=getSoup(returnHTML(url))
+        # interm = soup.find_all('h1', class_='post-title')
+        # soup2=getSoup(str(interm))
+        # list2=soup2.find_all('a')
+        # for a in list2:
+        #     if a.has_attr('href'):
+        #         searchlist.append(((a['href']), str(a.text)))
+        soup=url2soup(url)
+        for a in soup.select("h1.post-title > a"):
+            if a.has_attr('href'):
+                searchlist.append((a.get("href"),a.text))
+        return searchlist
+    except:
+        print("something wrong happened")
 
 #DL all comics in the liste
 def downAllCom(liste):
     for dl in liste:
-        print(dl[0])
         downCom(dl[0])
     print("Terminé, vous pouvez quitter")
     return
@@ -102,19 +110,26 @@ def downCom(url):
     zippylink = ''
     flag=False
     try:
-        html = returnHTML(finalurl)
-        downButtons = getTagClassData(html, 'div', 'aio-pulse')
+        #html = returnHTML(finalurl)
+        #downButtons = getTagClassData(html, 'div', 'aio-pulse')
+        soup=url2soup(finalurl)
+        downButtons = soup.select("div.aio-pulse > a")
         for button in downButtons:
-            if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
+            #if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
+            if 'zippyshare' in button.get("href") or 'zippyshare' in button.get('title').lower():
                 #downComZippy(button.a['href'])
-                zippylink = button.a['href']
-                finalzippy = urllib.request.urlopen(zippylink).geturl()
-                downComZippy(finalzippy)
+                #zippylink = button.a['href']
+                zippylink = button.get("href")
+                try:
+                    finalzippy = urllib.request.urlopen(zippylink).geturl()
+                    downComZippy(finalzippy)
+                except:
+                    print("Zippyhare download failed")
                 flag=False
-            else:
-                flag=True
-        if flag==True:
-            print("can't find zippyshare download button")
+            # elif 'download now' in button.get('title').lower():
+            #     print("can't find or open zippyshare download button\nTrying 'Download now button'")
+
+
     except urllib.error.HTTPError:
         print("downCom got HTTPError from returnHTML")
         raise
@@ -122,31 +137,32 @@ def downCom(url):
 
 #download from zippyshare
 def downComZippy(url):
-	zippyHTML = returnHTML(url)
-	#downButton = getTagClassData(zippyHTML, 'div', 'right')
-	downButton = getTagData(zippyHTML, "script", "type", "text/javascript")
-	try:
-		fullURL, fileName = getZippyDL(url, downButton)
-		print ("Download from zippyhare into : " + fileName)
-		r = requests.get(fullURL)
-	except:
-		print("Can't get download link on zippyshare page")
+    #zippyHTML = returnHTML(url)
+    #downButton = getTagClassData(zippyHTML, 'div', 'right')
+    #downButton = getTagData(zippyHTML, "script", "type", "text/javascript")
+    soup=url2soup(url)
+    downButton = soup.select('script[type="text/javascript"]')
+    try:
+        fullURL, fileName = getZippyDL(url, downButton)
+        print ("Download from zippyhare into : " + fileName)
+        r = requests.get(fullURL)
+    except:
+        print("Can't get download link on zippyshare page")
 
-	#download from url & trim it a little bit
-	with open(fileName, 'wb') as f:
-		try:
-			for block in r.iter_content(1024):
-				f.write(block)
-		except KeyboardInterrupt:
-			pass
-		except IOError:
-			print("Error while writing file")
-	print ('Done\n--')
-	return
+    #download from url & trim it a little bit
+    with open(fileName, 'wb') as f:
+        try:
+            for block in r.iter_content(1024):
+                f.write(block)
+        except KeyboardInterrupt:
+            pass
+        except IOError:
+            print("Error while writing file")
+        print ('Done\n--')
+    return
 
 def getZippyDL(url, button):
 	print("Found zippyshare : " + url)
-
 	#disassemble url
 	comRawUrl0 = regexNightmare(button, '.*?getElementById.*?href = \"(.*?)\"');
 	comRawUrl1 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;');
@@ -168,6 +184,9 @@ def getZippyDL(url, button):
 		raise
 	return fullURL, filename
 
+def downlaodnow(url):
+    pass
+
 #just optimizing
 def regexNightmare(html, regex):
 	try:
@@ -176,15 +195,22 @@ def regexNightmare(html, regex):
 	except:
 		print("Cant't regex html")
 
+#returns a getcomics research URL
 def searchurl(user_search, mode, page):
+    #research with tag (https://getcomics.info/tag/......)
     if mode == 0:
+        #page 1 (no page number on this one)
         if page == 1:
             url = tagsearch + user_search.lower().replace(' ', '-')
+        #other pages
         else:
             url = tagsearch + user_search.lower().replace(' ', '-') + '/page/' + str(page) + '/'
+    #classic research https://getcomics.info/?s=
     else:
+        #page 1
         if page == 1:
             url = basesearch + '/?s=' + user_search.lower().replace(' ', '+')
+        #other pages
         else:
             url = basesearch + '/page/' + str(page) + '/?s=' + user_search.lower().replace(' ', '+')
     return url
@@ -299,7 +325,6 @@ class Getcomics(tk.Tk):
         self.destroylist(self.buttonlist)
         searchmode = self.choices.index(self.mode.get())
         self.searchlist = getresults(searchurl(self.usersearch.get(),searchmode, self.page))
-        print(self.mode.get())
         #buttonlist = list()
         for i in self.searchlist:
             url=i[0]

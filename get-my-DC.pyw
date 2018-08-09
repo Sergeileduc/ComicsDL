@@ -26,7 +26,12 @@ getcomicsurl = "https://getcomics.info/tag/dc-week/"
 #myComicsList = ['fathom', 'dark-ark']
 
 substitutions1 = {'%2c': '', '%20': ' ', '%28': '(', '%29': ')'}
-substitutions2 = {' (Digital)': '', ' (digital)': '', ' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'', ' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '', ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '', ' (Minutemen-Thoth)':''}
+substitutions2 = {' (Digital)': '', ' (digital)': '',
+' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'',
+' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
+' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
+' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
+'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':''}
 
 today = datetime.today().strftime("%Y-%m-%d")
 
@@ -48,34 +53,35 @@ def returnHTML(url):
         print (e.fp.read())
         raise
 
+#def url 2 soup
+def url2soup(url):
+    pass
+    try:
+        res = requests.get(url)
+        res.raise_for_status()
+        soup = BeautifulSoup(res.text, 'html.parser')
+        return soup
+    except:
+        print("Error in URL -> soup")
+        raise
+
 #get beautiful soup
-def getSoup(html):
+def html2soup(html):
     soup = BeautifulSoup(html, 'html.parser')
     return soup
 
-#get inner html from tag
-def getTagClassData(html, tag, classname):
-    soup = getSoup(html)
-    list = soup.find_all(tag, class_=classname)
-    return list
-
-#get inner html from tag
-def getTagData(html, tag, attr, name):
-    soup = getSoup(html)
-    list = soup.find_all(tag, {attr: name})
-    return list
-
 def getaALLhref(html, tag):
     urllist = list()
-    soup = getSoup(html)
+    soup = html2soup(html)
     for link in soup.find_all('a'):
         if link.has_attr('href'):
             urllist.append(link['href'])
     return urllist
 
 #find las weekly post
-def findLastWeekly(htmlMain):
-    lastPost = getTagClassData(htmlMain, 'article', 'type-post')[0]
+def findLastWeekly(url):
+    soup = url2soup(url)
+    lastPost = soup.find('article', class_='type-post')
     #check if today's archive is there, and retrieve its url
     print ("Latest weekly post: " + lastPost.time['datetime'])
     if today in lastPost.time['datetime']:
@@ -94,15 +100,19 @@ def downCom(url):
     finalurl = urllib.request.urlopen(url).geturl()
     print ("Found " + finalurl)
     zippylink = ''
+    flag=False
     try:
-        html = returnHTML(finalurl)
-        downButtons = getTagClassData(html, 'div', 'aio-pulse')
+        # html = returnHTML(finalurl)
+        soup=url2soup(finalurl)
+        downButtons = soup.select("div.aio-pulse > a")
         for button in downButtons:
-            if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
+            #if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
+            if 'zippyshare' in button.get("href").lower() or 'zippyshare' in button.get('title').lower():
                 #downComZippy(button.a['href'])
-                zippylink = button.a['href']
+                #zippylink = button.a['href']
+                zippylink = button.get("href")
                 finalzippy = urllib.request.urlopen(zippylink).geturl()
-                downComZippy(finalzippy)
+                downComZippy(zippylink)
                 flag=False
             else:
                 flag=True
@@ -147,12 +157,12 @@ def getZippyDL(url, button):
 
 #download from zippyshare
 def downComZippy(url):
-    zippyHTML = returnHTML(url)
-    #downButton = getTagClassData(zippyHTML, 'div', 'right')
-    downButton = getTagData(zippyHTML, "script", "type", "text/javascript")
+    #zippyHTML = returnHTML(url)
+    soup=url2soup(url)
+    downButton = soup.select('script[type="text/javascript"]')
     try:
         fullURL, fileName = getZippyDL(url, downButton)
-        print ("Downloading from " + fullURL + "\ninto : " + fileName)
+        print ("Downloading from zippyshare into : " + fileName)
         r = requests.get(fullURL)
     except:
         print("Can't get download link on zippyshare page")
@@ -174,12 +184,13 @@ def getWeeklyComics(mylist):
     print ('Je vais chercher les mots clés :')
     print (mylist)
     #get latest archive on the current page
-    htmlMain = returnHTML(getcomicsurl)
+    #htmlMain = returnHTML(getcomicsurl)
 
-    weeklyUrl = findLastWeekly(htmlMain)
-
-    interm = getTagClassData(returnHTML(weeklyUrl), 'section', 'post-contents')
-    interm2 = getTagClassData(str(interm), 'li', '')
+    weeklyUrl = findLastWeekly(getcomicsurl)
+    soup = url2soup(weeklyUrl)
+    interm = soup.select("section.post-contents")
+    soup2 = BeautifulSoup(str(interm), 'html.parser')
+    interm2 = soup2.find_all('li')
     comList = getaALLhref(str(interm2), 'a')
     for newcomic in comList:
         try:
@@ -277,7 +288,7 @@ class MyComicsList(tk.Tk):
         self.scrollbar2 = tk.Scrollbar(self.output_text, orient="vertical", command=self.output_text.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
         self.output_text.configure(yscrollcommand=self.scrollbar2.set)
-        self.title("Télécharger DC v2")
+        self.title("Télécharger DC v3")
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
         self.comic_create = tk.Text(self.text_frame, height=3, bg="white", fg="black")
 
@@ -360,7 +371,7 @@ class MyComicsList(tk.Tk):
 
     def recolour_comic(self):
         for index, comic in enumerate(self.comic):
-            self.set_comic_colour(index, task)
+            self.set_comic_colour(index, comic)
 
     def set_comic_colour(self, position, comic):
         _, comic_style_choice = divmod(position, 2)
