@@ -69,18 +69,6 @@ def html2soup(html):
     soup = BeautifulSoup(html, 'html.parser')
     return soup
 
-#get inner html from tag
-def getTagClassData(html, tag, classname):
-    soup = html2soup(html)
-    list = soup.find_all(tag, class_=classname)
-    return list
-
-#get inner html from tag
-def getTagData(html, tag, attr, name):
-    soup = html2soup(html)
-    list = soup.find_all(tag, {attr: name})
-    return list
-
 def getaALLhref(html, tag):
     urllist = list()
     soup = html2soup(html)
@@ -114,7 +102,6 @@ def downCom(url):
     flag=False
     try:
         # html = returnHTML(finalurl)
-        # downButtons = getTagClassData(html, 'div', 'aio-pulse')
         soup=url2soup(finalurl)
         downButtons = soup.select("div.aio-pulse > a")
         for button in downButtons:
@@ -170,8 +157,6 @@ def getZippyDL(url, button):
 #download from zippyshare
 def downComZippy(url):
     #zippyHTML = returnHTML(url)
-    #downButton = getTagClassData(zippyHTML, 'div', 'right')
-    #downButton = getTagData(zippyHTML, "script", "type", "text/javascript")
     soup=url2soup(url)
     downButton = soup.select('script[type="text/javascript"]')
     try:
@@ -202,10 +187,8 @@ def getWeeklyComics(mylist):
 
     weeklyUrl = findLastWeekly(getcomicsurl)
     soup = url2soup(weeklyUrl)
-    #interm = getTagClassData(returnHTML(weeklyUrl), 'section', 'post-contents')
     interm = soup.select("section.post-contents")
     soup2 = BeautifulSoup(str(interm), 'html.parser')
-    #interm2 = getTagClassData(str(interm), 'li', '')
     interm2 = soup2.find_all('li')
     comList = getaALLhref(str(interm2), 'a')
     for newcomic in comList:
