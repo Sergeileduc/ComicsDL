@@ -226,10 +226,11 @@ class Std_redirector(object):
 # our comicsList
 class Getcomics(tk.Tk):
     deepbg='gray50'
+    bgframe='gray50'
     def __init__(self):
         super().__init__()
         width = 400
-        sizex = 800
+        sizex = 750
         sizey = 600
         posx  = 100
         posy  = 100
@@ -249,7 +250,7 @@ class Getcomics(tk.Tk):
         #topbar = tk.Frame(self, width=width, height=100, relief='groove', borderwidth=1)
         topbar = tk.Frame(self)
         #topbar.pack(expand=False, fill='both', side='top', anchor='n')
-        topbar.pack()
+        topbar.pack(anchor='nw', expand=True, fill='both', padx=10, pady=10)
         topbarleft = tk.Frame(topbar)
         #topbarleft.pack(side='left')
         topbarleft.grid(row=0, column=0, ipadx=20)
@@ -278,21 +279,21 @@ class Getcomics(tk.Tk):
 
         #MainFrame
         MainFrame = tk.Frame(self, bg=self.deepbg)
-        MainFrame.pack(padx=10, pady=10)
+        MainFrame.pack(padx=10, pady=10, anchor='nw')
         #self.buttonframe = tk.Frame(MainFrame, width=width, height=200, relief='groove', borderwidth=0, padx=20, pady=20)
-        self.buttonframe = tk.Frame(MainFrame, relief='groove', borderwidth=0, padx=20, pady=20)
+        self.buttonframe = tk.Frame(MainFrame, width=200, height=500, relief='groove', borderwidth=0, padx=20, pady=20)
         #self.buttonframe.pack(expand=True, fill='both', side='top', anchor='n')
-        self.buttonframe.pack(side='left')
+        self.buttonframe.pack(side='left', anchor='nw')
 
         instructions = tk.Label(self.buttonframe, text='Cliquez pour ajouter un élément à votre liste de téléchargement')
         instructions.pack()
 
         self.rightframe = tk.Frame(MainFrame, padx=20, pady=20)
-        self.rightframe.pack(side='right', padx=(40,0))
+        self.rightframe.pack(side='right', anchor='nw', padx=(20,0), fill=tk.Y)
         liste = tk.Label(self.rightframe, text="Liste de téléchargement\n.............", font=("Verdana", 12))
         liste.pack(side='top')
         self.rightcanva = tk.Canvas(self.rightframe)
-        self.rightcanva.pack()
+        self.rightcanva.pack(anchor='nw')
 
         self.dlframe = tk.Frame(self.rightcanva, relief='groove', borderwidth=0, padx=20, pady=20)
         self.dlframe.pack(side='right', padx=(2,0))
@@ -303,9 +304,9 @@ class Getcomics(tk.Tk):
 
         #output console
         bottombar = tk.Frame(self, width=width, height=100, relief='groove', borderwidth=1)
-        bottombar.pack(expand=False, fill='both', side='bottom', anchor='n')
+        bottombar.pack(expand=False, fill='both', side='bottom', anchor='sw')
         self.output_text = tk.Text(bottombar, height=10, bg="black", fg="white")
-        self.output_text.pack()
+        self.output_text.pack(anchor='sw', fill=tk.X)
         sys.stdout = Std_redirector(self.output_text)
 
         #downCom(test_url)
