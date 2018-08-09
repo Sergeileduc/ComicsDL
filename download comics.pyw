@@ -10,15 +10,10 @@ import urllib.request
 import urllib.error
 import threading
 from bs4 import BeautifulSoup
-import webbrowser
 
-#getcomicsurl = "https://getcomics.info/tag/dc-week/"
-#getcomicsurl = "http://getcomics.info/tag/marvel-now/"
-#getcomicsurl = "https://getcomics.info/tag/indie-week/"
 url = ''
 basesearch = 'https://getcomics.info'
 tagsearch = 'https://getcomics.info/tag/'
-#basesearch = 'https://getcomics.info/?s=page/1/?s='
 
 exit_thread= False
 exit_success = False
@@ -28,14 +23,8 @@ substitutions2 = {' (Digital)': '', ' (digital)': '',
 ' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'',
 ' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
 ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
-' (Minutemen-Thoth)':'', ' (Glorith-HD)':''}
-
-#DEBUG:
-#open url
-def OpenUrl(url):
-    #webbrowser.open_new(url)
-    webbrowser.open(url, new=0, autoraise=False)
-    return
+' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
+'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':''}
 
 #multiple replace function
 def replace(string, substitutions):
@@ -84,10 +73,10 @@ def getSoup(html):
 # 	return list
 
 #get inner html from tag
-def getTagData(html, tag, attr, name):
-	soup = getSoup(html)
-	list = soup.find_all(tag, {attr: name})
-	return list
+# def getTagData(html, tag, attr, name):
+# 	soup = getSoup(html)
+# 	list = soup.find_all(tag, {attr: name})
+# 	return list
 
 def getresults(url):
     searchlist=list()
@@ -127,17 +116,20 @@ def downCom(url):
         downButtons = soup.select("div.aio-pulse > a")
         for button in downButtons:
             #if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
-            if 'zippyshare' in button.get("href"):
+            if 'zippyshare' in button.get("href") or 'zippyshare' in button.get('title').lower():
                 #downComZippy(button.a['href'])
                 #zippylink = button.a['href']
                 zippylink = button.get("href")
-                finalzippy = urllib.request.urlopen(zippylink).geturl()
-                downComZippy(finalzippy)
+                try:
+                    finalzippy = urllib.request.urlopen(zippylink).geturl()
+                    downComZippy(finalzippy)
+                except:
+                    print("Zippyhare download failed")
                 flag=False
-            else:
-                flag=True
-        if flag==True:
-            print("can't find zippyshare download button")
+            # elif 'download now' in button.get('title').lower():
+            #     print("can't find or open zippyshare download button\nTrying 'Download now button'")
+
+
     except urllib.error.HTTPError:
         print("downCom got HTTPError from returnHTML")
         raise
@@ -191,6 +183,9 @@ def getZippyDL(url, button):
 		print(e)
 		raise
 	return fullURL, filename
+
+def downlaodnow(url):
+    pass
 
 #just optimizing
 def regexNightmare(html, regex):
