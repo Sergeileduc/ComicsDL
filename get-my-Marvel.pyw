@@ -30,7 +30,8 @@ substitutions2 = {' (Digital)': '', ' (digital)': '',
 ' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'',
 ' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
 ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
-' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':''}
+' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
+'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':''}
 
 today = datetime.today().strftime("%Y-%m-%d")
 
@@ -285,7 +286,7 @@ class MyComicsList(tk.Tk):
         self.button = tk.Button(self, text="Télécharger les comics", command=self.run)
         self.scrollbar = tk.Scrollbar(self.comic_canvas, orient="vertical", command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.title("Télécharger Marvel v2")
+        self.title("Télécharger Marvel v3")
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
         self.comic_create = tk.Text(self.text_frame, height=3, bg="white", fg="black")
 
