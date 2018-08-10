@@ -40,6 +40,7 @@ def returnHTML(url):
         req = urllib.request.Request(finalurl, headers=hdr)
         response = urllib.request.urlopen(req)
         html = response.read()
+        req.close()
         return html
     except ValueError as e:
         print(e)
@@ -292,11 +293,11 @@ class Getcomics(tk.Tk):
         self.rightframe.pack(side='right', anchor='nw', padx=(20,0), fill=tk.Y)
         liste = tk.Label(self.rightframe, text="Liste de téléchargement\n.............", font=("Verdana", 12))
         liste.pack(side='top')
-        self.rightcanva = tk.Canvas(self.rightframe)
+        self.rightcanva = tk.Canvas(self.rightframe, bg=self.bgframe)
         self.rightcanva.pack(anchor='nw')
 
         self.dlframe = tk.Frame(self.rightcanva, relief='groove', borderwidth=0, padx=20, pady=20)
-        self.dlframe.pack(side='right', padx=(2,0))
+        self.dlframe.pack(side='right')
 
         dlall = tk.Button(self.rightframe, text="Télécharger la liste", font=("Verdana", 12), command=lambda: self.dlcom(self.downloadlist))
         dlall.pack(side='bottom')
