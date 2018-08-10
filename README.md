@@ -9,6 +9,6 @@ python -m pip install --upgrade pip
 
 Ensuite (si pip n'est pas reconnu, essayer pip3 à la pace "pip3 install .....")
 
-pip install requests
-pip install bs4
-pip install Pillow
+pip install requests  
+pip install bs4  
+pip install Pillow  
