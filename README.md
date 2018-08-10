@@ -1,7 +1,8 @@
 # ComicsDL
 Scripts for downlad from getcomics and other things
 
-Vous devez installer Python 3 https://www.python.org/downloads/ (choisissez l'installation avec pip, et cocher la case pour ajouter Python au PATH)
+Vous devez installer Python 3 https://www.python.org/downloads/  
+(choisissez l'installation avec pip, et cocher la case pour ajouter Python au PATH)
 
 Ensuite, pour installer les librairies nécéssaires, ouvrez un invité de commande (cmd) ou un terminal et lancer :
 
