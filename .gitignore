@@ -4,5 +4,6 @@ __pycache__/
 *.cbr
 *.cbz
 *.zip
+*.spec
 soup.html
 .comics.db
