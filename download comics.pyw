@@ -6,6 +6,7 @@ import requests
 import os
 import time
 import tkinter as tk
+import tkinter.scrolledtext as tkst
 import urllib.request
 import urllib.error
 import threading
@@ -125,7 +126,7 @@ def downCom(url):
                     downComZippy(finalzippy)
                 except:
                     print("Zippyhare download failed")
-                flag=False
+                    flag=False
             # elif 'download now' in button.get('title').lower():
             #     print("can't find or open zippyshare download button\nTrying 'Download now button'")
 
@@ -224,94 +225,90 @@ class Std_redirector(object):
             self.widget.insert(tk.END,string)
             self.widget.see(tk.END)
 
+    def flush(self):
+        pass
+
 # our comicsList
 class Getcomics(tk.Tk):
-    deepbg='gray50'
-    bgframe='gray50'
+
     def __init__(self):
+        def myfunction(event):
+            dlcanva.configure(scrollregion=dlcanva.bbox("all"),width=200,height=200)
         super().__init__()
-        width = 400
-        sizex = 750
-        sizey = 600
-        posx  = 100
+        sizex = 800 #largeur
+        sizey = 500 #hauter
+        posx  = 400
         posy  = 100
-        self.wm_geometry("%dx%d+%d+%d" % (sizex, sizey, posx, posy))
+        self.resultwidht=50
+        self.dlwidth=40
+        deepbg='#263238'
+        dark2='#37474F'
+        dark3='#455A64'
+        fg='white'
         self.page = 1
         self.usersearch = tk.StringVar()
         self.choices = ['Recherche par TAG', 'Recherche simple']
         self.mode = tk.StringVar()
         self.mode.set('Recherche simple')
+        self.usersearch = tk.StringVar()
         self.buttonlist = list()
         self.searchlist = list()
         self.downloadlist = list()
         self.mylist = list()
-        self.title("Télécharger sur Getcomics v1")
-        self.configure(background=self.deepbg)
-        #topbar
-        #topbar = tk.Frame(self, width=width, height=100, relief='groove', borderwidth=1)
-        topbar = tk.Frame(self)
-        #topbar.pack(expand=False, fill='both', side='top', anchor='n')
-        topbar.pack(anchor='nw', expand=True, fill='both', padx=10, pady=10)
-        topbarleft = tk.Frame(topbar)
-        #topbarleft.pack(side='left')
-        topbarleft.grid(row=0, column=0, ipadx=20)
-        topbarcenter = tk.Frame(topbar)
-        #topbarcenter.pack(side='top')
-        topbarcenter.grid(row=0, column=1)
-        topbarright = tk.Frame(topbar)
-        #topbarright.pack(side='right')
-        topbarright.grid(row=0, column=2, ipadx=20)
-        #left
-        prevpage = tk.Button(topbarleft, text="page précédente", font=("Verdana", 12), command=self.prevpage)
-        prevpage.pack(fill=tk.Y)
-        #right
-        nextpage = tk.Button(topbarright, text="page suivante", font=("Verdana", 12), command=self.nextpage)
-        nextpage.pack(anchor='s')
-        #center
-        messageRecherche = tk.Label(topbarcenter, width=30, text="Rechercher sur Getcomics", justify=tk.CENTER,
+        self.wm_geometry("%dx%d+%d+%d" % (sizex, sizey, posx, posy))
+        self.title("Télécharger sur Getcomics v2")
+        self.configure(background=deepbg)
+
+        topbar = tk.Frame(self, bg=deepbg)
+        mainframe = tk.Frame(self, bg=deepbg, border=0, relief='flat')
+        self.resultsframe = tk.Frame(mainframe, bg=dark2, border=0, relief='flat')
+        rightframe = tk.Frame(mainframe, bg=dark2, highlightthickness = 0)
+        buttonbar = tk.Frame(self.resultsframe, bg=deepbg)
+
+        bottombar = tk.Frame(self,bg=deepbg)
+        self.prevpage = tk.Button(buttonbar, text="page précédente", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.prevpage)
+        nextpage = tk.Button(buttonbar, text="page suivante", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.nextpage)
+        messageRecherche = tk.Label(topbar, text="Rechercher sur Getcomics", bg=dark2, fg=fg, justify=tk.CENTER,
                                     font=("Helvetica", 12))
-        messageRecherche.pack()
-        choice = tk.OptionMenu(topbarcenter, self.mode, *self.choices)
-        choice.pack()
-        search = tk.Entry(topbarcenter, width=30, bg='gray75', textvariable=self.usersearch ,font=("Verdana", 12))
-        search.pack()
+        choice = tk.OptionMenu(topbar, self.mode, *self.choices)
+        choice.config(bg=dark3, fg=fg, relief='flat', border=0, highlightthickness = 0)
+        choice["menu"].config(bg=dark3, fg=fg, relief='flat', border=0)
+        search = tk.Entry(topbar, width=self.resultwidht, justify='center', insertbackground=fg, bg=dark2,fg=fg, textvariable=self.usersearch ,font=("Verdana", 12))
+
+        dlcanva = tk.Canvas(rightframe, bg=dark2, highlightthickness = 0)
+        self.dlframe = tk.Frame(dlcanva, bg=dark2, border=0, relief='flat')
+        scrollbar = tk.Scrollbar(dlcanva, orient="vertical", command=dlcanva.yview)
+        instructions = tk.Label(self.resultsframe, bg=dark2, fg=fg, relief='raised', text='Cliquez pour ajouter un élément à votre liste de téléchargement', font=("Verdana", 12))
+        liste = tk.Label(rightframe, width=self.dlwidth, bg=dark2, fg=fg, relief='raised', text="Liste de téléchargement", font=("Verdana", 12))
+        dlall = tk.Button(rightframe, bg=dark2, fg=fg, highlightthickness = 0, text="Télécharger la liste", font=("Verdana", 12, 'bold'), command=lambda: self.dlcom(self.downloadlist))
+
+        outputtext = tkst.ScrolledText(bottombar, height=8, bg='black', fg='white', wrap = tk.WORD)
+
+        topbar.pack(fill='x', anchor='n', padx=20, pady=20)
+        mainframe.pack(fill='both', expand=1, anchor='nw', padx=20, pady=(0,5))
+        self.resultsframe.pack(side='left', anchor='nw', fill='both', expand = 1, padx=(0,20))
+        rightframe.pack(side='left', anchor='ne', fill='y', expand = 1)
+        buttonbar.pack(side='bottom', anchor='sw', fill='x', expand=1)
+
+        nextpage.pack(side='right', padx=(0,50))
+        search.pack(side='left')
+        choice.pack(side='right')
         search.focus_set()
-        #
-
-        #MainFrame
-        MainFrame = tk.Frame(self, bg=self.deepbg)
-        MainFrame.pack(padx=10, pady=10, anchor='nw')
-        #self.buttonframe = tk.Frame(MainFrame, width=width, height=200, relief='groove', borderwidth=0, padx=20, pady=20)
-        self.buttonframe = tk.Frame(MainFrame, width=200, height=500, relief='groove', borderwidth=0, padx=20, pady=20)
-        #self.buttonframe.pack(expand=True, fill='both', side='top', anchor='n')
-        self.buttonframe.pack(side='left', anchor='nw')
-
-        instructions = tk.Label(self.buttonframe, text='Cliquez pour ajouter un élément à votre liste de téléchargement')
-        instructions.pack()
-
-        self.rightframe = tk.Frame(MainFrame, padx=20, pady=20)
-        self.rightframe.pack(side='right', anchor='nw', padx=(20,0), fill=tk.Y)
-        liste = tk.Label(self.rightframe, text="Liste de téléchargement\n.............", font=("Verdana", 12))
-        liste.pack(side='top')
-        self.rightcanva = tk.Canvas(self.rightframe, bg=self.bgframe)
-        self.rightcanva.pack(anchor='nw')
-
-        self.dlframe = tk.Frame(self.rightcanva, relief='groove', borderwidth=0, padx=20, pady=20)
-        self.dlframe.pack(side='right')
-
-        dlall = tk.Button(self.rightframe, text="Télécharger la liste", font=("Verdana", 12), command=lambda: self.dlcom(self.downloadlist))
-        dlall.pack(side='bottom')
-
-
-        #output console
-        bottombar = tk.Frame(self, width=width, height=100, relief='groove', borderwidth=1)
-        bottombar.pack(expand=False, fill='both', side='bottom', anchor='sw')
-        self.output_text = tk.Text(bottombar, height=10, bg="black", fg="white")
-        self.output_text.pack(anchor='sw', fill=tk.X)
-        sys.stdout = Std_redirector(self.output_text)
-
-        #downCom(test_url)
         search.bind("<Return>", self.searchcomics)
+        instructions.pack(fill='x')
+        liste.pack(fill='x')
+        dlcanva.pack(fill='both', expand=1)
+        scrollbar.pack(side = 'right', fill = 'y')
+        dlcanva.configure(yscrollcommand=scrollbar.set)
+        dlcanva.create_window((0,0),window=self.dlframe, anchor='nw')
+        self.dlframe.bind("<Configure>",myfunction)
+        dlall.pack(fill='x', side='bottom')
+
+
+        bottombar.pack(fill='x')
+        outputtext.pack(padx=10, pady=(0,10), fill=tk.BOTH, expand=True)
+        sys.stdout = Std_redirector(outputtext)
+
 
         self.searchcomics(None)
 
@@ -322,6 +319,8 @@ class Getcomics(tk.Tk):
         pass
 
     def searchcomics(self, event):
+        dark2='#546E7A'
+        fg='#FAFAFA'
         self.searchlist.clear()
         self.destroylist(self.buttonlist)
         searchmode = self.choices.index(self.mode.get())
@@ -330,10 +329,10 @@ class Getcomics(tk.Tk):
         for i in self.searchlist:
             url=i[0]
             #newButton = tk.Button(self.buttonframe, text=i[1].replace('-',' ').title(), width=40, bg='RoyalBlue4', fg='white', relief='sunken', bd=0, font=("Verdana", 12))
-            newButton = tk.Button(self.buttonframe, text=i[1], width=40, bg='RoyalBlue4', fg='white', relief='sunken', bd=0, font=("Verdana", 12))
+            newButton = tk.Button(self.resultsframe, text=i[1], width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
             #newButton.config(command= lambda url=url: self.dlcom(url))
             newButton.config(command= lambda button=newButton: self.addtodl(button))
-            newButton.pack()
+            newButton.pack(fill='both', expand=1, pady=0)
             #print(i)
             self.buttonlist.append(newButton)
         #self.printwidgets(self.buttonlist)
@@ -347,12 +346,17 @@ class Getcomics(tk.Tk):
             pass
 
     def addtodl(self, button):
+        dark2='#546E7A'
+        fg='#FAFAFA'
         index = self.buttonlist.index(button)
         comic = button.cget('text')
-        newDL = tk.Button(self.dlframe, text=button.cget('text').title(), relief='flat')
-        newDL.config(command= lambda button=newDL: self.removedl(button))
-        newDL.pack()
-        self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1], newDL))
+        if comic not in (item[1] for item in self.downloadlist):
+            newDL = tk.Button(self.dlframe, text=button.cget('text').title(), width=self.resultwidht, anchor='w', bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
+            newDL.config(command= lambda button=newDL: self.removedl(button))
+            newDL.pack(fill='both', expand=1, pady=0)
+            self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1], newDL))
+        else:
+            print("Already in your DL list")
 
 
     def removedl(self, button):
@@ -373,10 +377,12 @@ class Getcomics(tk.Tk):
     def nextpage(self):
         self.page = self.page + 1
         self.searchcomics(None)
+        self.prevpage.pack(side='left', padx=(50,0))
 
     def prevpage(self):
         if self.page > 1:
             self.page = self.page - 1
+            self.prevpage.pack_forget()
         else:
             self.page = 1
         self.searchcomics(None)
