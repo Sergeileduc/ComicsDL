@@ -31,7 +31,8 @@ substitutions2 = {' (Digital)': '', ' (digital)': '',
 ' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
 ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
 ' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
-'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':''}
+'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'',
+' GetComics.INFO':''}
 
 today = datetime.today().strftime("%Y-%m-%d")
 
@@ -163,7 +164,7 @@ def downComZippy(url):
     try:
         fullURL, fileName = getZippyDL(url, downButton)
         print ("Downloading from zippyshare into : " + fileName)
-        r = requests.get(fullURL)
+        r = requests.get(fullURL, stream=True)
     except:
         print("Can't get download link on zippyshare page")
 
