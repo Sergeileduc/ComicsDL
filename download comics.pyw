@@ -126,7 +126,7 @@ def downCom(url):
                     downComZippy(finalzippy)
                 except:
                     print("Zippyhare download failed")
-                flag=False
+                    flag=False
             # elif 'download now' in button.get('title').lower():
             #     print("can't find or open zippyshare download button\nTrying 'Download now button'")
 
@@ -232,9 +232,9 @@ class Getcomics(tk.Tk):
         def myfunction(event):
             dlcanva.configure(scrollregion=dlcanva.bbox("all"),width=200,height=200)
         super().__init__()
-        sizex = 1000 #largeur
-        sizey = 700 #hauter
-        posx  = 100
+        sizex = 800 #largeur
+        sizey = 500 #hauter
+        posx  = 400
         posy  = 100
         self.resultwidht=50
         self.dlwidth=40
@@ -278,7 +278,7 @@ class Getcomics(tk.Tk):
         scrollbar = tk.Scrollbar(dlcanva, orient="vertical", command=dlcanva.yview)
         instructions = tk.Label(self.resultsframe, bg=dark2, fg=fg, relief='raised', text='Cliquez pour ajouter un élément à votre liste de téléchargement', font=("Verdana", 12))
         liste = tk.Label(rightframe, width=self.dlwidth, bg=dark2, fg=fg, relief='raised', text="Liste de téléchargement", font=("Verdana", 12))
-        dlall = tk.Button(rightframe, bg=dark2, fg=fg, highlightthickness = 0, text="Télécharger la liste", font=("Verdana", 12), command=lambda: self.dlcom(self.downloadlist))
+        dlall = tk.Button(rightframe, bg=dark2, fg=fg, highlightthickness = 0, text="Télécharger la liste", font=("Verdana", 12, 'bold'), command=lambda: self.dlcom(self.downloadlist))
 
         outputtext = tkst.ScrolledText(bottombar, height=8, bg='black', fg='white', wrap = tk.WORD)
 
@@ -330,7 +330,7 @@ class Getcomics(tk.Tk):
         for i in self.searchlist:
             url=i[0]
             #newButton = tk.Button(self.buttonframe, text=i[1].replace('-',' ').title(), width=40, bg='RoyalBlue4', fg='white', relief='sunken', bd=0, font=("Verdana", 12))
-            newButton = tk.Button(self.resultsframe, text=i[1], width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 12))
+            newButton = tk.Button(self.resultsframe, text=i[1], width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
             #newButton.config(command= lambda url=url: self.dlcom(url))
             newButton.config(command= lambda button=newButton: self.addtodl(button))
             newButton.pack(fill='both', expand=1, pady=0)
@@ -351,7 +351,7 @@ class Getcomics(tk.Tk):
         fg='#FAFAFA'
         index = self.buttonlist.index(button)
         comic = button.cget('text')
-        newDL = tk.Button(self.dlframe, text=button.cget('text').title(), width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0)
+        newDL = tk.Button(self.dlframe, text=button.cget('text').title(), width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
         newDL.config(command= lambda button=newDL: self.removedl(button))
         newDL.pack(fill='both', expand=1, pady=0)
         self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1], newDL))
