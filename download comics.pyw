@@ -351,10 +351,13 @@ class Getcomics(tk.Tk):
         fg='#FAFAFA'
         index = self.buttonlist.index(button)
         comic = button.cget('text')
-        newDL = tk.Button(self.dlframe, text=button.cget('text').title(), width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
-        newDL.config(command= lambda button=newDL: self.removedl(button))
-        newDL.pack(fill='both', expand=1, pady=0)
-        self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1], newDL))
+        if comic not in (item[1] for item in self.downloadlist):
+            newDL = tk.Button(self.dlframe, text=button.cget('text').title(), width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
+            newDL.config(command= lambda button=newDL: self.removedl(button))
+            newDL.pack(fill='both', expand=1, pady=0)
+            self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1], newDL))
+        else:
+            print("Already in your DL list")
 
 
     def removedl(self, button):
