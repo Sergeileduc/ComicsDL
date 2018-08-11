@@ -253,26 +253,25 @@ class Getcomics(tk.Tk):
         self.downloadlist = list()
         self.mylist = list()
         self.wm_geometry("%dx%d+%d+%d" % (sizex, sizey, posx, posy))
-        self.title("Télécharger sur Getcomics v1")
+        self.title("Télécharger sur Getcomics v2")
         self.configure(background=deepbg)
 
-        topbar = tk.Frame(self, bg=dark2)
-        topbarleft = tk.Frame(topbar, bg=dark2)
-        topbarcenter = tk.Frame(topbar, bg=dark2)
-        topbarright = tk.Frame(topbar, bg=dark2)
-        bottombar = tk.Frame(self,bg=deepbg)
-        prevpage = tk.Button(topbarleft, text="page précédente", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.prevpage)
-        nextpage = tk.Button(topbarright, text="page suivante", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.nextpage)
-        messageRecherche = tk.Label(topbarcenter, text="Rechercher sur Getcomics", bg=dark2, fg=fg, justify=tk.CENTER,
-                                    font=("Helvetica", 12))
-        choice = tk.OptionMenu(topbarcenter, self.mode, *self.choices)
-        choice.config(bg=dark3, fg=fg, relief='flat', border=0, highlightthickness = 0)
-        choice["menu"].config(bg=dark3, fg=fg, relief='flat', border=0)
-        search = tk.Entry(topbarcenter, width=30, justify='center', insertbackground=fg, bg=deepbg,fg=fg, textvariable=self.usersearch ,font=("Verdana", 12))
-
+        topbar = tk.Frame(self, bg=deepbg)
         mainframe = tk.Frame(self, bg=deepbg, border=0, relief='flat')
         self.resultsframe = tk.Frame(mainframe, bg=dark2, border=0, relief='flat')
         rightframe = tk.Frame(mainframe, bg=dark2, highlightthickness = 0)
+        buttonbar = tk.Frame(self.resultsframe, bg=deepbg)
+
+        bottombar = tk.Frame(self,bg=deepbg)
+        self.prevpage = tk.Button(buttonbar, text="page précédente", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.prevpage)
+        nextpage = tk.Button(buttonbar, text="page suivante", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.nextpage)
+        messageRecherche = tk.Label(topbar, text="Rechercher sur Getcomics", bg=dark2, fg=fg, justify=tk.CENTER,
+                                    font=("Helvetica", 12))
+        choice = tk.OptionMenu(topbar, self.mode, *self.choices)
+        choice.config(bg=dark3, fg=fg, relief='flat', border=0, highlightthickness = 0)
+        choice["menu"].config(bg=dark3, fg=fg, relief='flat', border=0)
+        search = tk.Entry(topbar, width=self.resultwidht, justify='center', insertbackground=fg, bg=dark2,fg=fg, textvariable=self.usersearch ,font=("Verdana", 12))
+
         dlcanva = tk.Canvas(rightframe, bg=dark2, highlightthickness = 0)
         self.dlframe = tk.Frame(dlcanva, bg=dark2, border=0, relief='flat')
         scrollbar = tk.Scrollbar(dlcanva, orient="vertical", command=dlcanva.yview)
@@ -282,20 +281,17 @@ class Getcomics(tk.Tk):
 
         outputtext = tkst.ScrolledText(bottombar, height=8, bg='black', fg='white', wrap = tk.WORD)
 
-        topbar.pack(fill='x', anchor='n', padx=20, pady=(10,5))
-        topbarleft.pack(side='left')
-        topbarcenter.pack(side='left', fill='x', expand=1, padx=50)
-        topbarright.pack(side='left')
-        prevpage.pack(padx=(10,0))
-        nextpage.pack(padx=(0,10))
-        #messageRecherche.pack(fill='x', expand=1)
-        search.pack(side='left', padx=(0,30))
-        choice.pack(side='left')
+        topbar.pack(fill='x', anchor='n', padx=20, pady=20)
+        mainframe.pack(fill='both', expand=1, anchor='nw', padx=20, pady=(0,5))
+        self.resultsframe.pack(side='left', anchor='nw', fill='both', expand = 1, padx=(0,20))
+        rightframe.pack(side='left', anchor='ne', fill='y', expand = 1)
+        buttonbar.pack(side='bottom', anchor='sw', fill='x', expand=1)
+
+        nextpage.pack(side='right', padx=(0,50))
+        search.pack(side='left')
+        choice.pack(side='right')
         search.focus_set()
         search.bind("<Return>", self.searchcomics)
-        mainframe.pack(fill='both', expand=1, anchor='nw', padx=20, pady=(0,5))
-        self.resultsframe.pack(side='left', anchor='nw', fill='both', expand = 1)
-        rightframe.pack(side='left', anchor='ne', fill='y', expand = 1)
         instructions.pack(fill='x')
         liste.pack(fill='x')
         dlcanva.pack(fill='both', expand=1)
@@ -352,7 +348,7 @@ class Getcomics(tk.Tk):
         index = self.buttonlist.index(button)
         comic = button.cget('text')
         if comic not in (item[1] for item in self.downloadlist):
-            newDL = tk.Button(self.dlframe, text=button.cget('text').title(), width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
+            newDL = tk.Button(self.dlframe, text=button.cget('text').title(), width=self.resultwidht, anchor='w', bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
             newDL.config(command= lambda button=newDL: self.removedl(button))
             newDL.pack(fill='both', expand=1, pady=0)
             self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1], newDL))
@@ -378,10 +374,12 @@ class Getcomics(tk.Tk):
     def nextpage(self):
         self.page = self.page + 1
         self.searchcomics(None)
+        self.prevpage.pack(side='left', padx=(50,0))
 
     def prevpage(self):
         if self.page > 1:
             self.page = self.page - 1
+            self.prevpage.pack_forget()
         else:
             self.page = 1
         self.searchcomics(None)
