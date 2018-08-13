@@ -25,7 +25,8 @@ substitutions2 = {' (Digital)': '', ' (digital)': '',
 ' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
 ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
 ' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
-'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':''}
+'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'',
+' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':''}
 
 #multiple replace function
 def replace(string, substitutions):
