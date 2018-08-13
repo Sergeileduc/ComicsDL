@@ -225,6 +225,9 @@ class Std_redirector(object):
             self.widget.insert(tk.END,string)
             self.widget.see(tk.END)
 
+    def flush(self):
+        pass
+
 # our comicsList
 class Getcomics(tk.Tk):
 
