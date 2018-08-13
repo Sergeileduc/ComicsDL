@@ -32,7 +32,7 @@ substitutions2 = {' (Digital)': '', ' (digital)': '',
 ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
 ' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
 '(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'',
-' GetComics.INFO':''}
+' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':''}
 
 today = datetime.today().strftime("%Y-%m-%d")
 
