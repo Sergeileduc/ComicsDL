@@ -277,9 +277,9 @@ class MyComicsList(tk.Tk):
 # """
 
         self.comic_canvas = tk.Canvas(self)
-        self.message = tk.Label(self, text=longtext, anchor=tk.W, justify=tk.CENTER, wraplength = 250, font=("Helvetica", 12))
-        self.asciititle = tk.Label(self, text=ascii_title, anchor=tk.W, justify=tk.LEFT, font=("Courier", 4))
-        self.cat = tk.Label(self, text=ascii_cat, anchor=tk.W, justify=tk.LEFT, font=("Courier", 3))
+        self.message = tk.Label(self, text=longtext, anchor='w', justify='center', wraplength = 250, font=("Helvetica", 12))
+        self.asciititle = tk.Label(self, text=ascii_title, anchor='w', justify='left', font=("Courier", 4))
+        self.cat = tk.Label(self, text=ascii_cat, anchor='w', justify='left', font=("Courier", 3))
         self.comic_frame = tk.Frame(self.comic_canvas)
         self.text_frame = tk.Frame(self)
         self.output_text = tk.Text(self, bg="black", fg="white")
@@ -293,8 +293,8 @@ class MyComicsList(tk.Tk):
         self.asciititle.pack()
         self.cat.pack()
         self.message.pack()
-        self.comic_canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.comic_canvas.pack(side='top', fill='both', expand=1)
+        self.scrollbar.pack(side='right', fill='y')
 
         self.canvas_frame = self.comic_canvas.create_window((0, 0), window=self.comic_frame, anchor="n")
 
@@ -302,7 +302,7 @@ class MyComicsList(tk.Tk):
         self.text_frame.pack()
         self.button.pack()
         self.comic_create.pack()
-        self.output_text.pack(side=tk.BOTTOM, fill=tk.X)
+        self.output_text.pack(side='bottom', fill='x')
         #self.button.pack(side=tk.BOTTOM, fill=tk.X)
         self.update_idletasks()
 
@@ -344,7 +344,7 @@ class MyComicsList(tk.Tk):
             self.set_comic_colour(len(self.comic), new_comic)
 
             new_comic.bind("<Button-1>", self.remove_comic)
-            new_comic.pack(side=tk.TOP, fill=tk.X)
+            new_comic.pack(side='top', fill='x')
 
             self.comic.append(new_comic)
 
