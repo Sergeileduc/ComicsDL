@@ -7,6 +7,7 @@ import os
 import time
 import tkinter as tk
 import tkinter.scrolledtext as tkst
+from tkinter import ttk
 import urllib.request
 import urllib.error
 import threading
@@ -237,15 +238,23 @@ class Getcomics(tk.Tk):
             dlcanva.configure(scrollregion=dlcanva.bbox("all"),width=200,height=200)
         super().__init__()
         sizex = 800 #largeur
-        sizey = 500 #hauter
+        sizey = 600 #hauter
         posx  = 400
         posy  = 100
         self.resultwidht=50
         self.dlwidth=40
         deepbg='#263238'
+        color1='#37474F'
+        color2='#455A64'
         dark2='#37474F'
         dark3='#455A64'
         fg='white'
+        style = ttk.Style()
+        style.configure("deepBG.TFrame", foreground=fg, background=deepbg, border=0, relief='flat')
+        style = ttk.Style()
+        style.configure("dark1.TFrame", foreground=fg, background=color1, border=0, relief='flat', highlightthickness = 0)
+        style = ttk.Style()
+        style.configure("L.TLabel", foreground=fg, background=color1, relief='raised', font=("Verdana", 12))
         self.page = 1
         self.usersearch = tk.StringVar()
         self.choices = ['Recherche par TAG', 'Recherche simple']
@@ -260,13 +269,13 @@ class Getcomics(tk.Tk):
         self.title("Télécharger sur Getcomics v2")
         self.configure(background=deepbg)
 
-        topbar = tk.Frame(self, bg=deepbg)
-        mainframe = tk.Frame(self, bg=deepbg, border=0, relief='flat')
-        self.resultsframe = tk.Frame(mainframe, bg=dark2, border=0, relief='flat')
-        rightframe = tk.Frame(mainframe, bg=dark2, highlightthickness = 0)
-        buttonbar = tk.Frame(self.resultsframe, bg=deepbg)
+        topbar = ttk.Frame(self, style="deepBG.TFrame")
+        mainframe = ttk.Frame(self, style="deepBG.TFrame")
+        self.resultsframe = ttk.Frame(mainframe, style="dark1.TFrame")
+        rightframe = ttk.Frame(mainframe, style="dark1.TFrame")
+        buttonbar = ttk.Frame(self.resultsframe, style="deepBG.TFrame")
 
-        bottombar = tk.Frame(self,bg=deepbg)
+        bottombar = ttk.Frame(self, style="deepBG.TFrame")
         self.prevpage = tk.Button(buttonbar, text="page précédente", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.prevpage)
         nextpage = tk.Button(buttonbar, text="page suivante", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.nextpage)
         messageRecherche = tk.Label(topbar, text="Rechercher sur Getcomics", bg=dark2, fg=fg, justify=tk.CENTER,
@@ -276,12 +285,12 @@ class Getcomics(tk.Tk):
         choice["menu"].config(bg=dark3, fg=fg, relief='flat', border=0)
         search = tk.Entry(topbar, width=self.resultwidht, justify='center', insertbackground=fg, bg=dark2,fg=fg, textvariable=self.usersearch ,font=("Verdana", 12))
 
-        dlcanva = tk.Canvas(rightframe, bg=dark2, highlightthickness = 0)
-        self.dlframe = tk.Frame(dlcanva, bg=dark2, border=0, relief='flat')
-        scrollbar = tk.Scrollbar(dlcanva, orient="vertical", command=dlcanva.yview)
-        instructions = tk.Label(self.resultsframe, bg=dark2, fg=fg, relief='raised', text='Cliquez pour ajouter un élément à votre liste de téléchargement', font=("Verdana", 12))
+        dlcanva = tk.Canvas(rightframe, bg=color1, highlightthickness = 0)
+        self.dlframe = ttk.Frame(dlcanva, style="dark1.TFrame")
+        scrollbar = ttk.Scrollbar(dlcanva, orient="vertical", command=dlcanva.yview)
+        instructions = ttk.Label(self.resultsframe, style="L.TLabel", text='Cliquez pour ajouter un élément à votre liste de téléchargement')
         liste = tk.Label(rightframe, width=self.dlwidth, bg=dark2, fg=fg, relief='raised', text="Liste de téléchargement", font=("Verdana", 12))
-        dlall = tk.Button(rightframe, bg=dark2, fg=fg, highlightthickness = 0, text="Télécharger la liste", font=("Verdana", 12, 'bold'), command=lambda: self.dlcom(self.downloadlist))
+        dlall = tk.Button(rightframe, bg=color1, fg=fg, highlightthickness = 0, text="Télécharger la liste", font=("Verdana", 12, 'bold'), command=lambda: self.dlcom(self.downloadlist))
 
         outputtext = tkst.ScrolledText(bottombar, height=8, bg='black', fg='white', wrap = tk.WORD)
 
