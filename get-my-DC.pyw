@@ -56,7 +56,6 @@ def returnHTML(url):
 
 #def url 2 soup
 def url2soup(url):
-    pass
     try:
         res = requests.get(url)
         res.raise_for_status()
@@ -103,7 +102,6 @@ def downCom(url):
     zippylink = ''
     flag=False
     try:
-        # html = returnHTML(finalurl)
         soup=url2soup(finalurl)
         downButtons = soup.select("div.aio-pulse > a")
         for button in downButtons:
@@ -158,13 +156,12 @@ def getZippyDL(url, button):
 
 #download from zippyshare
 def downComZippy(url):
-    #zippyHTML = returnHTML(url)
     soup=url2soup(url)
     downButton = soup.select('script[type="text/javascript"]')
     try:
         fullURL, fileName = getZippyDL(url, downButton)
         print ("Downloading from zippyshare into : " + fileName)
-        r = requests.get(fullURL, stream=True)
+        r = requests.get(fullURL)
     except:
         print("Can't get download link on zippyshare page")
 
@@ -184,9 +181,8 @@ def getWeeklyComics(mylist):
     print ('Initialisation...')
     print ('Je vais chercher les mots clés :')
     print (mylist)
-    #get latest archive on the current page
-    #htmlMain = returnHTML(getcomicsurl)
 
+    #get latest archive on the current page
     weeklyUrl = findLastWeekly(getcomicsurl)
     soup = url2soup(weeklyUrl)
     interm = soup.select("section.post-contents")
@@ -238,12 +234,12 @@ class MyComicsList(tk.Tk):
         y = (hs/2) - (h/2)
         longtext = "Ajoutez ou supprimez les séries à chercher dans le dernier post \n\"DC week\" de Getcomics.info"
         # ascii_dctrad = """
-        # ██████╗  ██████╗    ████████╗██████╗  █████╗ ██████╗
-        # ██╔══██╗██╔════╝    ╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗
-        # ██║  ██║██║            ██║   ██████╔╝███████║██║  ██║
-        # ██║  ██║██║            ██║   ██╔══██╗██╔══██║██║  ██║
-        # ██████╔╝╚██████╗       ██║   ██║  ██║██║  ██║██████╔╝
-        # ╚═════╝  ╚═════╝       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ """
+# ██████╗  ██████╗    ████████╗██████╗  █████╗ ██████╗
+# ██╔══██╗██╔════╝    ╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗
+# ██║  ██║██║            ██║   ██████╔╝███████║██║  ██║
+# ██║  ██║██║            ██║   ██╔══██╗██╔══██║██║  ██║
+# ██████╔╝╚██████╗       ██║   ██║  ██║██║  ██║██████╔╝
+# ╚═════╝  ╚═════╝       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ """
         ascii_title = """
 ██████╗ ███████╗████████╗ ██████╗ ██████╗ ███╗   ███╗██╗ ██████╗███████╗
 ██╔════╝ ██╔════╝╚══██╔══╝██╔════╝██╔═══██╗████╗ ████║██║██╔════╝██╔════╝
@@ -269,7 +265,7 @@ class MyComicsList(tk.Tk):
 ██║  ██║██║
 ██████╔╝╚██████╗
 ╚═════╝  ╚═════╝
-"""
+        """
 
 #         ascii_cat = """
 # ██╗███╗   ██╗██████╗ ██╗███████╗███████╗
@@ -286,12 +282,10 @@ class MyComicsList(tk.Tk):
         self.cat = tk.Label(self, text=ascii_cat, anchor=tk.W, justify=tk.LEFT, font=("Courier", 3))
         self.comic_frame = tk.Frame(self.comic_canvas)
         self.text_frame = tk.Frame(self)
-        self.output_text = tk.Text(self, height=8, bg="black", fg="white")
+        self.output_text = tk.Text(self, bg="black", fg="white")
         self.button = tk.Button(self, text="Télécharger les comics", command=self.run)
         self.scrollbar = tk.Scrollbar(self.comic_canvas, orient="vertical", command=self.comic_canvas.yview)
-        self.scrollbar2 = tk.Scrollbar(self.output_text, orient="vertical", command=self.output_text.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.output_text.configure(yscrollcommand=self.scrollbar2.set)
         self.title("Télécharger DC v3")
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
         self.comic_create = tk.Text(self.text_frame, height=3, bg="white", fg="black")
@@ -309,7 +303,6 @@ class MyComicsList(tk.Tk):
         self.button.pack()
         self.comic_create.pack()
         self.output_text.pack(side=tk.BOTTOM, fill=tk.X)
-        self.scrollbar2.pack(side=tk.RIGHT, fill=tk.Y)
         #self.button.pack(side=tk.BOTTOM, fill=tk.X)
         self.update_idletasks()
 
