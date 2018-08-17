@@ -238,9 +238,12 @@ class Getcomics(tk.Tk):
             dlcanva.configure(scrollregion=dlcanva.bbox("all"),width=200,height=200)
         super().__init__()
         sizex = 800 #largeur
-        sizey = 600 #hauter
-        posx  = 400
-        posy  = 100
+        sizey = 600 #hauteur
+
+        # Gets both half the screen width/height and window width/height
+        posx = int(self.winfo_screenwidth()/2 - sizex/2)
+        posy = int(self.winfo_screenheight()/3 - sizey/2)
+
         self.resultwidht=50
         self.dlwidth=40
         deepbg='#263238'
