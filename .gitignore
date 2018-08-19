@@ -10,3 +10,5 @@ __pycache__/
 *.spec
 soup.html
 .comics.db
+liste-comics-semaine.txt
+comics-week.py
