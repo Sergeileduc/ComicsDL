@@ -220,8 +220,13 @@ class Getcomics(tk.Tk):
         style = ttk.Style()
         style.configure("L.TLabel", foreground=fg, background=color1, relief='raised', font=("Verdana", 12))
         self.page = 1
-        self.bytes = 0
-        self.maxbytes = 100
+        self.currentpercent = tk.IntVar()
+        self.percent = tk.IntVar()
+        self.dlbytes = tk.IntVar()
+        self.currentpercent.set(0)
+        self.percent.set(0)
+        self.dlbytes.set(0)
+        self.maxpercent = 100
         self.listsize = 0
         self.usersearch = tk.StringVar()
         self.choices = ['Recherche par TAG', 'Recherche simple']
@@ -260,10 +265,8 @@ class Getcomics(tk.Tk):
         dlall = tk.Button(rightframe, bg=color1, fg=fg, highlightthickness = 0, text="Télécharger la liste", font=("Verdana", 12, 'bold'), command=lambda: self.dlcom(self.downloadlist))
 
         outputtext = tkst.ScrolledText(bottombar, height=8, bg='black', fg='white', wrap = tk.WORD)
-        self.progress = ttk.Progressbar(bottombar, orient="horizontal",
-                                        length=200, mode="determinate")
-        self.progress2 = ttk.Progressbar(bottombar, orient="horizontal",
-                                        length=200, mode="determinate")
+        self.progress = ttk.Progressbar(bottombar, orient="horizontal", variable=self.currentpercent, mode="determinate")
+        self.progress2 = ttk.Progressbar(bottombar, orient="horizontal", variable=self.percent, mode="determinate")
 
         topbar.pack(fill='x', anchor='n', padx=20, pady=20)
         mainframe.pack(fill='both', expand=1, anchor='nw', padx=20, pady=(0,5))
@@ -292,8 +295,8 @@ class Getcomics(tk.Tk):
         outputtext.pack(padx=10, pady=(0,10), fill=tk.BOTH, expand=True)
         sys.stdout = Std_redirector(outputtext)
 
-
         self.searchcomics(None)
+
 
     def destroylist(self, widgetlist):
         for w in widgetlist:
@@ -314,14 +317,10 @@ class Getcomics(tk.Tk):
         for i in self.searchlist:
             url=i[0]
             title = i[1] + ' (' + str(i[2]) + ')'
-            #newButton = tk.Button(self.buttonframe, text=i[1].replace('-',' ').title(), width=40, bg='RoyalBlue4', fg='white', relief='sunken', bd=0, font=("Verdana", 12))
             newButton = tk.Button(self.resultsframe, text=title, width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
-            #newButton.config(command= lambda url=url: self.dlcom(url))
             newButton.config(command= lambda button=newButton: self.addtodl(button))
             newButton.pack(fill='both', expand=1, pady=0)
-            #print(i)
             self.buttonlist.append(newButton)
-        #self.printwidgets(self.buttonlist)
         return
 
     #download one comic
@@ -330,6 +329,7 @@ class Getcomics(tk.Tk):
             thread1 = threading.Thread(target=self.downAllCom, args=[liste])
             thread1.start()
         except:
+            print("Problem")
             pass
 
 
@@ -342,10 +342,7 @@ class Getcomics(tk.Tk):
         if comic not in (item[1] for item in self.downloadlist):
             if self.searchlist[index][2] != None:
                 bytes = convert2bytes(self.searchlist[index][2])
-                #print(bytes)
                 self.listsize += bytes
-            #print(bytes)
-            #self.listsize += self.searchlist[index][2]
             newDL = tk.Button(self.dlframe, text=button.cget('text').title(), width=self.resultwidht, anchor='w', bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
             newDL.config(command= lambda button=newDL: self.removedl(button))
             newDL.pack(fill='both', expand=1, pady=0)
@@ -361,7 +358,6 @@ class Getcomics(tk.Tk):
             if button == i[2]:
                 if i[3] != None:
                     bytes = convert2bytes(i[3])
-                    #print(bytes)
                     self.listsize -= bytes
                 self.downloadlist.remove(i)
         button.destroy()
@@ -370,7 +366,7 @@ class Getcomics(tk.Tk):
 
     #DL all comics in the liste
     def downAllCom(self, liste):
-        self.bytes = 0
+        self.dlbytes.set(0)
         for dl in liste:
             self.downCom(dl[0])
         print("Terminé, vous pouvez quitter")
@@ -384,20 +380,16 @@ class Getcomics(tk.Tk):
         zippylink = ''
         flag=False
         try:
-            #html = returnHTML(finalurl)
-            #downButtons = getTagClassData(html, 'div', 'aio-pulse')
             soup=url2soup(finalurl)
             downButtons = soup.select("div.aio-pulse > a")
             for button in downButtons:
                 #if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
                 if 'zippyshare' in button.get("href") or 'zippyshare' in button.get('title').lower():
-                    #downComZippy(button.a['href'])
-                    #zippylink = button.a['href']
                     zippylink = button.get("href")
                     try:
                         finalzippy = urllib.request.urlopen(zippylink).geturl()
                         self.downComZippy(finalzippy)
-                    except:
+                    except IOError:
                         print("Zippyhare download failed")
                         flag=False
                 # elif 'download now' in button.get('title').lower():
@@ -425,11 +417,11 @@ class Getcomics(tk.Tk):
         with open(fileName, 'wb') as f:
             try:
                 dl = 0
-                for block in r.iter_content(1024):
+                for block in r.iter_content(51200):
                     dl += len(block)
-                    self.bytes += len(block)
-                    self.progress['value'] = int(100 * dl / size)
-                    self.progress2['value'] = int(100* self.bytes / self.listsize)
+                    self.currentpercent.set(int(100 * dl / size))
+                    self.dlbytes.set(self.dlbytes.get() + len(block))
+                    self.percent.set(int(100 * self.dlbytes.get() / self.listsize))
                     f.write(block)
             except KeyboardInterrupt:
                 pass
