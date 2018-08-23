@@ -203,7 +203,7 @@ class Getcomics(tk.Tk):
 
         # Gets both half the screen width/height and window width/height
         posx = int(self.winfo_screenwidth()/2 - sizex/2)
-        posy = int(self.winfo_screenheight()/3 - sizey/2)
+        posy = int(self.winfo_screenheight()/2 - sizey/2)
 
         self.resultwidht=50
         self.dlwidth=40
