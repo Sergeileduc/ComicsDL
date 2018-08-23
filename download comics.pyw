@@ -7,6 +7,7 @@ import os
 import time
 import tkinter as tk
 import tkinter.scrolledtext as tkst
+from tkinter import ttk
 import urllib.request
 import urllib.error
 import threading
@@ -68,18 +69,6 @@ def getSoup(html):
     return soup
 
 
-#get inner html from tag
-# def getTagClassData(html, tag, classname):
-# 	soup = getSoup(html)
-# 	list = soup.find_all(tag, class_=classname)
-# 	return list
-
-#get inner html from tag
-# def getTagData(html, tag, attr, name):
-# 	soup = getSoup(html)
-# 	list = soup.find_all(tag, {attr: name})
-# 	return list
-
 def getresults(url):
     searchlist=list()
     try:
@@ -98,70 +87,6 @@ def getresults(url):
     except:
         print("something wrong happened")
 
-#DL all comics in the liste
-def downAllCom(liste):
-    for dl in liste:
-        downCom(dl[0])
-    print("Terminé, vous pouvez quitter")
-    return
-
-#find download link
-def downCom(url):
-    finalurl = urllib.request.urlopen(url).geturl()
-    print ("Trying " + finalurl)
-    zippylink = ''
-    flag=False
-    try:
-        #html = returnHTML(finalurl)
-        #downButtons = getTagClassData(html, 'div', 'aio-pulse')
-        soup=url2soup(finalurl)
-        downButtons = soup.select("div.aio-pulse > a")
-        for button in downButtons:
-            #if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
-            if 'zippyshare' in button.get("href") or 'zippyshare' in button.get('title').lower():
-                #downComZippy(button.a['href'])
-                #zippylink = button.a['href']
-                zippylink = button.get("href")
-                try:
-                    finalzippy = urllib.request.urlopen(zippylink).geturl()
-                    downComZippy(finalzippy)
-                except:
-                    print("Zippyhare download failed")
-                    flag=False
-            # elif 'download now' in button.get('title').lower():
-            #     print("can't find or open zippyshare download button\nTrying 'Download now button'")
-
-
-    except urllib.error.HTTPError:
-        print("downCom got HTTPError from returnHTML")
-        raise
-    return
-
-#download from zippyshare
-def downComZippy(url):
-    #zippyHTML = returnHTML(url)
-    #downButton = getTagClassData(zippyHTML, 'div', 'right')
-    #downButton = getTagData(zippyHTML, "script", "type", "text/javascript")
-    soup=url2soup(url)
-    downButton = soup.select('script[type="text/javascript"]')
-    try:
-        fullURL, fileName = getZippyDL(url, downButton)
-        print ("Download from zippyhare into : " + fileName)
-        r = requests.get(fullURL)
-    except:
-        print("Can't get download link on zippyshare page")
-
-    #download from url & trim it a little bit
-    with open(fileName, 'wb') as f:
-        try:
-            for block in r.iter_content(1024):
-                f.write(block)
-        except KeyboardInterrupt:
-            pass
-        except IOError:
-            print("Error while writing file")
-        print ('Done\n--')
-    return
 
 def getZippyDL(url, button):
 	print("Found zippyshare : " + url)
@@ -237,16 +162,29 @@ class Getcomics(tk.Tk):
             dlcanva.configure(scrollregion=dlcanva.bbox("all"),width=200,height=200)
         super().__init__()
         sizex = 800 #largeur
-        sizey = 500 #hauter
-        posx  = 400
-        posy  = 100
+        sizey = 600 #hauteur
+
+        # Gets both half the screen width/height and window width/height
+        posx = int(self.winfo_screenwidth()/2 - sizex/2)
+        posy = int(self.winfo_screenheight()/3 - sizey/2)
+
         self.resultwidht=50
         self.dlwidth=40
         deepbg='#263238'
+        color1='#37474F'
+        color2='#455A64'
         dark2='#37474F'
         dark3='#455A64'
         fg='white'
+        style = ttk.Style()
+        style.configure("deepBG.TFrame", foreground=fg, background=deepbg, border=0, relief='flat')
+        style = ttk.Style()
+        style.configure("dark1.TFrame", foreground=fg, background=color1, border=0, relief='flat', highlightthickness = 0)
+        style = ttk.Style()
+        style.configure("L.TLabel", foreground=fg, background=color1, relief='raised', font=("Verdana", 12))
         self.page = 1
+        self.bytes = 0
+        self.maxbytes = 100
         self.usersearch = tk.StringVar()
         self.choices = ['Recherche par TAG', 'Recherche simple']
         self.mode = tk.StringVar()
@@ -260,13 +198,13 @@ class Getcomics(tk.Tk):
         self.title("Télécharger sur Getcomics v2")
         self.configure(background=deepbg)
 
-        topbar = tk.Frame(self, bg=deepbg)
-        mainframe = tk.Frame(self, bg=deepbg, border=0, relief='flat')
-        self.resultsframe = tk.Frame(mainframe, bg=dark2, border=0, relief='flat')
-        rightframe = tk.Frame(mainframe, bg=dark2, highlightthickness = 0)
-        buttonbar = tk.Frame(self.resultsframe, bg=deepbg)
+        topbar = ttk.Frame(self, style="deepBG.TFrame")
+        mainframe = ttk.Frame(self, style="deepBG.TFrame")
+        self.resultsframe = ttk.Frame(mainframe, style="dark1.TFrame")
+        rightframe = ttk.Frame(mainframe, style="dark1.TFrame")
+        buttonbar = ttk.Frame(self.resultsframe, style="deepBG.TFrame")
 
-        bottombar = tk.Frame(self,bg=deepbg)
+        bottombar = ttk.Frame(self, style="deepBG.TFrame")
         self.prevpage = tk.Button(buttonbar, text="page précédente", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.prevpage)
         nextpage = tk.Button(buttonbar, text="page suivante", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.nextpage)
         messageRecherche = tk.Label(topbar, text="Rechercher sur Getcomics", bg=dark2, fg=fg, justify=tk.CENTER,
@@ -276,14 +214,16 @@ class Getcomics(tk.Tk):
         choice["menu"].config(bg=dark3, fg=fg, relief='flat', border=0)
         search = tk.Entry(topbar, width=self.resultwidht, justify='center', insertbackground=fg, bg=dark2,fg=fg, textvariable=self.usersearch ,font=("Verdana", 12))
 
-        dlcanva = tk.Canvas(rightframe, bg=dark2, highlightthickness = 0)
-        self.dlframe = tk.Frame(dlcanva, bg=dark2, border=0, relief='flat')
-        scrollbar = tk.Scrollbar(dlcanva, orient="vertical", command=dlcanva.yview)
-        instructions = tk.Label(self.resultsframe, bg=dark2, fg=fg, relief='raised', text='Cliquez pour ajouter un élément à votre liste de téléchargement', font=("Verdana", 12))
+        dlcanva = tk.Canvas(rightframe, bg=color1, highlightthickness = 0)
+        self.dlframe = ttk.Frame(dlcanva, style="dark1.TFrame")
+        scrollbar = ttk.Scrollbar(dlcanva, orient="vertical", command=dlcanva.yview)
+        instructions = ttk.Label(self.resultsframe, style="L.TLabel", text='Cliquez pour ajouter un élément à votre liste de téléchargement')
         liste = tk.Label(rightframe, width=self.dlwidth, bg=dark2, fg=fg, relief='raised', text="Liste de téléchargement", font=("Verdana", 12))
-        dlall = tk.Button(rightframe, bg=dark2, fg=fg, highlightthickness = 0, text="Télécharger la liste", font=("Verdana", 12, 'bold'), command=lambda: self.dlcom(self.downloadlist))
+        dlall = tk.Button(rightframe, bg=color1, fg=fg, highlightthickness = 0, text="Télécharger la liste", font=("Verdana", 12, 'bold'), command=lambda: self.dlcom(self.downloadlist))
 
         outputtext = tkst.ScrolledText(bottombar, height=8, bg='black', fg='white', wrap = tk.WORD)
+        self.progress = ttk.Progressbar(bottombar, orient="horizontal",
+                                        length=200, mode="determinate")
 
         topbar.pack(fill='x', anchor='n', padx=20, pady=20)
         mainframe.pack(fill='both', expand=1, anchor='nw', padx=20, pady=(0,5))
@@ -307,6 +247,7 @@ class Getcomics(tk.Tk):
 
 
         bottombar.pack(fill='x')
+        self.progress.pack(padx=10, pady=(0,10), fill=tk.BOTH, expand=True)
         outputtext.pack(padx=10, pady=(0,10), fill=tk.BOTH, expand=True)
         sys.stdout = Std_redirector(outputtext)
 
@@ -319,6 +260,8 @@ class Getcomics(tk.Tk):
         widgetlist.clear()
         pass
 
+
+    #search comics function
     def searchcomics(self, event):
         dark2='#546E7A'
         fg='#FAFAFA'
@@ -339,13 +282,16 @@ class Getcomics(tk.Tk):
         #self.printwidgets(self.buttonlist)
         return
 
+    #download one comic
     def dlcom(self, liste):
         try:
-            thread1 = threading.Thread(target=downAllCom, args=[liste])
+            thread1 = threading.Thread(target=self.downAllCom, args=[liste])
             thread1.start()
         except:
             pass
 
+
+    #click to add to DL list
     def addtodl(self, button):
         dark2='#546E7A'
         fg='#FAFAFA'
@@ -360,6 +306,7 @@ class Getcomics(tk.Tk):
             print("Already in your DL list")
 
 
+    #click to remove an item function
     def removedl(self, button):
         for i in self.downloadlist:
             if button == i[2]:
@@ -367,19 +314,82 @@ class Getcomics(tk.Tk):
         button.destroy()
 
 
-    def printwidgets(self, widegetlist):
-        for w in widegetlist:
-            print(str(w.cget('text')))
+    #DL all comics in the liste
+    def downAllCom(self, liste):
+        for dl in liste:
+            self.downCom(dl[0])
+        print("Terminé, vous pouvez quitter")
+        return
 
-    def show_frame(self, cont):
-        frame = self.frames[cont]
-        frame.tkraise()
 
+    #find download link
+    def downCom(self, url):
+        finalurl = urllib.request.urlopen(url).geturl()
+        print ("Trying " + finalurl)
+        zippylink = ''
+        flag=False
+        try:
+            #html = returnHTML(finalurl)
+            #downButtons = getTagClassData(html, 'div', 'aio-pulse')
+            soup=url2soup(finalurl)
+            downButtons = soup.select("div.aio-pulse > a")
+            for button in downButtons:
+                #if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
+                if 'zippyshare' in button.get("href") or 'zippyshare' in button.get('title').lower():
+                    #downComZippy(button.a['href'])
+                    #zippylink = button.a['href']
+                    zippylink = button.get("href")
+                    try:
+                        finalzippy = urllib.request.urlopen(zippylink).geturl()
+                        self.downComZippy(finalzippy)
+                    except:
+                        print("Zippyhare download failed")
+                        flag=False
+                # elif 'download now' in button.get('title').lower():
+                #     print("can't find or open zippyshare download button\nTrying 'Download now button'")
+        except urllib.error.HTTPError:
+            print("downCom got HTTPError from returnHTML")
+            raise
+        return
+
+
+    #download from zippyshare
+    def downComZippy(self, url):
+        self.progress["value"] = 0
+        soup=url2soup(url)
+        downButton = soup.select('script[type="text/javascript"]')
+        try:
+            fullURL, fileName = getZippyDL(url, downButton)
+            print ("Download from zippyhare into : " + fileName)
+            r = requests.get(fullURL, stream=True)
+            size = int(r.headers['Content-length'])
+        except:
+            print("Can't get download link on zippyshare page")
+
+        #download from url & trim it a little bit
+        with open(fileName, 'wb') as f:
+            try:
+                dl = 0
+                for block in r.iter_content(1024):
+                    dl += len(block)
+                    self.bytes = int(100 * dl / size)
+                    self.progress['value'] = int(100 * dl / size)
+                    f.write(block)
+            except KeyboardInterrupt:
+                pass
+            except IOError:
+                print("Error while writing file")
+            print ('Done\n--')
+        return
+
+
+    #nexpage button function
     def nextpage(self):
         self.page = self.page + 1
         self.searchcomics(None)
         self.prevpage.pack(side='left', padx=(50,0))
 
+    #previous page button function
     def prevpage(self):
         if self.page > 1:
             self.page = self.page - 1
@@ -388,15 +398,6 @@ class Getcomics(tk.Tk):
             self.page = 1
         self.searchcomics(None)
 
-
-
-# class StartPage(tk.Frame):
-#
-#     def __init__(self, parent, controller):
-#         tk.Frame.__init__(self, parent)
-#         label = tk.Label(self, text="Start Page", font=LARGE_FONT)
-#         label.pack(pady=10, padx=10)
-#
 
 if __name__ == "__main__":
     app = Getcomics()  # constructor, calls method __init__
