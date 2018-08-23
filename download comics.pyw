@@ -72,13 +72,6 @@ def getSoup(html):
 def getresults(url):
     searchlist=list()
     try:
-        # soup=getSoup(returnHTML(url))
-        # interm = soup.find_all('h1', class_='post-title')
-        # soup2=getSoup(str(interm))
-        # list2=soup2.find_all('a')
-        # for a in list2:
-        #     if a.has_attr('href'):
-        #         searchlist.append(((a['href']), str(a.text)))
         soup=url2soup(url)
         for a in soup.select("h1.post-title > a"):
             if a.has_attr('href'):
