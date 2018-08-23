@@ -29,11 +29,50 @@ substitutions2 = {' (Digital)': '', ' (digital)': '',
 '(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'', ' (BlackManta-Empire)':'',
 ' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':''}
 
+defs={'KB':1024, 'MB':1024**2, 'GB':1024**3, 'TB':1024**4}
+
 #multiple replace function
 def replace(string, substitutions):
     substrings = sorted(substitutions, key=len, reverse=True)
     regex = re.compile('|'.join(map(re.escape, substrings)))
     return regex.sub(lambda match: substitutions[match.group(0)], string)
+
+#convert to bytes
+def convert2bytes(size):
+    parts = size.split()
+    size = parts[0]
+    unit = parts[1]
+    return int(size)*defs[unit]
+
+def bytes_2_human_readable(number_of_bytes):
+    if number_of_bytes < 0:
+        raise ValueError("!!! number_of_bytes can't be smaller than 0 !!!")
+
+    step_to_greater_unit = 1024.
+
+    number_of_bytes = float(number_of_bytes)
+    unit = 'bytes'
+
+    if (number_of_bytes / step_to_greater_unit) >= 1:
+        number_of_bytes /= step_to_greater_unit
+        unit = 'KB'
+
+    if (number_of_bytes / step_to_greater_unit) >= 1:
+        number_of_bytes /= step_to_greater_unit
+        unit = 'MB'
+
+    if (number_of_bytes / step_to_greater_unit) >= 1:
+        number_of_bytes /= step_to_greater_unit
+        unit = 'GB'
+
+    if (number_of_bytes / step_to_greater_unit) >= 1:
+        number_of_bytes /= step_to_greater_unit
+        unit = 'TB'
+
+    precision = 1
+    number_of_bytes = round(number_of_bytes, precision)
+
+    return str(number_of_bytes) + ' ' + unit
 
 # get html from url
 def returnHTML(url):
@@ -73,11 +112,16 @@ def getresults(url):
     searchlist=list()
     try:
         soup=url2soup(url)
-        for a in soup.select("h1.post-title > a"):
-            if a.has_attr('href'):
-                searchlist.append((a.get("href"),a.text))
+        for d in soup.select("div.post-info"):
+            if d.h1.a.has_attr('href'):
+                size = None
+                searchsize = re.search( r'\d+ [KMGT]B', d.p.text, re.M|re.I)
+                if searchsize:
+                    size = searchsize.group(0)
+                searchlist.append((d.h1.a.get("href"),d.h1.a.text, size))
+        #print(searchlist)
         return searchlist
-    except:
+    except urllib.error.HTTPError:
         print("something wrong happened")
 
 
@@ -178,6 +222,7 @@ class Getcomics(tk.Tk):
         self.page = 1
         self.bytes = 0
         self.maxbytes = 100
+        self.listsize = 0
         self.usersearch = tk.StringVar()
         self.choices = ['Recherche par TAG', 'Recherche simple']
         self.mode = tk.StringVar()
@@ -217,6 +262,8 @@ class Getcomics(tk.Tk):
         outputtext = tkst.ScrolledText(bottombar, height=8, bg='black', fg='white', wrap = tk.WORD)
         self.progress = ttk.Progressbar(bottombar, orient="horizontal",
                                         length=200, mode="determinate")
+        self.progress2 = ttk.Progressbar(bottombar, orient="horizontal",
+                                        length=200, mode="determinate")
 
         topbar.pack(fill='x', anchor='n', padx=20, pady=20)
         mainframe.pack(fill='both', expand=1, anchor='nw', padx=20, pady=(0,5))
@@ -241,6 +288,7 @@ class Getcomics(tk.Tk):
 
         bottombar.pack(fill='x')
         self.progress.pack(padx=10, pady=(0,10), fill=tk.BOTH, expand=True)
+        self.progress2.pack(padx=10, pady=(0,10), fill=tk.BOTH, expand=True)
         outputtext.pack(padx=10, pady=(0,10), fill=tk.BOTH, expand=True)
         sys.stdout = Std_redirector(outputtext)
 
@@ -265,8 +313,9 @@ class Getcomics(tk.Tk):
         #buttonlist = list()
         for i in self.searchlist:
             url=i[0]
+            title = i[1] + ' (' + str(i[2]) + ')'
             #newButton = tk.Button(self.buttonframe, text=i[1].replace('-',' ').title(), width=40, bg='RoyalBlue4', fg='white', relief='sunken', bd=0, font=("Verdana", 12))
-            newButton = tk.Button(self.resultsframe, text=i[1], width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
+            newButton = tk.Button(self.resultsframe, text=title, width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
             #newButton.config(command= lambda url=url: self.dlcom(url))
             newButton.config(command= lambda button=newButton: self.addtodl(button))
             newButton.pack(fill='both', expand=1, pady=0)
@@ -291,10 +340,17 @@ class Getcomics(tk.Tk):
         index = self.buttonlist.index(button)
         comic = button.cget('text')
         if comic not in (item[1] for item in self.downloadlist):
+            if self.searchlist[index][2] != None:
+                bytes = convert2bytes(self.searchlist[index][2])
+                #print(bytes)
+                self.listsize += bytes
+            #print(bytes)
+            #self.listsize += self.searchlist[index][2]
             newDL = tk.Button(self.dlframe, text=button.cget('text').title(), width=self.resultwidht, anchor='w', bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
             newDL.config(command= lambda button=newDL: self.removedl(button))
             newDL.pack(fill='both', expand=1, pady=0)
-            self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1], newDL))
+            self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1], newDL, self.searchlist[index][2]))
+            print("Taille de la file d'attente (donnée indicative) : " + bytes_2_human_readable(self.listsize))
         else:
             print("Already in your DL list")
 
@@ -303,12 +359,18 @@ class Getcomics(tk.Tk):
     def removedl(self, button):
         for i in self.downloadlist:
             if button == i[2]:
+                if i[3] != None:
+                    bytes = convert2bytes(i[3])
+                    #print(bytes)
+                    self.listsize -= bytes
                 self.downloadlist.remove(i)
         button.destroy()
+        print("Taille de la file d'attente (donnée indicative) : " + bytes_2_human_readable(self.listsize))
 
 
     #DL all comics in the liste
     def downAllCom(self, liste):
+        self.bytes = 0
         for dl in liste:
             self.downCom(dl[0])
         print("Terminé, vous pouvez quitter")
@@ -355,7 +417,7 @@ class Getcomics(tk.Tk):
             fullURL, fileName = getZippyDL(url, downButton)
             print ("Download from zippyhare into : " + fileName)
             r = requests.get(fullURL, stream=True)
-            size = int(r.headers['Content-length'])
+            size = int(r.headers['Content-length']) #size in bytes
         except:
             print("Can't get download link on zippyshare page")
 
@@ -365,8 +427,9 @@ class Getcomics(tk.Tk):
                 dl = 0
                 for block in r.iter_content(1024):
                     dl += len(block)
-                    self.bytes = int(100 * dl / size)
+                    self.bytes += len(block)
                     self.progress['value'] = int(100 * dl / size)
+                    self.progress2['value'] = int(100* self.bytes / self.listsize)
                     f.write(block)
             except KeyboardInterrupt:
                 pass
