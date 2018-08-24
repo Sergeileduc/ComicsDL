@@ -67,7 +67,6 @@ def printWeek(url, f):
 
     for a in var:
         if a.has_attr('href'):
-            #searchlist.append((a.get("href"),a.text))
             #print(a.text + '==> [url]' + a.get("href") + '[/url]')
             f.write(a.text + '==> [url]' + a.get("href") + '[/url]' + '\n')
 
@@ -78,7 +77,6 @@ def printIndieWeek(url, f):
     soup2=BeautifulSoup(str(temp), 'html.parser')
     var = soup2.find_all('strong')
     for s in var:
-        #print(s.a)
         if s.text in indies:
             f.write('\n' + s.text + '\n==============================' + '\n')
         else:
