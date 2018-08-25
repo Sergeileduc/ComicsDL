@@ -82,7 +82,7 @@ def returnHTML(url):
         req = urllib.request.Request(finalurl, headers=hdr)
         response = urllib.request.urlopen(req)
         html = response.read()
-        req.close()
+        response.close()
         return html
     except ValueError as e:
         print(e)
@@ -128,15 +128,15 @@ def getresults(url):
 def getZippyDL(url, button):
 	print("Found zippyshare : " + url)
 	#disassemble url
-	comRawUrl0 = regexNightmare(button, '.*?getElementById.*?href = \"(.*?)\"');
-	comRawUrl1 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;');
-	comRawUrl2 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;');
+	comRawUrl0 = regexNightmare(button, r'.*?getElementById.*?href = \"(.*?)\"')
+	comRawUrl1 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;')
+	comRawUrl2 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;')
 	#filename = comRawUrl2[1:].replace('%20',' ').replace('%28','(').replace('%29',')').replace('%2c','')
 	temp = replace(comRawUrl2[1:], substitutions1)
 	filename = replace(temp, substitutions2)
 	#calculating the id and forming url | that is an extremely dirty way, I know
 	try:
-		urlPattern = re.compile('(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
+		urlPattern = re.compile(r'(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
 		urlNum1 = urlPattern.search(str(comRawUrl1)).group(2)
 		urlNum2 = urlPattern.search(str(comRawUrl1)).group(3)
 		urlNum3 = urlPattern.search(str(comRawUrl1)).group(4)
@@ -209,7 +209,7 @@ class Getcomics(tk.Tk):
         self.dlwidth=40
         deepbg='#263238'
         color1='#37474F'
-        color2='#455A64'
+        #color2='#455A64'
         dark2='#37474F'
         dark3='#455A64'
         fg='white'
@@ -248,10 +248,10 @@ class Getcomics(tk.Tk):
         buttonbar = ttk.Frame(self.resultsframe, style="deepBG.TFrame")
 
         bottombar = ttk.Frame(self, style="deepBG.TFrame")
-        self.prevpage = tk.Button(buttonbar, text="page précédente", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.prevpage)
-        nextpage = tk.Button(buttonbar, text="page suivante", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.nextpage)
-        messageRecherche = tk.Label(topbar, text="Rechercher sur Getcomics", bg=dark2, fg=fg, justify=tk.CENTER,
-                                    font=("Helvetica", 12))
+        self.prevpage = tk.Button(buttonbar, text="page précédente", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.gotoprevpage)
+        nextpage = tk.Button(buttonbar, text="page suivante", bg=dark3, fg=fg, font=("Verdana", 12), relief='raised', border=2, highlightthickness = 0, command=self.gotonextpage)
+        #messageRecherche = tk.Label(topbar, text="Rechercher sur Getcomics", bg=dark2, fg=fg, justify=tk.CENTER,
+        #                            font=("Helvetica", 12))
         choice = tk.OptionMenu(topbar, self.mode, *self.choices)
         choice.config(bg=dark3, fg=fg, relief='flat', border=0, highlightthickness = 0)
         choice["menu"].config(bg=dark3, fg=fg, relief='flat', border=0)
@@ -315,7 +315,6 @@ class Getcomics(tk.Tk):
         self.searchlist = getresults(searchurl(self.usersearch.get(),searchmode, self.page))
         #buttonlist = list()
         for i in self.searchlist:
-            url=i[0]
             title = i[1] + ' (' + str(i[2]) + ')'
             newButton = tk.Button(self.resultsframe, text=title, width=self.resultwidht, bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
             newButton.config(command= lambda button=newButton: self.addtodl(button))
@@ -378,7 +377,6 @@ class Getcomics(tk.Tk):
         finalurl = urllib.request.urlopen(url).geturl()
         print ("Trying " + finalurl)
         zippylink = ''
-        flag=False
         try:
             soup=url2soup(finalurl)
             downButtons = soup.select("div.aio-pulse > a")
@@ -391,9 +389,6 @@ class Getcomics(tk.Tk):
                         self.downComZippy(finalzippy)
                     except IOError:
                         print("Zippyhare download failed")
-                        flag=False
-                # elif 'download now' in button.get('title').lower():
-                #     print("can't find or open zippyshare download button\nTrying 'Download now button'")
         except urllib.error.HTTPError:
             print("downCom got HTTPError from returnHTML")
             raise
@@ -417,6 +412,8 @@ class Getcomics(tk.Tk):
         with open(fileName, 'wb') as f:
             try:
                 dl = 0
+                if self.listsize == 0:
+                    self.listsize = 1
                 for block in r.iter_content(51200):
                     dl += len(block)
                     self.currentpercent.set(int(100 * dl / size))
@@ -432,13 +429,13 @@ class Getcomics(tk.Tk):
 
 
     #nexpage button function
-    def nextpage(self):
+    def gotonextpage(self):
         self.page = self.page + 1
         self.searchcomics(None)
         self.prevpage.pack(side='left', padx=(50,0))
 
     #previous page button function
-    def prevpage(self):
+    def gotoprevpage(self):
         if self.page > 1:
             self.page = self.page - 1
             self.prevpage.pack_forget()
