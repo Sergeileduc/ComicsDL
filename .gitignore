@@ -9,6 +9,7 @@ __pycache__/
 *.cbz
 *.zip
 *.spec
+*test*
 soup.html
 .comics.db
 liste-comics-semaine.txt
