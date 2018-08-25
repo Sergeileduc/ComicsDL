@@ -107,10 +107,8 @@ def downCom(url):
         for button in downButtons:
             #if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
             if 'zippyshare' in button.get("href").lower() or 'zippyshare' in button.get('title').lower():
-                #downComZippy(button.a['href'])
-                #zippylink = button.a['href']
                 zippylink = button.get("href")
-                finalzippy = urllib.request.urlopen(zippylink).geturl()
+                #finalzippy = urllib.request.urlopen(zippylink).geturl()
                 downComZippy(zippylink)
                 flag=False
             else:
@@ -134,15 +132,15 @@ def getZippyDL(url, button):
     print("Found zippyshare : " + url)
 
     #disassemble url
-    comRawUrl0 = regexNightmare(button, '.*?getElementById.*?href = \"(.*?)\"');
-    comRawUrl1 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;');
-    comRawUrl2 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;');
+    comRawUrl0 = regexNightmare(button, r'.*?getElementById.*?href = \"(.*?)\"')
+    comRawUrl1 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;')
+    comRawUrl2 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;')
     #filename = comRawUrl2[1:].replace('%20',' ').replace('%28','(').replace('%29',')').replace('%2c','')
     temp = replace(comRawUrl2[1:], substitutions1)
     filename = replace(temp, substitutions2)
     #calculating the id and forming url | that is an extremely dirty way, I know
     try:
-        urlPattern = re.compile('(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
+        urlPattern = re.compile(r'(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
         urlNum1 = urlPattern.search(str(comRawUrl1)).group(2)
         urlNum2 = urlPattern.search(str(comRawUrl1)).group(3)
         urlNum3 = urlPattern.search(str(comRawUrl1)).group(4)
