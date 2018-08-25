@@ -22,7 +22,13 @@ config = 'liste-dc.txt'
 #config = 'liste-indie.txt'
 
 substitutions1 = {'%2c': '', '%20': ' ', '%28': '(', '%29': ')'}
-substitutions2 = {' (Digital)': '', ' (digital)': '', ' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'', ' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '', ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '', ' (Minutemen-Thoth)':'', ' (Oroboros-DCP)': '', ' (Oracle-SWA)': ''}
+substitutions2 = {' (Digital)': '', ' (digital)': '',
+' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'',
+' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
+' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
+' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
+'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'',
+' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':''}
 
 today = datetime.today().strftime("%Y-%m-%d")
 
@@ -114,15 +120,15 @@ def getZippyDL(url, button):
     print("Found zippyshare : " + url)
 
     #disassemble url
-    comRawUrl0 = regexNightmare(button, '.*?getElementById.*?href = \"(.*?)\"');
-    comRawUrl1 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;');
-    comRawUrl2 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;');
+    comRawUrl0 = regexNightmare(button, r'.*?getElementById.*?href = \"(.*?)\"')
+    comRawUrl1 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;')
+    comRawUrl2 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;')
     #filename = comRawUrl2[1:].replace('%20',' ').replace('%28','(').replace('%29',')').replace('%2c','')
     temp = replace(comRawUrl2[1:], substitutions1)
     filename = replace(temp, substitutions2)
     #calculating the id and forming url | that is an extremely dirty way, I know
     try:
-        urlPattern = re.compile('(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
+        urlPattern = re.compile(r'(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
         urlNum1 = urlPattern.search(str(comRawUrl1)).group(2)
         urlNum2 = urlPattern.search(str(comRawUrl1)).group(3)
         urlNum3 = urlPattern.search(str(comRawUrl1)).group(4)
