@@ -12,7 +12,8 @@ DCurl = "https://getcomics.info/tag/dc-week/"
 MarvelURL = "http://getcomics.info/tag/marvel-now/"
 IndieURL = "https://getcomics.info/tag/indie-week/"
 
-indies = ['2000AD:', 'ABSTRACT STUDIOS:', 'ACTION LAB:', 'AFTERSHOCK COMICS',
+indies = ['2000AD:', 'ABSTRACT STUDIOS:', 'ACTION LAB:',
+'AFTERSHOCK COMICS', 'AFTERSHOCK COMICS:',
 'ALBATROSS FUNNYBOOKS:', 'AMERICAN MYTHOLOGY PRODUCTIONS:', 'ANTARTIC PRESS:',
 'ARCHIE COMIC PUBLICATIONS:',
 'ASPEN:', 'AVATAR PRESS:', 'BENITEZ:', 'BLACK MASK COMICS:', 'BOOM! STUDIOS:', 'BOUNDLESS:',
