@@ -12,12 +12,23 @@ DCurl = "https://getcomics.info/tag/dc-week/"
 MarvelURL = "http://getcomics.info/tag/marvel-now/"
 IndieURL = "https://getcomics.info/tag/indie-week/"
 
-indies = ['2000AD:', 'ABSTRACT STUDIOS:', 'ACTION LAB:', 'AFTERSHOCK COMICS',
-'ALBATROSS FUNNYBOOKS:', 'AMERICAN MYTHOLOGY PRODUCTIONS:', 'ARCHIE COMIC PUBLICATIONS:',
-'ASPEN:', 'AVATAR PRESS:', 'BLACK MASK COMICS:', 'BOOM! STUDIOS:', 'BOUNDLESS:',
+indies = ['2000AD:', 'ABSTRACT STUDIOS:', 'ACTION LAB:',
+'AFTERSHOCK COMICS', 'AFTERSHOCK COMICS:',
+'ALBATROSS FUNNYBOOKS:', 'AMERICAN MYTHOLOGY PRODUCTIONS:', 'ANTARTIC PRESS:',
+'ARCHIE COMIC PUBLICATIONS:',
+'ASPEN:', 'AVATAR PRESS:', 'BENITEZ:', 'BLACK MASK COMICS:', 'BOOM! STUDIOS:', 'BOUNDLESS:',
 'BROADSWORD COMICS:', 'DANGER ZONE:', 'DARK HORSE COMICS:', 'DYNAMITE ENTERTAINMENT:',
-'IDW PUBLISHING:', 'LEGENDARY COMICS:', 'LION FORGE:', 'MAGAZINE:', 'ONI PRESS:', 'STORM KING PRODUCTIONS:',
-'VALIANT ENTERTAINMENT:', 'ZENESCOPE ENTERTAINMENT:']
+'IDW PUBLISHING:', 'LEGENDARY COMICS:', 'LION FORGE:', 'MAGAZINE:', 'ONI PRESS:',
+'STORM KING PRODUCTIONS:',
+'VALIANT:', 'VALIANT ENTERTAINMENT:',
+'ZENESCOPE:', 'ZENESCOPE ENTERTAINMENT:']
+
+note = "Notes :\n"
+howto = "Video guide on how"
+howtodl = "how to download"
+consistof = "consist of :"
+lower = "or on the lower"
+bloat = ['Language :', 'Image Format :', 'Year :', 'Size :', 'Notes :']
 
 #get html from url
 def returnHTML(url):
@@ -79,6 +90,10 @@ def printIndieWeek(url, f):
     for s in var:
         if s.text in indies:
             f.write('\n' + s.text + '\n==============================' + '\n')
+        elif note in s.text or howto in s.text or consistof in s.text or howtodl in s.text or lower in s.text:
+            pass
+        elif s.text in bloat:
+            pass
         else:
             if s.a and s.a.has_attr('href'):
                 f.write('[url=' + s.a.get("href") + ']' + s.a.text  + '[/url]' + '\n')

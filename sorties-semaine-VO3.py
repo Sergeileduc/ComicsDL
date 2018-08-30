@@ -29,6 +29,7 @@ howtodl = "how to download"
 consistof = "consist of :"
 lower = "or on the lower"
 bloat = ['Language :', 'Image Format :', 'Year :', 'Size :', 'Notes :']
+
 #get html from url
 def returnHTML(url):
     hdr = {'Accept': 'text/html', 'User-Agent' : "Fiddler"}
