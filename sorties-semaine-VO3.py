@@ -13,11 +13,11 @@ MarvelURL = "http://getcomics.info/tag/marvel-now/"
 IndieURL = "https://getcomics.info/tag/indie-week/"
 
 indies = ['2000AD:', 'ABSTRACT STUDIOS:', 'ACTION LAB:',
-'AFTERSHOCK COMICS', 'AFTERSHOCK COMICS:',
-'ALBATROSS FUNNYBOOKS:', 'AMERICAN MYTHOLOGY PRODUCTIONS:', 'ANTARTIC PRESS:',
-'ANTARCTIC PRESS:', 'ARCHIE COMIC PUBLICATIONS:',
-'ASPEN:', 'AVATAR PRESS:', 'BENITEZ:', 'BLACK MASK COMICS:', 'BOOM! STUDIOS:',
-'BOUNDLESS:', 'BROADSWORD COMICS:', 'DANGER ZONE:', 'DARK HORSE COMICS:',
+'AFTERSHOCK COMICS', 'AFTERSHOCK COMICS:', 'ALBATROSS FUNNYBOOKS:',
+'AMERICAN MYTHOLOGY PRODUCTIONS:', 'ANTARTIC PRESS:', 'ANTARCTIC PRESS:',
+'ARCHIE COMIC PUBLICATIONS:', 'ASPEN:', 'ASPEN COMICS:', 'AVATAR PRESS:',
+'AHOY COMICS:', 'BENITEZ:', 'BLACK MASK COMICS:', 'BOOM! STUDIOS:', 'BOUNDLESS:',
+'BROADSWORD COMICS:', 'DANGER ZONE:', 'DARK HORSE COMICS:',
 'DYNAMITE ENTERTAINMENT:', 'IDW PUBLISHING:', 'LEGENDARY COMICS:',
 'LION FORGE:', 'MAGAZINE:', 'ONI PRESS:', 'RED5:', 'STORM KING PRODUCTIONS:',
 'VALIANT:', 'VALIANT ENTERTAINMENT:',
@@ -81,8 +81,13 @@ def printWeek(url, f):
         name = s.text.replace(' : ','').replace('Download','')\
                     .replace(' | ','').replace('Read Online','')
         a = s.find('a')
-        if a.has_attr('href'):
-            f.write('[url=' + a.get("href") + ']' + name  + '[/url]' + '\n')
+        try:
+            if 'href' in a.attrs:
+            #if a.has_attr('href'):
+                l = a.get('href')
+                f.write('[url=' + a.get("href") + ']' + name  + '[/url]' + '\n')
+        except:
+            f.write(name + '\n')
 
 
 #print getcomics Indie+ weekly post
