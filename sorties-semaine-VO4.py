@@ -115,7 +115,7 @@ def printIndieWeek(url, f):
     var = soup2.find_all('strong')
     for s in var:
         if s.text in indies:
-            f.write('\n' + s.text + '\n==============================' + '\n')
+            f.write('\n' + s.text + '\n=====================' + '\n')
         elif note in s.text \
         or howto in s.text \
         or consistof in s.text \
@@ -142,28 +142,28 @@ def generateweekly():
     with open("liste-comics-semaine.txt", "w")  as f:
         #DC
         f.write("DC week" + '\n')
-        f.write("==============================" + '\n')
+        f.write("=====================" + '\n')
         printWeek(DCurl, f)
-        f.write("==============================" + '\n')
+        f.write("=====================" + '\n')
         f.write("" + '\n')
         #Marvel
         f.write("Marvel week" + '\n')
-        f.write("==============================" + '\n')
+        f.write("=====================" + '\n')
         printWeek(MarvelURL, f)
-        f.write("==============================" + '\n')
+        f.write("=====================" + '\n')
         f.write("" + '\n')
         #Indie
         f.write("Indé week" + '\n')
-        f.write("==============================" + '\n')
+        f.write("=====================" + '\n')
         #Image
         f.write("Image week" + '\n')
-        f.write("==============================" + '\n')
+        f.write("=====================" + '\n')
         printWeek(ImageURL, f)
-        f.write("==============================" + '\n')
+        f.write("=====================" + '\n')
         f.write("" + '\n')
         #Indé
         #f.write("Indé week" + '\n')
-        f.write("==============================" + '\n')
+        f.write("=====================" + '\n')
         printIndieWeek(IndieURL, f)
 
 
