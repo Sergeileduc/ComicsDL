@@ -171,12 +171,9 @@ def generateweekly():
 print("Les derniers 'weekly packs' de Getcomics sont :")
 displayLastWeeklies()
 
-# Join = input('Voulez-vous continuer ? (y/n) ?\n')
-# if Join.lower() == 'yes' or Join.lower() == 'y':
-#     print("Processing")
-#     generateweekly()
-# else:
-#     print ("Exit")
-
-print("Processing")
-generateweekly()
+Join = input('Voulez-vous continuer ? (y/n) ?\n')
+if Join.lower() == 'yes' or Join.lower() == 'y':
+    print("Processing")
+    generateweekly()
+else:
+    print ("Exit")
