@@ -9,7 +9,7 @@ import urllib.error
 from bs4 import BeautifulSoup
 
 DCurl = "https://getcomics.info/tag/dc-week/"
-MarvelURL = "http://getcomics.info/tag/marvel-now/"
+MarvelURL = "https://getcomics.info/tag/marvel-now/"
 IndieURL = "https://getcomics.info/tag/indie-week/"
 
 indies = ['2000AD:', 'ABSTRACT STUDIOS:', 'ACTION LAB:',

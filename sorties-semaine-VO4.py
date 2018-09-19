@@ -9,7 +9,7 @@ import urllib.error
 from bs4 import BeautifulSoup
 
 DCurl = "https://getcomics.info/tag/dc-week/"
-MarvelURL = "http://getcomics.info/tag/marvel-now/"
+MarvelURL = "https://getcomics.info/tag/marvel-now/"
 ImageURL = "https://getcomics.info/tag/image-week/"
 IndieURL = "https://getcomics.info/tag/indie-week/"
 
@@ -88,7 +88,8 @@ def findLastWeekly(url):
 def printWeek(url, f):
     weeklyUrl = findLastWeekly(url)
     soup = url2soup(weeklyUrl)
-    temp = soup.select('section.post-contents > ul > li')
+    #temp = soup.select('section.post-contents > ul > li')
+    temp = soup.select('section.post-contents > ul')
     soup2=BeautifulSoup(str(temp), 'html.parser')
     var = soup2.find_all('strong')
 
@@ -139,22 +140,29 @@ def generateweekly():
         pass
 
     with open("liste-comics-semaine.txt", "w")  as f:
+        #DC
         f.write("DC week" + '\n')
         f.write("==============================" + '\n')
         printWeek(DCurl, f)
         f.write("==============================" + '\n')
         f.write("" + '\n')
+        #Marvel
         f.write("Marvel week" + '\n')
         f.write("==============================" + '\n')
         printWeek(MarvelURL, f)
         f.write("==============================" + '\n')
         f.write("" + '\n')
+        #Indie
+        f.write("Indé week" + '\n')
+        f.write("==============================" + '\n')
+        #Image
         f.write("Image week" + '\n')
         f.write("==============================" + '\n')
         printWeek(ImageURL, f)
         f.write("==============================" + '\n')
         f.write("" + '\n')
-        f.write("Indé week" + '\n')
+        #Indé
+        #f.write("Indé week" + '\n')
         f.write("==============================" + '\n')
         printIndieWeek(IndieURL, f)
 
@@ -163,9 +171,12 @@ def generateweekly():
 print("Les derniers 'weekly packs' de Getcomics sont :")
 displayLastWeeklies()
 
-Join = input('Voulez-vous continuer ? (y/n) ?\n')
-if Join.lower() == 'yes' or Join.lower() == 'y':
-    print("Processing")
-    generateweekly()
-else:
-    print ("Exit")
+# Join = input('Voulez-vous continuer ? (y/n) ?\n')
+# if Join.lower() == 'yes' or Join.lower() == 'y':
+#     print("Processing")
+#     generateweekly()
+# else:
+#     print ("Exit")
+
+print("Processing")
+generateweekly()
