@@ -130,7 +130,7 @@ def printIndieWeek(url, f):
             if s.a and s.a.has_attr('href'):
                 f.write('[url=' + s.a.get("href") + ']' + name  + '[/url]' + '\n')
             else:
-                f.write(s.text + '\n')
+                f.write(name + '\n')
 
 #generate output file
 def generateweekly():
