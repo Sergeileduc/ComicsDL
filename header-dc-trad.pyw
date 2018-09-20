@@ -64,7 +64,7 @@ def returnHTML(url):
 #get inner html from tag
 def getTagData(html, tag, classname):
     soup = BeautifulSoup(html, 'html.parser')
-    prettysoup = soup.prettify()
+    #prettysoup = soup.prettify()
     list = soup.find_all(tag, class_=classname)
     return list
 
@@ -106,7 +106,7 @@ def refresh(comicslist):
     coverimgurllist = list()
     html = returnHTML(dctradpage)
     soup = BeautifulSoup(html, 'html.parser')
-    headerlist = soup.find_all('span', class_="btn-cover")
+    #headerlist = soup.find_all('span', class_="btn-cover")
     comicslist = soup.select('span.btn-cover a')
     coverlist = soup.select('span.btn-cover img')
     for img in coverlist:
@@ -121,9 +121,9 @@ class DCTradapp(tk.Tk):
         logo=False
         html = returnHTML(dctradpage)
         soup = BeautifulSoup(html, 'html.parser')
-        headerlist = soup.find_all('span', class_="btn-cover")
+        #headerlist = soup.find_all('span', class_="btn-cover")
         comicslist = soup.select('span.btn-cover a')
-        coverlist = soup.select('span.btn-cover img')
+        #coverlist = soup.select('span.btn-cover img')
 
         tk.Tk.__init__(self, *args, **kwargs)
         self.configure(background='SteelBlue3')
