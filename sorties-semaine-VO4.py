@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# -*-coding:Utf-8 -
+# -*-coding:utf-8 -*-
 
 import requests
 import sys
@@ -100,7 +100,6 @@ def printWeek(url, f):
         try:
             if 'href' in a.attrs:
             #if a.has_attr('href'):
-                l = a.get('href')
                 f.write('[url=' + a.get("href") + ']' + name  + '[/url]' + '\n')
         except:
             f.write(name + '\n')
