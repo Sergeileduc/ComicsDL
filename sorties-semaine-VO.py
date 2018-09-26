@@ -61,7 +61,8 @@ def displayLastWeek(url):
     htmlMain = returnHTML(url)
     soup = getSoup(htmlMain)
     lastPost = soup.find_all('article', class_= 'type-post')[0]
-    print(lastPost.h1.a.text)
+    time = lastPost.find('time')
+    print(lastPost.h1.a.text + ' : ' + time.text)
 
 
 #find las weekly post
