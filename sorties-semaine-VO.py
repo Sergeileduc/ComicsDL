@@ -13,22 +13,6 @@ MarvelURL = "https://getcomics.info/tag/marvel-now/"
 ImageURL = "https://getcomics.info/tag/image-week/"
 IndieURL = "https://getcomics.info/tag/indie-week/"
 
-indies = ['2000AD:', 'ABSTRACT STUDIO:', 'ABSTRACT STUDIOS:', 'ACTION LAB:',
-'AFTERSHOCK COMICS', 'AFTERSHOCK COMICS:', 'AFTERSHOCK:',
-'ALBATROSS FUNNYBOOKS:', 'AMERICAN MYTHOLOGY PRODUCTIONS:',
-'ANTARTIC PRESS:', 'ANTARCTIC PRESS:',
-'ARCHIE COMIC PUBLICATIONS:', 'ASPEN:', 'ASPEN COMICS:', 'AVATAR PRESS:',
-'AHOY COMICS:', 'BENITEZ:', 'BLACK MASK COMICS:',
-'BOOM! STUDIOS:', 'BOOM STUDIOS:',
-'BOUNDLESS:', 'BROADSWORD COMICS:', 'DANGER ZONE:',
-'DARK HORSE COMICS:', 'DARK HORSE:', 'DC COMICS:',
-'DYNAMITE ENTERTAINMENT:', 'IDW PUBLISHING:', 'IDW:', 'IMAGE COMICS:',
-'LEGENDARY COMICS:',
-'LION FORGE:', 'MAGAZINE:', 'MARVEL COMICS:', 'PREVIEWS:','ONI PRESS:',
-'RED5:', 'STORM KING PRODUCTIONS:',
-'VALIANT:', 'VALIANT ENTERTAINMENT:',
-'ZENESCOPE:', 'ZENESCOPE ENTERTAINMENT:']
-
 note = "Notes :\n"
 howto = "Video guide on how"
 howtodl = "how to download"
@@ -113,10 +97,16 @@ def printWeek(url, f):
 #print getcomics Indie+ weekly post
 def printIndieWeek(url, f):
     weeklyUrl = findLastWeekly(url)
-    soup = url2soup(weeklyUrl)
-    temp = soup.select('section.post-contents')
-    soup2=BeautifulSoup(str(temp), 'html.parser')
+    soup=url2soup(weeklyUrl).select('section.post-contents')
+    soup2=BeautifulSoup(str(soup), 'html.parser')
+
+    publishers = soup2.find_all('span', style="color: #3366ff;")
+    indies = []
+    for p in publishers:
+        indies.append(p.text)
+
     var = soup2.find_all('strong')
+
     for s in var:
         if s.text in indies:
             f.write('\n' + s.text + '\n=====================' + '\n')
@@ -166,8 +156,6 @@ def generateweekly():
         f.write("=====================" + '\n')
         f.write("" + '\n')
         #Indé
-        #f.write("Indé week" + '\n')
-        f.write("=====================" + '\n')
         printIndieWeek(IndieURL, f)
 
 
