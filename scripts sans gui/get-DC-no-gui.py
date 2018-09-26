@@ -1,5 +1,5 @@
-#!/usr/bin/python3
-# -*-coding:Utf-8 -
+#!/usr/bin/python3
+# -*-coding:utf-8 -*-
 import os
 import re
 import requests
@@ -104,7 +104,7 @@ def downCom(url):
             if 'zippyshare' in button.get("href").lower():
                 #downComZippy(button.a['href'])
                 zippylink = button.get("href")
-                finalzippy = urllib.request.urlopen(zippylink).geturl()
+                #finalzippy = urllib.request.urlopen(zippylink).geturl()
                 downComZippy(zippylink)
                 flag=False
             else:
@@ -128,9 +128,9 @@ def getZippyDL(url, button):
     print("Found zippyshare : " + url)
 
     #disassemble url
-    comRawUrl0 = regexNightmare(button, '.*?getElementById.*?href = \"(.*?)\"');
-    comRawUrl1 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;');
-    comRawUrl2 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;');
+    comRawUrl0 = regexNightmare(button, '.*?getElementById.*?href = \"(.*?)\"')
+    comRawUrl1 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;')
+    comRawUrl2 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;')
     #filename = comRawUrl2[1:].replace('%20',' ').replace('%28','(').replace('%29',')').replace('%2c','')
     temp = replace(comRawUrl2[1:], substitutions1)
     filename = replace(temp, substitutions2)

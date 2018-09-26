@@ -1,5 +1,5 @@
-#!/usr/bin/python3
-# -*-coding:Utf-8 -
+#!/usr/bin/python3
+# -*-coding:utf-8 -*-
 import os
 import re
 import requests
@@ -94,26 +94,24 @@ def findLastWeekly(url):
 #find download link
 def downCom(url):
     finalurl = urllib.request.urlopen(url).geturl()
-    print ("Found " + finalurl)
+    print ("Trying " + finalurl)
     zippylink = ''
-    flag=False
     try:
         soup=url2soup(finalurl)
         downButtons = soup.select("div.aio-pulse > a")
         for button in downButtons:
-            if 'zippyshare' in button.get("href").lower():
-                #downComZippy(button.a['href'])
+            #if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
+            if 'zippyshare' in button.get("href") or 'zippyshare' in button.get('title').lower():
                 zippylink = button.get("href")
-                finalzippy = urllib.request.urlopen(zippylink).geturl()
-                downComZippy(zippylink)
-                flag=False
-            else:
-                flag=True
-        if flag==True:
-            print("can't find zippyshare download button")
+                try:
+                    finalzippy = urllib.request.urlopen(zippylink).geturl()
+                    downComZippy(finalzippy)
+                except IOError:
+                    print("Zippyhare download failed")
+                    pass
     except urllib.error.HTTPError:
         print("downCom got HTTPError from returnHTML")
-        raise
+        pass
     return
 
 #just optimizing
@@ -128,22 +126,22 @@ def getZippyDL(url, button):
     print("Found zippyshare : " + url)
 
     #disassemble url
-    comRawUrl0 = regexNightmare(button, '.*?getElementById.*?href = \"(.*?)\"');
-    comRawUrl1 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;');
-    comRawUrl2 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;');
+    comRawUrl0 = regexNightmare(button, r'.*?getElementById.*?href = \"(.*?)\"')
+    comRawUrl1 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;')
+    comRawUrl2 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;')
     #filename = comRawUrl2[1:].replace('%20',' ').replace('%28','(').replace('%29',')').replace('%2c','')
     temp = replace(comRawUrl2[1:], substitutions1)
     filename = replace(temp, substitutions2)
     #calculating the id and forming url | that is an extremely dirty way, I know
     try:
-        urlPattern = re.compile('(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
+        urlPattern = re.compile(r'(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
         urlNum1 = urlPattern.search(str(comRawUrl1)).group(2)
         urlNum2 = urlPattern.search(str(comRawUrl1)).group(3)
         urlNum3 = urlPattern.search(str(comRawUrl1)).group(4)
         urlNumFull = (int(urlNum2) % int(urlNum1)) + (int(urlNum2) % int(urlNum3))
         fullURL = url[:-21] + comRawUrl0 + str(urlNumFull) + comRawUrl2
     except Exception as e:
-        print("Mon erreur")
+        print("Mon erreur in getZippyDL")
         print(e)
         raise
     return fullURL, filename
@@ -199,10 +197,8 @@ try:
             for myComic in myComicsList:
                 if myComic in newcomic:
                     downCom(newcomic)
-                    pass
         except Exception as e:
             print(e)
-            pass
     print("C'est tout. Vous pouvez fermer.")
     time.sleep(20)
 except NameError:
