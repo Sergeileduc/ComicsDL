@@ -50,19 +50,20 @@ def getSoup(html):
     return soup
 
 #find last weekly and display
-def displayLastWeeklies():
-    displayLastWeek(DCurl)
-    displayLastWeek(MarvelURL)
-    displayLastWeek(ImageURL)
-    displayLastWeek(IndieURL)
+def printLastWeeklies():
+    printLastWeek(DCurl, "DC")
+    printLastWeek(MarvelURL, "Marvel")
+    printLastWeek(ImageURL, "Image")
+    printLastWeek(IndieURL, "Indé")
 
 #def print last weekly date
-def displayLastWeek(url):
+def printLastWeek(url, editor):
     htmlMain = returnHTML(url)
     soup = getSoup(htmlMain)
     lastPost = soup.find_all('article', class_= 'type-post')[0]
+    title = lastPost.h1.a.text
     time = lastPost.find('time')
-    print(lastPost.h1.a.text + ' : ' + time.text)
+    print(editor + '\t : ' + title + ' :\t' + time.text)
 
 
 #find las weekly post
@@ -70,19 +71,40 @@ def findLastWeekly(url):
     htmlMain = returnHTML(url)
     soup = getSoup(htmlMain)
     lastPost = soup.find_all('article', class_= 'type-post')[0]
+    postTitle = lastPost.h1.a.text
     postUrl = lastPost.h1.a['href']
-    return postUrl
+    return postTitle, postUrl
 
 
 #print getcomics weekly post in file f
-def printWeek(url, f):
-    weeklyUrl = findLastWeekly(url)
-    soup = url2soup(weeklyUrl)
+def printWeek(url, f, editor):
+    global flag
+    postTitle, weeklyUrl = findLastWeekly(url)
+
+    #Missing post already been done
+    if "Missing" in postTitle and flag:
+        pass
+    #Missing post not done yet
+    elif "Missing" in postTitle and not flag:
+        f.write(postTitle + '\n')
+        f.write("=====================" + '\n')
+        printMultipleEditors(weeklyUrl, f)
+        flag = True
+    elif editor == "Indé week":
+        printMultipleEditors(weeklyUrl, f)
+    else:
+        printOneEditor(weeklyUrl, f, editor)
+
+#for Marvel, DC, or Image weeklies
+def printOneEditor(url, f, editor):
+    soup = url2soup(url)
     #temp = soup.select('section.post-contents > ul > li')
     temp = soup.select('section.post-contents > ul')
     soup2=BeautifulSoup(str(temp), 'html.parser')
     var = soup2.find_all('strong')
 
+    f.write(editor + '\n')
+    f.write("=====================" + '\n')
     for s in var:
         name = s.text.replace(' : ','').replace('Download','')\
                     .replace(' | ','').replace('Read Online','')
@@ -93,12 +115,13 @@ def printWeek(url, f):
                 f.write('[url=' + a.get("href") + ']' + name  + '[/url]' + '\n')
         except:
             f.write(name + '\n')
+    f.write("=====================" + '\n')
+    f.write("" + '\n')
 
 
-#print getcomics Indie+ weekly post
-def printIndieWeek(url, f):
-    weeklyUrl = findLastWeekly(url)
-    soup=url2soup(weeklyUrl).select('section.post-contents')
+#for Indie week+
+def printMultipleEditors(url, f):
+    soup=url2soup(url).select('section.post-contents')
     soup2=BeautifulSoup(str(soup), 'html.parser')
 
     publishers = soup2.find_all('span', style="color: #3366ff;")
@@ -126,44 +149,30 @@ def printIndieWeek(url, f):
                 f.write('[url=' + s.a.get("href") + ']' + name  + '[/url]' + '\n')
             else:
                 f.write(name + '\n')
+    f.write('\n')
 
 #generate output file
 def generateweekly():
+    global flag
+    flag = False
     try:
         os.remove("liste-comics-semaine.txt")
     except OSError:
         pass
 
     with open("liste-comics-semaine.txt", "w")  as f:
-        #DC
-        f.write("DC week" + '\n')
-        f.write("=====================" + '\n')
-        printWeek(DCurl, f)
-        f.write("=====================" + '\n')
-        f.write("" + '\n')
-        #Marvel
-        f.write("Marvel week" + '\n')
-        f.write("=====================" + '\n')
-        printWeek(MarvelURL, f)
-        f.write("=====================" + '\n')
-        f.write("" + '\n')
-        #Indie
+        printWeek(DCurl, f, "DC week")
+        printWeek(MarvelURL, f, "Marvel week")
         f.write("Indé week" + '\n')
         f.write("=====================" + '\n')
-        #Image
-        f.write("Image week" + '\n')
-        f.write("=====================" + '\n')
-        printWeek(ImageURL, f)
-        f.write("=====================" + '\n')
-        f.write("" + '\n')
-        #Indé
-        printIndieWeek(IndieURL, f)
+        printWeek(ImageURL, f, "Image week")
+        printWeek(IndieURL, f, "Indé week")
 
 
 #MAIN
 print("Les derniers 'weekly packs' de Getcomics sont :")
 print("----------------")
-displayLastWeeklies()
+printLastWeeklies()
 print("----------------")
 
 Join = input('Voulez-vous continuer ? (y/n) ?\n')
