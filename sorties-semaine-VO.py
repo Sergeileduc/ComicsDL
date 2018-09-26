@@ -74,7 +74,7 @@ def findLastWeekly(url):
     return postUrl
 
 
-#print getcomics weekly post
+#print getcomics weekly post in file f
 def printWeek(url, f):
     weeklyUrl = findLastWeekly(url)
     soup = url2soup(weeklyUrl)
