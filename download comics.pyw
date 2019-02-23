@@ -76,13 +76,19 @@ def bytes_2_human_readable(number_of_bytes):
 
 # get html from url
 def returnHTML(url):
-    hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
+    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+    headers = { 'User-Agent' : user_agent }
+    #hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
     try:
-        finalurl = urllib.request.urlopen(url).geturl()
-        req = urllib.request.Request(finalurl, headers=hdr)
+        req = urllib.request.Request(url, None, headers)
         response = urllib.request.urlopen(req)
         html = response.read()
         response.close()
+        # finalurl = urllib.request.urlopen(url).geturl()
+        # req = urllib.request.Request(finalurl, headers=hdr)
+        # response = urllib.request.urlopen(req)
+        # html = response.read()
+        # response.close()
         return html
     except ValueError as e:
         print(e)
@@ -374,7 +380,14 @@ class Getcomics(tk.Tk):
 
     #find download link
     def downCom(self, url):
-        finalurl = urllib.request.urlopen(url).geturl()
+        user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+        headers = { 'User-Agent' : user_agent }
+        try:
+            req = urllib.request.Request(url, None, headers)
+            finalurl = urllib.request.urlopen(req).geturl()
+        except urllib.error.HTTPError:
+            print("downCom got HTTPError from returnHTML")
+            raise
         print ("Trying " + finalurl)
         zippylink = ''
         try:
@@ -385,10 +398,20 @@ class Getcomics(tk.Tk):
                 if 'zippyshare' in button.get("href") or 'zippyshare' in button.get('title').lower():
                     zippylink = button.get("href")
                     try:
-                        finalzippy = urllib.request.urlopen(zippylink).geturl()
-                        self.downComZippy(finalzippy)
+                        user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+                        headers = { 'User-Agent' : user_agent }
+                        req = urllib.request.Request(zippylink, None, headers)
+                        print(req)
+                        finalzippy = urllib.request.urlopen(req).geturl()
+                    except urllib.error.HTTPError:
+                        print("can't obtain final zippyshare url")
+                        raise
                     except IOError:
                         print("Zippyhare download failed")
+                    try:
+                        self.downComZippy(finalzippy)
+                    except:
+                        print("error in downComZippy")
         except urllib.error.HTTPError:
             print("downCom got HTTPError from returnHTML")
             raise
