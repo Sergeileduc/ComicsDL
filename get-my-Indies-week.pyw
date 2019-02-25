@@ -20,6 +20,7 @@ today = datetime.today().strftime("%Y-%m-%d")
 #getcomicsurl = "https://getcomics.info/tag/dc-week/"
 #getcomicsurl = "http://getcomics.info/tag/marvel-now/"
 getcomicsurl = "https://getcomics.info/tag/indie-week/"
+#getcomicsurl = "https://getcomics.info/tag/image-week/"
 
 #myComicsList = ['batman', 'superman']
 #myComicsList = ['deadpool', 'captain-america', 'x-men-gold']
@@ -450,6 +451,8 @@ class MyComicsList(tk.Tk):
         MyComicsList.runQuery(create_table2)
         create_table3 = "CREATE TABLE IF NOT EXISTS comics_indies (comic TEXT)"
         MyComicsList.runQuery(create_table3)
+        create_table4 = "CREATE TABLE IF NOT EXISTS comics_image (comic TEXT)"
+        MyComicsList.runQuery(create_table4)
 
         default_comic_data = ("--- Ajoutez vos séries de comics ---",)
         default_dc_query = "INSERT INTO comics_dc VALUES (?)"
@@ -458,7 +461,8 @@ class MyComicsList(tk.Tk):
         MyComicsList.runQuery(default_marvel_query, default_comic_data)
         default_indie_query = "INSERT INTO comics_indies VALUES (?)"
         MyComicsList.runQuery(default_indie_query, default_comic_data)
-
+        default_image_query = "INSERT INTO comics_image VALUES (?)"
+        MyComicsList.runQuery(default_image_query, default_comic_data)
 #thread1 = threading.Thread(target=call_gen)
 
 if __name__ == "__main__":
