@@ -17,12 +17,13 @@ BASE = "https://getcomics.info/go.php-url=/"
 #subistitions for getcomics
 substitutions1 = {'%2c': '', '%20': ' ', '%28': '(', '%29': ')'}
 substitutions2 = {' (Digital)': '', ' (digital)': '',
-' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'',
+' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'', ' (Webrip-DCP)':'',
 ' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
 ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
 ' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
 '(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'',
-' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':'', ' (Mephisto-Empire)':''}
+' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':'', ' (Mephisto-Empire)':'',
+' (Shadowcat-Empire)':''}
 
 #just optimizing
 def regexNightmare(html, regex):
