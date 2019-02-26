@@ -5,7 +5,11 @@ import getcomics
 import time
 import htmlsoup
 
-getcomicsurl = "https://getcomics.info/tag/dc-week/"
+getcomicsurls = ['https://getcomics.info/tag/dc-week/',
+                'http://getcomics.info/tag/marvel-now/',
+                'https://getcomics.info/tag/indie-week/',
+                'https://getcomics.info/tag/image-week/'
+                ]
 #getcomicsurl = "http://getcomics.info/tag/marvel-now/"
 #getcomicsurl = "https://getcomics.info/tag/indie-week/"
 myComicsList = list()
@@ -16,9 +20,6 @@ myComicsList = list()
 config = 'liste-dc.txt'
 #config = 'liste-marvel.txt'
 #config = 'liste-indie.txt'
-
-#get list of all comics from the last "Weekly" pack
-comList = getcomics.comicsList(getcomicsurl)
 
 #read configfile
 try:
@@ -36,15 +37,19 @@ except IOError as e:
 
 try:
     print("Je vais chercher : " + str(myComicsList))
-    for newcomic in comList:
-        try:
-            for myComic in myComicsList:
-                if myComic in newcomic:
-                    getcomics.downCom(newcomic)
-                    pass
-        except Exception as e:
-            print(e)
-            pass
+
+    #get list of all comics from the last "Weekly" pack
+    for url in getcomicsurls:
+        remoteComicsList = getcomics.comicsList(url)
+        for newcomic in remoteComicsList:
+            try:
+                for myComic in myComicsList:
+                    if myComic in newcomic:
+                        getcomics.downCom(newcomic)
+                        pass
+            except Exception as e:
+                print(e)
+                pass
     print("C'est tout. Vous pouvez fermer.")
     time.sleep(20)
 except NameError:
