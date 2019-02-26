@@ -12,6 +12,9 @@ import base64
 
 today = datetime.today().strftime("%Y-%m-%d")
 
+basesearch = 'https://getcomics.info'
+tagsearch = 'https://getcomics.info/tag/'
+
 getcomicsurls = ['https://getcomics.info/tag/dc-week/',
                 'http://getcomics.info/tag/marvel-now/',
                 'https://getcomics.info/tag/indie-week/',
@@ -200,3 +203,23 @@ def getresults(url):
 		return searchlist
 	except urllib.error.HTTPError:
 		print("something wrong happened")
+
+#returns a getcomics research URL
+def searchurl(user_search, mode, page):
+	#research with tag (https://getcomics.info/tag/......)
+	if mode == 0:
+		#page 1 (no page number on this one)
+		if page == 1:
+			url = tagsearch + user_search.lower().replace(' ', '-')
+		#other pages
+		else:
+			url = tagsearch + user_search.lower().replace(' ', '-') + '/page/' + str(page) + '/'
+	#classic research https://getcomics.info/?s=
+	else:
+		#page 1
+		if page == 1:
+			url = basesearch + '/?s=' + user_search.lower().replace(' ', '+')
+		#other pages
+		else:
+			url = basesearch + '/page/' + str(page) + '/?s=' + user_search.lower().replace(' ', '+')
+	return url

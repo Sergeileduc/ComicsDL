@@ -15,32 +15,10 @@ import threading
 import base64
 
 url = ''
-basesearch = 'https://getcomics.info'
-tagsearch = 'https://getcomics.info/tag/'
 BASE = "https://getcomics.info/go.php-url=/"
 
 exit_thread= False
 exit_success = False
-
-#returns a getcomics research URL
-def searchurl(user_search, mode, page):
-	#research with tag (https://getcomics.info/tag/......)
-	if mode == 0:
-		#page 1 (no page number on this one)
-		if page == 1:
-			url = tagsearch + user_search.lower().replace(' ', '-')
-		#other pages
-		else:
-			url = tagsearch + user_search.lower().replace(' ', '-') + '/page/' + str(page) + '/'
-	#classic research https://getcomics.info/?s=
-	else:
-		#page 1
-		if page == 1:
-			url = basesearch + '/?s=' + user_search.lower().replace(' ', '+')
-		#other pages
-		else:
-			url = basesearch + '/page/' + str(page) + '/?s=' + user_search.lower().replace(' ', '+')
-	return url
 
 class Std_redirector(object):
 	def __init__(self,widget):
@@ -175,7 +153,7 @@ class Getcomics(tk.Tk):
 		self.searchlist.clear()
 		self.destroylist(self.buttonlist)
 		searchmode = self.choices.index(self.mode.get())
-		self.searchlist = getcomics.getresults(searchurl(self.usersearch.get(),searchmode, self.page))
+		self.searchlist = getcomics.getresults(getcomics.searchurl(self.usersearch.get(),searchmode, self.page))
 		#buttonlist = list()
 		for i in self.searchlist:
 			title = i[1] + ' (' + str(i[2]) + ')'
@@ -219,11 +197,11 @@ class Getcomics(tk.Tk):
 		for i in self.downloadlist:
 			if button == i[2]:
 				if i[3] != None:
-					bytes = convert2bytes(i[3])
+					bytes = tools.convert2bytes(i[3])
 					self.listsize -= bytes
 				self.downloadlist.remove(i)
 		button.destroy()
-		print("Taille de la file d'attente (donnée indicative) : " + bytes_2_human_readable(self.listsize))
+		print("Taille de la file d'attente (donnée indicative) : " + tools.bytes_2_human_readable(self.listsize))
 
 
 	#DL all comics in the liste
