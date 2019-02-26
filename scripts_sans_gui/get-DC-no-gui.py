@@ -2,7 +2,6 @@
 # -*-coding:utf-8 -*-
 import os
 import getcomics
-from bs4 import BeautifulSoup
 import time
 import htmlsoup
 
