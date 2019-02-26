@@ -17,10 +17,10 @@ exit_thread= False
 exit_success = False
 today = datetime.today().strftime("%Y-%m-%d")
 
-getcomicsurl = "https://getcomics.info/tag/dc-week/"
+#getcomicsurl = "https://getcomics.info/tag/dc-week/"
 #getcomicsurl = "http://getcomics.info/tag/marvel-now/"
 #getcomicsurl = "https://getcomics.info/tag/indie-week/"
-#getcomicsurl = "https://getcomics.info/tag/image-week/"
+getcomicsurl = "https://getcomics.info/tag/image-week/"
 
 #myComicsList = ['batman', 'superman']
 #myComicsList = ['deadpool', 'captain-america', 'x-men-gold']
@@ -278,14 +278,14 @@ class MyComicsList(tk.Tk):
 # ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚══════╝
 # """
 
-        ascii_cat = """
-██████╗  ██████╗
-██╔══██╗██╔════╝
-██║  ██║██║
-██║  ██║██║
-██████╔╝╚██████╗
-╚═════╝  ╚═════╝
-        """
+#         ascii_cat = """
+# ██████╗  ██████╗
+# ██╔══██╗██╔════╝
+# ██║  ██║██║
+# ██║  ██║██║
+# ██████╔╝╚██████╗
+# ╚═════╝  ╚═════╝
+#         """
 
 #         ascii_cat = """
 # ██╗███╗   ██╗██████╗ ██╗███████╗███████╗
@@ -295,6 +295,16 @@ class MyComicsList(tk.Tk):
 # ██║██║ ╚████║██████╔╝██║███████╗███████║
 # ╚═╝╚═╝  ╚═══╝╚═════╝ ╚═╝╚══════╝╚══════╝
 # """
+
+        ascii_cat = """
+██╗███╗   ███╗ █████╗  ██████╗ ███████╗
+██║████╗ ████║██╔══██╗██╔════╝ ██╔════╝
+██║██╔████╔██║███████║██║  ███╗█████╗
+██║██║╚██╔╝██║██╔══██║██║   ██║██╔══╝
+██║██║ ╚═╝ ██║██║  ██║╚██████╔╝███████╗
+╚═╝╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝
+        """
+
 
         self.comic_canvas = tk.Canvas(self)
         self.message = tk.Label(self, text=longtext, anchor=tk.W, justify=tk.CENTER, wraplength = 250, font=("Helvetica", 12))
@@ -306,7 +316,7 @@ class MyComicsList(tk.Tk):
         self.button = tk.Button(self, text="Télécharger les comics", command=self.run)
         self.scrollbar = tk.Scrollbar(self.comic_canvas, orient="vertical", command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.title("Télécharger DC v4")
+        self.title("Télécharger IMAGE 4")
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
         self.comic_create = tk.Text(self.text_frame, height=3, bg="white", fg="black")
 
@@ -417,12 +427,12 @@ class MyComicsList(tk.Tk):
             self.comic_canvas.yview_scroll(move, "units")
 
     def save_comic(self, comic):
-        insert_comic_query = "INSERT INTO comics_dc VALUES (?)"
+        insert_comic_query = "INSERT INTO comics_image VALUES (?)"
         insert_comic_data = (comic,)
         self.runQuery(insert_comic_query, insert_comic_data)
 
     def load_comic(self):
-        load_comic_query = "SELECT comic FROM comics_dc"
+        load_comic_query = "SELECT comic FROM comics_image"
         my_comic = self.runQuery(load_comic_query, receive=True)
         return my_comic
 

@@ -27,7 +27,8 @@ substitutions2 = {' (Digital)': '', ' (digital)': '',
 ' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
 ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
 ' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
-'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':''}
+'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'',
+' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':'', ' (Mephisto-Empire)':''}
 
 today = datetime.today().strftime("%Y-%m-%d")
 
@@ -37,16 +38,22 @@ def replace(string, substitutions):
     regex = re.compile('|'.join(map(re.escape, substrings)))
     return regex.sub(lambda match: substitutions[match.group(0)], string)
 
-#get html from url
+# get html from url
 def returnHTML(url):
-    hdr = {'Accept': 'text/html', 'User-Agent' : "Fiddler"}
-    req = urllib.request.Request(url, headers=hdr)
+    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+    headers = { 'User-Agent' : user_agent }
+    #hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
     try:
+        req = urllib.request.Request(url, None, headers)
         response = urllib.request.urlopen(req)
         html = response.read()
+        response.close()
         return html
+    except ValueError as e:
+        print(e)
+        raise
     except urllib.error.HTTPError as e:
-        print (e.fp.read())
+        print(e)
         raise
 
 #def url 2 soup
@@ -65,7 +72,6 @@ def html2soup(html):
     soup = BeautifulSoup(html, 'html.parser')
     return soup
 
-#get all url from input HTML
 def getaALLhref(html, tag):
     urllist = list()
     soup = html2soup(html)
@@ -93,26 +99,42 @@ def findLastWeekly(url):
 
 #find download link
 def downCom(url):
-    finalurl = urllib.request.urlopen(url).geturl()
-    print ("Found " + finalurl)
+    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+    headers = { 'User-Agent' : user_agent }
+    try:
+        req = urllib.request.Request(url, None, headers)
+        finalurl = urllib.request.urlopen(req).geturl()
+    except urllib.error.HTTPError:
+        print("downCom got HTTPError from returnHTML")
+        raise
+    print ("Trying " + finalurl)
     zippylink = ''
-    flag=False
     try:
         soup=url2soup(finalurl)
         downButtons = soup.select("div.aio-pulse > a")
         for button in downButtons:
-            if 'zippyshare' in button.get("href").lower():
-                #downComZippy(button.a['href'])
+            #if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
+            if 'zippyshare' in button.get("href") or 'zippyshare' in button.get('title').lower():
                 zippylink = button.get("href")
-                #finalzippy = urllib.request.urlopen(zippylink).geturl()
-                downComZippy(zippylink)
-                flag=False
-            else:
-                flag=True
-        if flag==True:
-            print("can't find zippyshare download button")
+                try:
+                    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+                    headers = { 'User-Agent' : user_agent }
+                    req = urllib.request.Request(zippylink, None, headers)
+                    print(req)
+                    finalzippy = urllib.request.urlopen(req).geturl()
+                except urllib.error.HTTPError:
+                    print("can't obtain final zippyshare url")
+                    raise
+                except IOError:
+                    print("Zippyhare download failed")
+                #try:
+                print(finalzippy)
+                downComZippy(finalzippy)
+                #except:
+                #    print("error in downComZippy")
     except urllib.error.HTTPError:
         print("downCom got HTTPError from returnHTML")
+        raise
     return
 
 #just optimizing
@@ -124,36 +146,36 @@ def regexNightmare(html, regex):
         print("Cant't regex html")
 
 def getZippyDL(url, button):
-    print("Found zippyshare : " + url)
-
-    #disassemble url
-    comRawUrl0 = regexNightmare(button, '.*?getElementById.*?href = \"(.*?)\"')
-    comRawUrl1 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;')
-    comRawUrl2 = regexNightmare(button, '.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;')
-    #filename = comRawUrl2[1:].replace('%20',' ').replace('%28','(').replace('%29',')').replace('%2c','')
-    temp = replace(comRawUrl2[1:], substitutions1)
-    filename = replace(temp, substitutions2)
-    #calculating the id and forming url | that is an extremely dirty way, I know
-    try:
-        urlPattern = re.compile('(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
-        urlNum1 = urlPattern.search(str(comRawUrl1)).group(2)
-        urlNum2 = urlPattern.search(str(comRawUrl1)).group(3)
-        urlNum3 = urlPattern.search(str(comRawUrl1)).group(4)
-        urlNumFull = (int(urlNum2) % int(urlNum1)) + (int(urlNum2) % int(urlNum3))
-        fullURL = url[:-21] + comRawUrl0 + str(urlNumFull) + comRawUrl2
-    except Exception as e:
-        print("Mon erreur")
-        print(e)
-        raise
-    return fullURL, filename
+	print("Found zippyshare : " + url)
+	#disassemble url
+	comRawUrl0 = regexNightmare(button, r'.*?getElementById.*?href = \"(.*?)\"')
+	comRawUrl1 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;')
+	comRawUrl2 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;')
+	#filename = comRawUrl2[1:].replace('%20',' ').replace('%28','(').replace('%29',')').replace('%2c','')
+	temp = replace(comRawUrl2[1:], substitutions1)
+	filename = replace(temp, substitutions2)
+	#calculating the id and forming url | that is an extremely dirty way, I know
+	try:
+		urlPattern = re.compile(r'(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
+		urlNum1 = urlPattern.search(str(comRawUrl1)).group(2)
+		urlNum2 = urlPattern.search(str(comRawUrl1)).group(3)
+		urlNum3 = urlPattern.search(str(comRawUrl1)).group(4)
+		urlNumFull = (int(urlNum2) % int(urlNum1)) + (int(urlNum2) % int(urlNum3))
+		fullURL = url[:-21] + comRawUrl0 + str(urlNumFull) + comRawUrl2
+	except Exception as e:
+		print("Mon erreur")
+		print(e)
+		raise
+	return fullURL, filename
 
 #download from zippyshare
 def downComZippy(url):
+    print("Zippy")
     soup=url2soup(url)
     downButton = soup.select('script[type="text/javascript"]')
     try:
         fullURL, fileName = getZippyDL(url, downButton)
-        print ("Downloading from " + fullURL + "\ninto : " + fileName)
+        print ("Downloading from zippyshare into : " + fileName)
         r = requests.get(fullURL)
     except:
         print("Can't get download link on zippyshare page")
