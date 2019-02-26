@@ -4,12 +4,6 @@ import sys
 import os
 import getcomics
 import htmlsoup
-import re
-import requests
-import urllib.request
-import urllib.error
-from bs4 import BeautifulSoup
-from datetime import datetime
 import tkinter as tk
 import tkinter.messagebox as msg
 import sqlite3
@@ -17,7 +11,6 @@ import threading
 
 exit_thread= False
 exit_success = False
-today = datetime.today().strftime("%Y-%m-%d")
 
 getcomicsurls = ['https://getcomics.info/tag/dc-week/',
                 'http://getcomics.info/tag/marvel-now/',
