@@ -27,30 +27,6 @@ getcomicsurls = ['https://getcomics.info/tag/dc-week/',
 
 getcomicsurl = "https://getcomics.info/tag/dc-week/"
 
-
-# def getWeeklyComics(mylist):
-#     print ('Initialisation...')
-#     print ('Je vais chercher les mots clés :')
-#     print (mylist)
-#
-#     #get latest archive on the current page
-#     weeklyUrl = findLastWeekly(getcomicsurl)
-#     soup = url2soup(weeklyUrl)
-#     interm = soup.select("section.post-contents")
-#     soup2 = BeautifulSoup(str(interm), 'html.parser')
-#     interm2 = soup2.find_all('li')
-#     comList = getaALLhref(str(interm2), 'a')
-#     for newcomic in comList:
-#         try:
-#             for myComic in mylist:
-#                 if myComic in newcomic:
-#                     downCom(newcomic)
-#                     pass
-#         except Exception as e:
-#             print(e)
-#             pass
-#     print("C'est tout. Vous pouvez fermer.")
-
 class Std_redirector(object):
     def __init__(self,widget):
         self.widget = widget
