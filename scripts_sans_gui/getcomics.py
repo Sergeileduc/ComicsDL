@@ -86,11 +86,14 @@ def downCom(url):
             zippylink = button.get("href")
             print(zippylink)
             try:
-                # user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-                # headers = { 'User-Agent' : user_agent }
-                # req = urllib.request.Request(zippylink, None, headers)
-                # finalzippy = urllib.request.urlopen(req).geturl()
-                finalzippy = base64.b64decode(zippylink[len(BASE):]).decode()
+                if str(zippylink).startswith(BASE):
+                    print("Abracadabra !")
+                    finalzippy = base64.b64decode(zippylink[len(BASE):]).decode()
+                else:
+                    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+                    headers = { 'User-Agent' : user_agent }
+                    req = urllib.request.Request(zippylink, None, headers)
+                    finalzippy = urllib.request.urlopen(req).geturl()
             except urllib.error.HTTPError as e:
                 print("can't obtain final zippyshare page url")
                 print(e)
