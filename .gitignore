@@ -13,6 +13,7 @@ __pycache__/
 soup.html
 .comics.db
 liste-comics-semaine.txt
+liste-dc.txt
 comics-week.py
 *.ico
 *.png
