@@ -107,14 +107,11 @@ def downCom(url):
                 raise
             except IOError:
                 print("Zippyhare download failed")
-            #try:
-            print(finalzippy)
-            downComZippy(finalzippy)
-                #except:
-                #    print("error in downComZippy")
-    #except urllib.error.HTTPError:
-        #print("downCom got HTTPError from returnHTML")
-        #raise
+            try:
+                print(finalzippy)
+                downComZippy(finalzippy)
+            except:
+                print("error in downComZippy")
     return
 
 def getZippyDL(url, button):
