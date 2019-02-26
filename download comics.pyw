@@ -1,171 +1,26 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
 import sys
-import re
+import getcomics
+import htmlsoup
+import tools
 import requests
 import os
-import time
 import tkinter as tk
 import tkinter.scrolledtext as tkst
 from tkinter import ttk
 import urllib.request
 import urllib.error
 import threading
-from bs4 import BeautifulSoup
-
-#CLEAING
+import base64
 
 url = ''
 basesearch = 'https://getcomics.info'
 tagsearch = 'https://getcomics.info/tag/'
+BASE = "https://getcomics.info/go.php-url=/"
 
 exit_thread= False
 exit_success = False
-
-substitutions1 = {'%2c': '', '%20': ' ', '%28': '(', '%29': ')'}
-substitutions2 = {' (Digital)': '', ' (digital)': '',
-' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'',
-' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
-' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
-' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
-'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'',
-' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':'', ' (Mephisto-Empire)':''}
-
-defs={'KB':1024, 'MB':1024**2, 'GB':1024**3, 'TB':1024**4}
-
-#multiple replace function
-def replace(string, substitutions):
-	substrings = sorted(substitutions, key=len, reverse=True)
-	regex = re.compile('|'.join(map(re.escape, substrings)))
-	return regex.sub(lambda match: substitutions[match.group(0)], string)
-
-#convert to bytes
-def convert2bytes(size):
-	parts = size.split()
-	size = parts[0]
-	unit = parts[1]
-	return int(size)*defs[unit]
-
-def bytes_2_human_readable(number_of_bytes):
-	if number_of_bytes < 0:
-		raise ValueError("!!! number_of_bytes can't be smaller than 0 !!!")
-
-	step_to_greater_unit = 1024.
-
-	number_of_bytes = float(number_of_bytes)
-	unit = 'bytes'
-
-	if (number_of_bytes / step_to_greater_unit) >= 1:
-		number_of_bytes /= step_to_greater_unit
-		unit = 'KB'
-
-	if (number_of_bytes / step_to_greater_unit) >= 1:
-		number_of_bytes /= step_to_greater_unit
-		unit = 'MB'
-
-	if (number_of_bytes / step_to_greater_unit) >= 1:
-		number_of_bytes /= step_to_greater_unit
-		unit = 'GB'
-
-	if (number_of_bytes / step_to_greater_unit) >= 1:
-		number_of_bytes /= step_to_greater_unit
-		unit = 'TB'
-
-	precision = 1
-	number_of_bytes = round(number_of_bytes, precision)
-
-	return str(number_of_bytes) + ' ' + unit
-
-# get html from url
-def returnHTML(url):
-	user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-	headers = { 'User-Agent' : user_agent }
-	#hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
-	try:
-		req = urllib.request.Request(url, None, headers)
-		response = urllib.request.urlopen(req)
-		html = response.read()
-		response.close()
-		# finalurl = urllib.request.urlopen(url).geturl()
-		# req = urllib.request.Request(finalurl, headers=hdr)
-		# response = urllib.request.urlopen(req)
-		# html = response.read()
-		# response.close()
-		return html
-	except ValueError as e:
-		print(e)
-		raise
-	except urllib.error.HTTPError as e:
-		print(e)
-		raise
-
-#def url 2 soup
-def url2soup(url):
-	try:
-		res = requests.get(url)
-		res.raise_for_status()
-		soup = BeautifulSoup(res.text, 'html.parser')
-		return soup
-	except:
-		print("Error")
-		raise
-
-# get beautiful soup
-def getSoup(html):
-	soup = BeautifulSoup(html, 'html.parser')
-	return soup
-
-
-def getresults(url):
-	searchlist=list()
-	try:
-		soup=url2soup(url)
-		for d in soup.select("div.post-info"):
-			if d.h1.a.has_attr('href'):
-				size = None
-				searchsize = re.search( r'\d+ [KMGT]B', d.p.text, re.M|re.I)
-				if searchsize:
-					size = searchsize.group(0)
-				searchlist.append((d.h1.a.get("href"),d.h1.a.text, size))
-		#print(searchlist)
-		return searchlist
-	except urllib.error.HTTPError:
-		print("something wrong happened")
-
-
-def getZippyDL(url, button):
-	print("Found zippyshare : " + url)
-	#disassemble url
-	comRawUrl0 = regexNightmare(button, r'.*?getElementById.*?href = \"(.*?)\"')
-	comRawUrl1 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;')
-	comRawUrl2 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;')
-	#filename = comRawUrl2[1:].replace('%20',' ').replace('%28','(').replace('%29',')').replace('%2c','')
-	temp = replace(comRawUrl2[1:], substitutions1)
-	filename = replace(temp, substitutions2)
-	#calculating the id and forming url | that is an extremely dirty way, I know
-	try:
-		urlPattern = re.compile(r'(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
-		urlNum1 = urlPattern.search(str(comRawUrl1)).group(2)
-		urlNum2 = urlPattern.search(str(comRawUrl1)).group(3)
-		urlNum3 = urlPattern.search(str(comRawUrl1)).group(4)
-		urlNumFull = (int(urlNum2) % int(urlNum1)) + (int(urlNum2) % int(urlNum3))
-		fullURL = url[:-21] + comRawUrl0 + str(urlNumFull) + comRawUrl2
-	except Exception as e:
-		print("Mon erreur")
-		print(e)
-		raise
-	return fullURL, filename
-
-def downlaodnow(url):
-	pass
-
-#just optimizing
-def regexNightmare(html, regex):
-	try:
-		urlPattern = re.compile(regex, re.I)
-		return urlPattern.search(str(html)).group(1)
-	except:
-		print("Cant't regex html")
 
 #returns a getcomics research URL
 def searchurl(user_search, mode, page):
@@ -320,7 +175,7 @@ class Getcomics(tk.Tk):
 		self.searchlist.clear()
 		self.destroylist(self.buttonlist)
 		searchmode = self.choices.index(self.mode.get())
-		self.searchlist = getresults(searchurl(self.usersearch.get(),searchmode, self.page))
+		self.searchlist = getcomics.getresults(searchurl(self.usersearch.get(),searchmode, self.page))
 		#buttonlist = list()
 		for i in self.searchlist:
 			title = i[1] + ' (' + str(i[2]) + ')'
@@ -348,13 +203,13 @@ class Getcomics(tk.Tk):
 		comic = button.cget('text')
 		if comic not in (item[1] for item in self.downloadlist):
 			if self.searchlist[index][2] != None:
-				bytes = convert2bytes(self.searchlist[index][2])
+				bytes = tools.convert2bytes(self.searchlist[index][2])
 				self.listsize += bytes
 			newDL = tk.Button(self.dlframe, text=button.cget('text').title(), width=self.resultwidht, anchor='w', bg=dark2, fg=fg, relief='flat', border=0, highlightthickness = 0, font=("Verdana", 10))
 			newDL.config(command= lambda button=newDL: self.removedl(button))
 			newDL.pack(fill='both', expand=1, pady=0)
 			self.downloadlist.append((self.searchlist[index][0], self.searchlist[index][1], newDL, self.searchlist[index][2]))
-			print("Taille de la file d'attente (donnée indicative) : " + bytes_2_human_readable(self.listsize))
+			print("Taille de la file d'attente (donnée indicative) : " + tools.bytes_2_human_readable(self.listsize))
 		else:
 			print("Already in your DL list")
 
@@ -391,34 +246,41 @@ class Getcomics(tk.Tk):
 			req = urllib.request.Request(url, None, headers)
 			finalurl = urllib.request.urlopen(req).geturl()
 		except urllib.error.HTTPError:
-			print("downCom got HTTPError from returnHTML")
+			print("downCom got HTTPError from Request")
 			raise
 		print ("Trying " + finalurl)
 		zippylink = ''
 		try:
-			soup=url2soup(finalurl)
+			soup = htmlsoup.url2soup(finalurl)
 			downButtons = soup.select("div.aio-pulse > a")
 			for button in downButtons:
 				#if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
 				if 'zippyshare' in button.get("href") or 'zippyshare' in button.get('title').lower():
 					zippylink = button.get("href")
+					print(zippylink)
 					try:
-						user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-						headers = { 'User-Agent' : user_agent }
-						req = urllib.request.Request(zippylink, None, headers)
-						#print(req)
-						finalzippy = urllib.request.urlopen(req).geturl()
-					except urllib.error.HTTPError:
+						if str(zippylink).startswith(BASE):
+							print("Abracadabra !")
+							finalzippy = base64.b64decode(zippylink[len(BASE):]).decode()
+						else:
+							user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+							headers = { 'User-Agent' : user_agent }
+							req = urllib.request.Request(zippylink, None, headers)
+							finalzippy = urllib.request.urlopen(req).geturl()
+					except urllib.error.HTTPError as e:
 						print("can't obtain final zippyshare url")
+						print(e)
 						raise
 					except IOError:
 						print("Zippyhare download failed")
 					try:
+						print(finalzippy)
 						self.downComZippy(finalzippy)
 					except:
 						print("error in downComZippy")
-		except urllib.error.HTTPError:
-			print("downCom got HTTPError from returnHTML")
+		except urllib.error.HTTPError as e:
+			print("downCom got HTTPError")
+			print(e)
 			raise
 		return
 
@@ -426,10 +288,10 @@ class Getcomics(tk.Tk):
 	#download from zippyshare
 	def downComZippy(self, url):
 		self.progress["value"] = 0
-		soup=url2soup(url)
+		soup = htmlsoup.url2soup(url)
 		downButton = soup.select('script[type="text/javascript"]')
 		try:
-			fullURL, fileName = getZippyDL(url, downButton)
+			fullURL, fileName = getcomics.getZippyDL(url, downButton)
 			print ("Download from zippyhare into : " + fileName)
 			r = requests.get(fullURL, stream=True)
 			size = int(r.headers['Content-length']) #size in bytes
