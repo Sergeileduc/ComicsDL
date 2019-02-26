@@ -26,8 +26,8 @@ substitutions2 = {' (Digital)': '', ' (digital)': '',
 ' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
 ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
 ' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
-'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'', ' (BlackManta-Empire)':'',
-' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':''}
+'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'',
+' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':'', ' (Mephisto-Empire)':''}
 
 defs={'KB':1024, 'MB':1024**2, 'GB':1024**3, 'TB':1024**4}
 
