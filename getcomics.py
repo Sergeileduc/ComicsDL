@@ -139,7 +139,6 @@ def getZippyDL(url, button):
 
 #download from zippyshare
 def downComZippy(url):
-    print("Zippy")
     soup = htmlsoup.url2soup(url)
     downButton = soup.select('script[type="text/javascript"]')
     try:
