@@ -2,6 +2,8 @@
 # -*-coding:utf-8 -*-
 import sys
 import os
+import getcomics
+import htmlsoup
 import re
 import requests
 import urllib.request
@@ -16,6 +18,12 @@ import threading
 exit_thread= False
 exit_success = False
 today = datetime.today().strftime("%Y-%m-%d")
+
+getcomicsurls = ['https://getcomics.info/tag/dc-week/',
+                'http://getcomics.info/tag/marvel-now/',
+                'https://getcomics.info/tag/indie-week/',
+                'https://getcomics.info/tag/image-week/'
+                ]
 
 getcomicsurl = "https://getcomics.info/tag/dc-week/"
 #getcomicsurl = "http://getcomics.info/tag/marvel-now/"
@@ -269,49 +277,21 @@ class MyComicsList(tk.Tk):
  ╚═════╝ ╚══════╝   ╚═╝    ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝ ╚═════╝╚══════╝"""
 
 
-#         ascii_cat = """
-# ███╗   ███╗ █████╗ ██████╗ ██╗   ██╗███████╗██╗
-# ████╗ ████║██╔══██╗██╔══██╗██║   ██║██╔════╝██║
-# ██╔████╔██║███████║██████╔╝██║   ██║█████╗  ██║
-# ██║╚██╔╝██║██╔══██║██╔══██╗╚██╗ ██╔╝██╔══╝  ██║
-# ██║ ╚═╝ ██║██║  ██║██║  ██║ ╚████╔╝ ███████╗███████╗
-# ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚══════╝
-# """
-
-        ascii_cat = """
-██████╗  ██████╗
-██╔══██╗██╔════╝
-██║  ██║██║
-██║  ██║██║
-██████╔╝╚██████╗
-╚═════╝  ╚═════╝
-        """
-
-#         ascii_cat = """
-# ██╗███╗   ██╗██████╗ ██╗███████╗███████╗
-# ██║████╗  ██║██╔══██╗██║██╔════╝██╔════╝
-# ██║██╔██╗ ██║██║  ██║██║█████╗  ███████╗
-# ██║██║╚██╗██║██║  ██║██║██╔══╝  ╚════██║
-# ██║██║ ╚████║██████╔╝██║███████╗███████║
-# ╚═╝╚═╝  ╚═══╝╚═════╝ ╚═╝╚══════╝╚══════╝
-# """
 
         self.comic_canvas = tk.Canvas(self)
         self.message = tk.Label(self, text=longtext, anchor=tk.W, justify=tk.CENTER, wraplength = 250, font=("Helvetica", 12))
         self.asciititle = tk.Label(self, text=ascii_title, anchor=tk.W, justify=tk.LEFT, font=("Courier", 4))
-        self.cat = tk.Label(self, text=ascii_cat, anchor=tk.W, justify=tk.LEFT, font=("Courier", 3))
         self.comic_frame = tk.Frame(self.comic_canvas)
         self.text_frame = tk.Frame(self)
         self.output_text = tk.Text(self, bg="black", fg="white")
         self.button = tk.Button(self, text="Télécharger les comics", command=self.run)
         self.scrollbar = tk.Scrollbar(self.comic_canvas, orient="vertical", command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.title("Télécharger DC v4")
+        self.title("Télécharger All V1")
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
         self.comic_create = tk.Text(self.text_frame, height=3, bg="white", fg="black")
 
         self.asciititle.pack()
-        self.cat.pack()
         self.message.pack()
         self.comic_canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
