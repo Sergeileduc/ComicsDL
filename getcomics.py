@@ -183,3 +183,20 @@ def getWeeklyComics(mylist):
                 print(e)
                 pass
     print("C'est tout. Vous pouvez fermer.")
+
+#search Getcomics
+def getresults(url):
+	searchlist=list()
+	try:
+		soup = htmlsoup.url2soup(url)
+		for d in soup.select("div.post-info"):
+			if d.h1.a.has_attr('href'):
+				size = None
+				searchsize = re.search( r'\d+ [KMGT]B', d.p.text, re.M|re.I)
+				if searchsize:
+					size = searchsize.group(0)
+				searchlist.append((d.h1.a.get("href"),d.h1.a.text, size))
+		#print(searchlist)
+		return searchlist
+	except urllib.error.HTTPError:
+		print("something wrong happened")
