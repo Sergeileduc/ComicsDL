@@ -13,6 +13,8 @@ import urllib.error
 import threading
 from bs4 import BeautifulSoup
 
+#CLEAING
+
 url = ''
 basesearch = 'https://getcomics.info'
 tagsearch = 'https://getcomics.info/tag/'
