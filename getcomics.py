@@ -12,6 +12,12 @@ import base64
 
 today = datetime.today().strftime("%Y-%m-%d")
 
+getcomicsurls = ['https://getcomics.info/tag/dc-week/',
+                'http://getcomics.info/tag/marvel-now/',
+                'https://getcomics.info/tag/indie-week/',
+                'https://getcomics.info/tag/image-week/'
+                ]
+
 BASE = "https://getcomics.info/go.php-url=/"
 
 #subistitions for getcomics
@@ -157,3 +163,27 @@ def downComZippy(url):
             print("Error while writing file")
     print ('Done\n--')
     return
+
+def getWeeklyComics(mylist):
+    print ('Initialisation...')
+    print ('Je vais chercher les mots clés :')
+    print (mylist)
+
+    for url in getcomicsurls:
+    #get latest archive on the current page
+        weeklyUrl = findLastWeekly(url)
+        soup = htmlsoup.url2soup(weeklyUrl)
+        interm = soup.select("section.post-contents")
+        soup2 = BeautifulSoup(str(interm), 'html.parser')
+        interm2 = soup2.find_all('li')
+        remoteComicsList = htmlsoup.getaALLhref(str(interm2), 'a')
+        for newcomic in remoteComicsList:
+            try:
+                for myComic in mylist:
+                    if myComic in newcomic:
+                        downCom(newcomic)
+                        pass
+            except Exception as e:
+                print(e)
+                pass
+    print("C'est tout. Vous pouvez fermer.")
