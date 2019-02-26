@@ -373,7 +373,10 @@ class Getcomics(tk.Tk):
 	def downAllCom(self, liste):
 		self.dlbytes.set(0)
 		for dl in liste:
-			self.downCom(dl[0])
+			try:
+				self.downCom(dl[0])
+			except:
+				print("Something went wrong")
 		print("Terminé, vous pouvez quitter")
 		return
 
@@ -401,7 +404,7 @@ class Getcomics(tk.Tk):
 						user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 						headers = { 'User-Agent' : user_agent }
 						req = urllib.request.Request(zippylink, None, headers)
-						print(req)
+						#print(req)
 						finalzippy = urllib.request.urlopen(req).geturl()
 					except urllib.error.HTTPError:
 						print("can't obtain final zippyshare url")
