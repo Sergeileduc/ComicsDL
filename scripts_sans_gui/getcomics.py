@@ -55,8 +55,8 @@ def downCom(url):
     try:
         soup = htmlsoup.url2soup(finalurl)
         downButtons = soup.select("div.aio-pulse > a")
-    except:
-        print("Here is the Error")
+    except Exception as e:
+        print(e)
     for button in downButtons:
         #if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
         if 'zippyshare' in button.get("href") or 'zippyshare' in button.get('title').lower():
@@ -77,11 +77,12 @@ def downCom(url):
                 raise
             except IOError:
                 print("Zippyhare download failed")
-            #try:
-            print(finalzippy)
-            downComZippy(finalzippy)
-                #except:
-                #    print("error in downComZippy")
+            try:
+                print(finalzippy)
+                downComZippy(finalzippy)
+            except Exception as e:
+                print("error in downComZippy")
+                print(e)
     #except urllib.error.HTTPError:
         #print("downCom got HTTPError from returnHTML")
         #raise
