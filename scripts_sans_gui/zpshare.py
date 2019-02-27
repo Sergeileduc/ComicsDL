@@ -5,15 +5,16 @@ import re
 import math
 
 #subistitions for getcomics
-substitutions1 = {'%2c': '', '%20': ' ', '%28': '(', '%29': ')'}
+substitutions1 = {'%2c': '', '%20': ' ', '%28': '(', '%29': ')', '%27': '\'', '%26': '&'}
 substitutions2 = {' (Digital)': '', ' (digital)': '',
 ' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'', ' (Webrip-DCP)':'',
-' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
+' (d\'argh-Empire)': '', ' (d \'argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
 ' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
 ' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
 '(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'',
 ' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':'', ' (Mephisto-Empire)':'',
-' (Shadowcat-Empire)':''}
+' (Shadowcat-Empire)':'', ' (Minutemen-Slayer)': '', ' (Kileko-Empire)': '',
+' (The Seeker-Empire)': ''}
 
 #multiple replace function
 def replace(string, substitutions):
