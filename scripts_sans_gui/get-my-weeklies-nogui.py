@@ -28,7 +28,7 @@ try:
             f.write('%s\n' % comic)
             myComicsList.append(comic.lower().replace(' ','-'))
 except IOError as e:
-    print("Erreur : Il faut créer un fichier " + config + " dans le dossier du script et y ajouter vos séries en ligne,\n comme par exemple\n.........\nBatman\nSuperman\nInjustice\netc...\n.........")
+    print("Erreur : Il faut créer un fichier " + config + " et y ajouter vos séries en ligne,\n comme par exemple\n.........\nBatman\nSuperman\nInjustice\netc...\n.........")
 
 try:
     print("Je vais chercher : " + str(myComicsList))
