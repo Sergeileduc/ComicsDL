@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
 
-import re
 import requests #html
 import urllib.request
 import urllib.error
@@ -93,7 +92,7 @@ def downComZippy(url):
     #downButton = soup.select("script[type='text/javascript']")
     #downButton = soup.select("table[class='folderlogo'] > tr > td")[0].find("div", style=re.compile("margin-left"))
     downButton = soup.find('a', id="dlbutton").find_next_sibling().text
-#    .find("script", type="text/javascript")
+    #.find("script", type="text/javascript")
     #.find("div", style=re.compile("width: 303px;"))
     #downButton = soup.find("script", type="text/javascript")
     # print(downButton)
