@@ -275,6 +275,7 @@ class Getcomics(tk.Tk):
 			print ("Download from zippyhare into : " + fileName)
 			r = requests.get(fullURL, stream=True)
 			size = int(r.headers['Content-length']) #size in bytes
+			print(tools.bytes_2_human_readable(size))
 		except:
 			print("Can't get download link on zippyshare page")
 
@@ -294,6 +295,10 @@ class Getcomics(tk.Tk):
 				pass
 			except IOError:
 				print("Error while writing file")
+			try:
+				r.close()
+			except:
+				pass
 			print ('Done\n--')
 		return
 
