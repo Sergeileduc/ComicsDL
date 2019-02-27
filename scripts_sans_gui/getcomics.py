@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import htmlsoup
 import zpshare
 import base64
+import tools
 
 today = datetime.today().strftime("%Y-%m-%d")
 
@@ -102,8 +103,11 @@ def downComZippy(url):
     try:
         fullURL, fileName = zpshare.getZippyDL(url, downButton)
         print ("Downloading from zippyshare into : " + fileName)
-        r = requests.get(fullURL)
-    except:
+        r = requests.get(fullURL, stream=True)
+        size = tools.bytes_2_human_readable(int(r.headers['Content-length']))
+        print(size)
+    except Exception as e:
+        print(e)
         print("Can't get download link on zippyshare page")
 
     #download from url & trim it a little bit
@@ -115,5 +119,6 @@ def downComZippy(url):
             pass
         except IOError:
             print("Error while writing file")
+    r.close()
     print ('Done\n--')
     return
