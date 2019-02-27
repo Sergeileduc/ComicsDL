@@ -13,6 +13,7 @@ import urllib.request
 import urllib.error
 import threading
 import base64
+import zpshare
 
 url = ''
 BASE = "https://getcomics.info/go.php-url=/"
@@ -267,9 +268,10 @@ class Getcomics(tk.Tk):
 	def downComZippy(self, url):
 		self.progress["value"] = 0
 		soup = htmlsoup.url2soup(url)
-		downButton = soup.select('script[type="text/javascript"]')
+		#downButton = soup.select('script[type="text/javascript"]')
+		downButton = soup.find('a', id="dlbutton").find_next_sibling().text
 		try:
-			fullURL, fileName = getcomics.getZippyDL(url, downButton)
+			fullURL, fileName = zpshare.getZippyDL(url, downButton)
 			print ("Download from zippyhare into : " + fileName)
 			r = requests.get(fullURL, stream=True)
 			size = int(r.headers['Content-length']) #size in bytes
