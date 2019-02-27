@@ -14,6 +14,7 @@ def url2soup(url):
         res = requests.get(url)
         res.raise_for_status()
         soup = BeautifulSoup(res.text, 'html.parser')
+        res.close()
         return soup
     except ValueError as e:
              print("url2soup error")
