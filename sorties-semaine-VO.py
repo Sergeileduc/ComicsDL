@@ -79,6 +79,7 @@ def findLastWeekly(url):
 #print getcomics weekly post in file f
 def printWeek(url, f, editor):
     global flag
+    flag = False
     postTitle, weeklyUrl = findLastWeekly(url)
 
     #Missing post already been done

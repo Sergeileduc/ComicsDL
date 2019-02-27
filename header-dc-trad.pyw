@@ -5,7 +5,7 @@ import base64
 import requests
 import io
 import re
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk #pip install pillow
 import tkinter as tk
 from tkinter import font as tkfont # python 3
 import urllib.request as urllib2
