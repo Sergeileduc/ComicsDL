@@ -103,8 +103,6 @@ def downComZippy(url):
         fullURL, fileName = zpshare.getZippyDL(url, downButton)
         print ("Downloading from zippyshare into : " + fileName)
         r = requests.get(fullURL)
-        head = r.headers
-        print(head)
     except:
         print("Can't get download link on zippyshare page")
 
