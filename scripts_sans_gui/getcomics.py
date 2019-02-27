@@ -1,43 +1,19 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
 
-import re #regex
+import re
 import requests #html
 import urllib.request
 import urllib.error
 from datetime import datetime
 from bs4 import BeautifulSoup
 import htmlsoup
+import zpshare
 import base64
 
 today = datetime.today().strftime("%Y-%m-%d")
 
 BASE = "https://getcomics.info/go.php-url=/"
-
-#subistitions for getcomics
-substitutions1 = {'%2c': '', '%20': ' ', '%28': '(', '%29': ')'}
-substitutions2 = {' (Digital)': '', ' (digital)': '',
-' (Webrip)': '', ' (webrip)': '', ' (webrip-DCP)':'', ' (Webrip-DCP)':'',
-' (d_%27argh-Empire)': '', ' (Zone-Empire)': '', ' (Thornn-Empire)': '',
-' (mv-DCP)': '', ' (The Last Kryptonian-DCP)': '', ' (GreenGiant-DCP)': '',
-' (Minutemen-Thoth)':'', ' (Glorith-HD)':'', ' (Oroboros-DCP)':'',
-'(Digital)(TLK-EMPIRE-HD)':'', ' (Son of Ultron-Empire)':'',
-' (Digital-Empire)':'', ' (2 covers)':'', ' GetComics.INFO':'', ' (Mephisto-Empire)':'',
-' (Shadowcat-Empire)':''}
-
-#just optimizing
-def regexNightmare(html, regex):
-    try:
-        urlPattern = re.compile(regex, re.I)
-        return urlPattern.search(str(html)).group(1)
-    except:
-        print("Cant't regex html")
-
-#multiple replace function
-def replace(string, substitutions):
-    substrings = sorted(substitutions, key=len, reverse=True)
-    regex = re.compile('|'.join(map(re.escape, substrings)))
-    return regex.sub(lambda match: substitutions[match.group(0)], string)
 
 #find las weekly post
 def findLastWeekly(url):
@@ -111,37 +87,25 @@ def downCom(url):
         #raise
     return
 
-def getZippyDL(url, button):
-	print("Found zippyshare : " + url)
-	#disassemble url
-	comRawUrl0 = regexNightmare(button, r'.*?getElementById.*?href = \"(.*?)\"')
-	comRawUrl1 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ \((.*?)\) \+ \".*?\"\;')
-	comRawUrl2 = regexNightmare(button, r'.*?getElementById.*?href = \".*?\" \+ .*? \+ \"(.*?)\"\;')
-	#filename = comRawUrl2[1:].replace('%20',' ').replace('%28','(').replace('%29',')').replace('%2c','')
-	temp = replace(comRawUrl2[1:], substitutions1)
-	filename = replace(temp, substitutions2)
-	#calculating the id and forming url | that is an extremely dirty way, I know
-	try:
-		urlPattern = re.compile(r'(.*?) \% (.*?) \+ (.*?) \% (.*?)$', re.I)
-		urlNum1 = urlPattern.search(str(comRawUrl1)).group(2)
-		urlNum2 = urlPattern.search(str(comRawUrl1)).group(3)
-		urlNum3 = urlPattern.search(str(comRawUrl1)).group(4)
-		urlNumFull = (int(urlNum2) % int(urlNum1)) + (int(urlNum2) % int(urlNum3))
-		fullURL = url[:-21] + comRawUrl0 + str(urlNumFull) + comRawUrl2
-	except Exception as e:
-		print("Mon erreur")
-		print(e)
-		raise
-	return fullURL, filename
-
 #download from zippyshare
 def downComZippy(url):
     soup = htmlsoup.url2soup(url)
-    downButton = soup.select('script[type="text/javascript"]')
+    #downButton = soup.select("script[type='text/javascript']")
+    #downButton = soup.select("table[class='folderlogo'] > tr > td")[0].find("div", style=re.compile("margin-left"))
+    downButton = soup.find('a', id="dlbutton").find_next_sibling().text
+#    .find("script", type="text/javascript")
+    #.find("div", style=re.compile("width: 303px;"))
+    #downButton = soup.find("script", type="text/javascript")
+    # print(downButton)
+    #interm = soup.select("div.right")
+    #soup2 = BeautifulSoup(str(interm), 'html.parser')
+    #downButton = soup2.select('script[type="text/javascript"]')
     try:
-        fullURL, fileName = getZippyDL(url, downButton)
+        fullURL, fileName = zpshare.getZippyDL(url, downButton)
         print ("Downloading from zippyshare into : " + fileName)
         r = requests.get(fullURL)
+        head = r.headers
+        print(head)
     except:
         print("Can't get download link on zippyshare page")
 
