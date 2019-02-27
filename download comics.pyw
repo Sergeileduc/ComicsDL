@@ -80,7 +80,7 @@ class Getcomics(tk.Tk):
 		self.downloadlist = list()
 		self.mylist = list()
 		self.wm_geometry("%dx%d+%d+%d" % (sizex, sizey, posx, posy))
-		self.title("Télécharger sur Getcomics v2")
+		self.title("Télécharger sur Getcomics V2019-02")
 		self.configure(background=deepbg)
 
 		topbar = ttk.Frame(self, style="deepBG.TFrame")
