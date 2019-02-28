@@ -2,9 +2,10 @@
 # -*-coding:utf-8 -*-
 
 import sys
-import getcomics
-import htmlsoup
-import tools
+from utils import getcomics
+from utils import htmlsoup
+from utils import tools
+from utils import zpshare
 import requests
 import tkinter as tk
 import tkinter.scrolledtext as tkst
@@ -13,7 +14,6 @@ import urllib.request
 import urllib.error
 import threading
 import base64
-import zpshare
 
 url = ''
 BASE = "https://getcomics.info/go.php-url=/"
