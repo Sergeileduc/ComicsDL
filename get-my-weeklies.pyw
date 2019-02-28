@@ -11,11 +11,11 @@ import threading
 exit_thread = False
 exit_success = False
 
-getcomicsurls = ['https://getcomics.info/tag/dc-week/',
-                 'http://getcomics.info/tag/marvel-now/',
-                 'https://getcomics.info/tag/indie-week/',
-                 'https://getcomics.info/tag/image-week/'
-                 ]
+getcomicsurls = [
+    'https://getcomics.info/tag/dc-week/',
+    'http://getcomics.info/tag/marvel-now/',
+    'https://getcomics.info/tag/indie-week/',
+    'https://getcomics.info/tag/image-week/']
 
 getcomicsurl = "https://getcomics.info/tag/dc-week/"
 
@@ -46,11 +46,11 @@ class MyComicsList(tk.Tk):
 
         w = 300  # width for the Tk
         h = 600  # height for the Tk
-        # get screen width and height
+        # Get screen width and height
         ws = self.winfo_screenwidth()  # width of the screen
         hs = self.winfo_screenheight()  # height of the screen
 
-        # calculate x and y coordinates for the Tk root window
+        # Calculate x and y coordinates for the Tk root window
         x = (ws/2) - (w/2)
         y = (hs/2) - (h/2)
         longtext = "Ajoutez ou supprimez les séries à chercher dans " \
