@@ -60,24 +60,26 @@ class Getcomics(tk.Tk):
         dark2 = '#37474F'
         dark3 = '#455A64'
         fg = 'white'
+        grey = '#37474F'
+        grey2 = '##d8d8d8'
         style = ttk.Style()
-        style.configure("deepBG.TFrame", foreground=fg, background=deepbg,
-                        border=0, relief='flat')
-        style.configure("dark1.TFrame", foreground=fg, background=color1,
-                        border=0, relief='flat', highlightthickness=0)
-        style.configure("L.TLabel", foreground=fg, background=color1,
-                        relief='raised', font=("Verdana", 12))
-        style.configure('pages.TButton', font=("Verdana", 12), relief='raised',
-                        background=dark3, foreground=fg,
-                        border=2, highlightthickness=0)
-        style.map('pages.TButton',
-                  foreground=[('active', 'black')],
-                  background=[('active', fg)])
-        style.configure('dl.TButton', background=color1, foreground=fg,
-                        highlightthickness=0, font=("Verdana", 12, 'bold'))
-        style.map('dl.TButton',
-                  foreground=[('active', 'black')],
-                  background=[('active', fg)])
+        # style.configure("deepBG.TFrame", foreground=fg, background=deepbg,
+        #                 border=0, relief='flat')
+        # style.configure("dark1.TFrame", foreground=fg, background=color1,
+        #                 border=0, relief='flat', highlightthickness=0)
+        # style.configure("L.TLabel", foreground=fg, background=color1,
+        #                 relief='raised', font=("Verdana", 12))
+        # style.configure('pages.TButton', font=("Verdana", 12), relief='raised',
+        #                 background='black', foreground=fg,
+        #                 border=2, highlightthickness=0)
+        # style.map('pages.TButton',
+        #           foreground=[('active', 'black')],
+        #           background=[('active', fg)])
+        # style.configure('dl.TButton', background='37474F', foreground='white',
+        #                 highlightthickness=0, font=("Verdana", 12, 'bold'))
+        # style.map('dl.TButton',
+        #           foreground=[('active', 'black')],
+        #           background=[('active', fg)])
 
         self.page = 1
         self.currentpercent = tk.IntVar()
@@ -101,42 +103,45 @@ class Getcomics(tk.Tk):
         self.title("Télécharger sur Getcomics V2019-02")
         self.configure(background=deepbg)
 
-        topbar = ttk.Frame(self, style="deepBG.TFrame")
-        mainframe = ttk.Frame(self, style="deepBG.TFrame")
-        self.resultsframe = ttk.Frame(mainframe, style="dark1.TFrame")
-        rightframe = ttk.Frame(mainframe, style="dark1.TFrame")
-        buttonbar = ttk.Frame(self.resultsframe, style="deepBG.TFrame")
+        topbar = ttk.Frame(self)  #, style="deepBG.TFrame")
+        mainframe = ttk.Frame(self)  #, style="deepBG.TFrame")
+        self.resultsframe = ttk.Frame(mainframe)  #, style="dark1.TFrame")
+        rightframe = ttk.Frame(mainframe)  #, style="dark1.TFrame")
+        buttonbar = ttk.Frame(self.resultsframe)  #, style="deepBG.TFrame")
 
-        bottombar = ttk.Frame(self, style="deepBG.TFrame")
+        bottombar = ttk.Frame(self)  #, style="deepBG.TFrame")
         self.prevpage = ttk.Button(buttonbar, text="page précédente",
-                                   style="pages.TButton",
+                                   #  style="pages.TButton",
                                    command=self.gotoprevpage)
         nextpage = ttk.Button(buttonbar, text="page suivante",
-                              style="pages.TButton",
+                              #  style="pages.TButton",
                               command=self.gotonextpage)
         # messageRecherche = tk.Label(
         #         topbar, text="Rechercher sur Getcomics", bg=dark2, fg=fg,
         #         justify=tk.CENTER, font=("Helvetica", 12))
         choice = tk.OptionMenu(topbar, self.mode, *self.choices)
-        choice.config(bg=dark3, fg=fg, relief='flat',
+        choice.config(  #bg=dark3, fg=fg, relief='flat',
                       border=0, highlightthickness=0)
-        choice["menu"].config(bg=dark3, fg=fg, relief='flat', border=0)
+        choice["menu"].config(  #bg=dark3, fg=fg,
+                              relief='flat', border=0)
         search = tk.Entry(topbar, width=self.resultwidht, justify='center',
-                          insertbackground=fg, bg=dark2, fg=fg,
+                          insertbackground=fg,  # bg=dark2, fg=fg,
                           textvariable=self.usersearch, font=("Verdana", 12))
 
-        dlcanva = tk.Canvas(rightframe, bg=color1, highlightthickness=0)
-        self.dlframe = ttk.Frame(dlcanva, style="dark1.TFrame")
+        dlcanva = tk.Canvas(rightframe,  bg='gray',
+                            highlightthickness=0)
+        self.dlframe = ttk.Frame(dlcanva)  #, style="dark1.TFrame")
         scrollbar = ttk.Scrollbar(
                 dlcanva, orient="vertical", command=dlcanva.yview)
-        instructions = ttk.Label(self.resultsframe, style="L.TLabel",
+        instructions = ttk.Label(self.resultsframe,  # style="L.TLabel",
                                  text='Cliquez pour ajouter un élément '\
                                  'à votre liste de téléchargement')
-        liste = tk.Label(rightframe, width=self.dlwidth, bg=dark2, fg=fg,
+        liste = tk.Label(rightframe, width=self.dlwidth,
+                         # bg=dark2, fg=fg,
                          relief='raised', text="Liste de téléchargement",
                          font=("Verdana", 12))
         dlall = ttk.Button(rightframe, text="Télécharger la liste",
-                           style="dl.TButton",
+                           # style="dl.TButton",
                            command=lambda: self.dlcom(self.downloadlist))
 
         outputtext = tkst.ScrolledText(
@@ -199,8 +204,8 @@ class Getcomics(tk.Tk):
             title = i[1] + ' (' + str(i[2]) + ')'
             newButton = tk.Button(
                     self.resultsframe, text=title, width=self.resultwidht,
-                    relief='flat', border=0, bg=dark2, fg=fg,
-                    activebackground='#FAFAFA', activeforeground='black',
+                    relief='flat', border=0,  # bg=dark2, fg=fg,
+                    # activebackground='#FAFAFA', activeforeground='black',
                     highlightthickness=0, font=("Verdana", 10))
             newButton.config(
                     command=lambda button=newButton: self.addtodl(button))
@@ -230,8 +235,8 @@ class Getcomics(tk.Tk):
                 self.listsize += bytes
             newDL = tk.Button(
                     self.dlframe, text=button.cget('text').title(),
-                    width=self.resultwidht, anchor='w', bg=dark2, fg=fg,
-                    activebackground='#FAFAFA', activeforeground='black',
+                    width=self.resultwidht, anchor='w',  # bg=dark2, fg=fg,
+                    # activebackground='#FAFAFA', activeforeground='black',
                     relief='flat', border=0, highlightthickness=0,
                     font=("Verdana", 10))
             newDL.config(command=lambda button=newDL: self.removedl(button))
