@@ -15,7 +15,6 @@ import urllib.error
 import threading
 import base64
 
-url = ''
 BASE = "https://getcomics.info/go.php-url=/"
 
 exit_thread = False
@@ -24,6 +23,7 @@ exit_success = False
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
 
+# Redirect standard output Std into a frame in the GUI
 class Std_redirector(object):
     def __init__(self, widget):
         self.widget = widget
@@ -37,7 +37,7 @@ class Std_redirector(object):
         pass
 
 
-# our comicsList
+# Main program interface and code
 class Getcomics(tk.Tk):
 
     def __init__(self):
@@ -178,6 +178,7 @@ class Getcomics(tk.Tk):
 
         self.searchcomics(None)
 
+    # Destroy a list of widgets (like buttons)
     def destroylist(self, widgetlist):
         for w in widgetlist:
             w.destroy()
@@ -215,7 +216,6 @@ class Getcomics(tk.Tk):
             thread1.start()
         except Exception as e:
             print(e)
-            print("Problem")
             pass
 
     # Click to add to DL list
@@ -375,6 +375,7 @@ class Getcomics(tk.Tk):
         self.searchcomics(None)
 
 
+# Main Loop
 if __name__ == "__main__":
     app = Getcomics()  # constructor, calls method __init__
     app.mainloop()
