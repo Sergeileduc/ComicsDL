@@ -74,7 +74,7 @@ def downCom(url):
                     finalzippy = base64.b64decode(
                             zippylink[len(BASE):]).decode()
                 else:
-                    headers = {'User-Agent': user_agent}
+                    # headers = {'User-Agent': user_agent}
                     req = urllib.request.Request(zippylink, None, headers)
                     finalzippy = urllib.request.urlopen(req).geturl()
             except urllib.error.HTTPError as e:
