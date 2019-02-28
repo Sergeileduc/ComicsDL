@@ -2,7 +2,6 @@
 # -*-coding:utf-8 -*-
 
 import requests
-import sys
 import os
 import urllib.request
 import urllib.error
@@ -20,9 +19,10 @@ consistof = "consist of :"
 lower = "or on the lower"
 bloat = ['Language :', 'Image Format :', 'Year :', 'Size :', 'Notes :']
 
-#get html from url
+
+# Get html from url
 def returnHTML(url):
-    hdr = {'Accept': 'text/html', 'User-Agent' : "Fiddler"}
+    hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
     req = urllib.request.Request(url, headers=hdr)
     try:
         response = urllib.request.urlopen(req)
@@ -32,60 +32,64 @@ def returnHTML(url):
         print (e.fp.read())
         raise
 
-#get BS soup from an url
+
+# Get BS soup from an url
 def url2soup(url):
     try:
         res = requests.get(url)
         res.raise_for_status()
         soup = BeautifulSoup(res.text, 'html.parser')
         return soup
-    except:
+    except Exception as e:
+        print(e)
         print("Error")
         raise
 
 
-#get BS soup from html code
+# Get BS soup from html code
 def getSoup(html):
     soup = BeautifulSoup(html, 'html.parser')
     return soup
 
-#find last weekly and display
+
+# Find last weekly and display
 def printLastWeeklies():
     printLastWeek(DCurl, "DC")
     printLastWeek(MarvelURL, "Marvel")
     printLastWeek(ImageURL, "Image")
     printLastWeek(IndieURL, "Indé")
 
-#def print last weekly date
+
+# Def print last weekly date
 def printLastWeek(url, editor):
     htmlMain = returnHTML(url)
     soup = getSoup(htmlMain)
-    lastPost = soup.find_all('article', class_= 'type-post')[0]
+    lastPost = soup.find_all('article', class_='type-post')[0]
     title = lastPost.h1.a.text
     time = lastPost.find('time')
     print(editor + '\t : ' + title + ' :\t' + time.text)
 
 
-#find las weekly post
+# Find las weekly post
 def findLastWeekly(url):
     htmlMain = returnHTML(url)
     soup = getSoup(htmlMain)
-    lastPost = soup.find_all('article', class_= 'type-post')[0]
+    lastPost = soup.find_all('article', class_='type-post')[0]
     postTitle = lastPost.h1.a.text
     postUrl = lastPost.h1.a['href']
     return postTitle, postUrl
 
 
-#print getcomics weekly post in file f
+# Print getcomics weekly post in file f
 def printWeek(url, f, editor):
     global flag
     flag = False
     postTitle, weeklyUrl = findLastWeekly(url)
 
-    #Missing post already been done
+    # Missing post already been done
     if "Missing" in postTitle and flag:
         pass
-    #Missing post not done yet
+    # Missing post not done yet
     elif "Missing" in postTitle and not flag:
         f.write(postTitle + '\n')
         f.write("=====================" + '\n')
@@ -96,34 +100,35 @@ def printWeek(url, f, editor):
     else:
         printOneEditor(weeklyUrl, f, editor)
 
-#for Marvel, DC, or Image weeklies
+
+# For Marvel, DC, or Image weeklies
 def printOneEditor(url, f, editor):
     soup = url2soup(url)
-    #temp = soup.select('section.post-contents > ul > li')
+    # temp = soup.select('section.post-contents > ul > li')
     temp = soup.select('section.post-contents > ul')
-    soup2=BeautifulSoup(str(temp), 'html.parser')
+    soup2 = BeautifulSoup(str(temp), 'html.parser')
     var = soup2.find_all('strong')
 
     f.write(editor + '\n')
     f.write("=====================" + '\n')
     for s in var:
-        name = s.text.replace(' : ','').replace('Download','')\
-                    .replace(' | ','').replace('Read Online','')
+        name = s.text.replace(' : ', '').replace('Download', '')\
+                    .replace(' | ', '').replace('Read Online', '')
         a = s.find('a')
         try:
+            # if a.has_attr('href'):
             if 'href' in a.attrs:
-            #if a.has_attr('href'):
-                f.write('[url=' + a.get("href") + ']' + name  + '[/url]' + '\n')
-        except:
+                f.write('[url=' + a.get("href") + ']' + name + '[/url]' + '\n')
+        except Exception:
             f.write(name + '\n')
     f.write("=====================" + '\n')
     f.write("" + '\n')
 
 
-#for Indie week+
+# For Indie week+
 def printMultipleEditors(url, f):
-    soup=url2soup(url).select('section.post-contents')
-    soup2=BeautifulSoup(str(soup), 'html.parser')
+    soup = url2soup(url).select('section.post-contents')
+    soup2 = BeautifulSoup(str(soup), 'html.parser')
 
     publishers = soup2.find_all('span', style="color: #3366ff;")
     indies = []
@@ -136,23 +141,25 @@ def printMultipleEditors(url, f):
         if s.text in indies:
             f.write('\n' + s.text + '\n=====================' + '\n')
         elif note in s.text \
-        or howto in s.text \
-        or consistof in s.text \
-        or howtodl in s.text \
-        or lower in s.text:
+                or howto in s.text \
+                or consistof in s.text \
+                or howtodl in s.text \
+                or lower in s.text:
             pass
         elif s.text in bloat:
             pass
         else:
-            name = s.text.replace(' : ','').replace('Download','')\
-                        .replace(' | ','').replace('Read Online','')
+            name = s.text.replace(' : ', '').replace('Download', '')\
+                        .replace(' | ', '').replace('Read Online', '')
             if s.a and s.a.has_attr('href'):
-                f.write('[url=' + s.a.get("href") + ']' + name  + '[/url]' + '\n')
+                f.write(
+                    '[url=' + s.a.get("href") + ']' + name + '[/url]' + '\n')
             else:
                 f.write(name + '\n')
     f.write('\n')
 
-#generate output file
+
+# Generate output file
 def generateweekly():
     global flag
     flag = False
@@ -161,7 +168,7 @@ def generateweekly():
     except OSError:
         pass
 
-    with open("liste-comics-semaine.txt", "w")  as f:
+    with open("liste-comics-semaine.txt", "w") as f:
         printWeek(DCurl, f, "DC week")
         printWeek(MarvelURL, f, "Marvel week")
         f.write("Indé week" + '\n')
@@ -170,7 +177,7 @@ def generateweekly():
         printWeek(IndieURL, f, "Indé week")
 
 
-#MAIN
+# MAIN
 print("Les derniers 'weekly packs' de Getcomics sont :")
 print("----------------")
 printLastWeeklies()

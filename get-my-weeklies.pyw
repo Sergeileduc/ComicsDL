@@ -3,56 +3,58 @@
 import sys
 import os
 import getcomics
-import htmlsoup
 import tkinter as tk
 import tkinter.messagebox as msg
 import sqlite3
 import threading
 
-exit_thread= False
+exit_thread = False
 exit_success = False
 
 getcomicsurls = ['https://getcomics.info/tag/dc-week/',
-                'http://getcomics.info/tag/marvel-now/',
-                'https://getcomics.info/tag/indie-week/',
-                'https://getcomics.info/tag/image-week/'
-                ]
+                 'http://getcomics.info/tag/marvel-now/',
+                 'https://getcomics.info/tag/indie-week/',
+                 'https://getcomics.info/tag/image-week/'
+                 ]
 
 getcomicsurl = "https://getcomics.info/tag/dc-week/"
 
+
 class Std_redirector(object):
-    def __init__(self,widget):
+    def __init__(self, widget):
         self.widget = widget
 
-    def write(self,string):
+    def write(self, string):
         if not exit_thread:
-            self.widget.insert(tk.END,string)
+            self.widget.insert(tk.END, string)
             self.widget.see(tk.END)
 
     def flush(self):
         pass
 
-#our comicsList
+
+# Our comicsList
 class MyComicsList(tk.Tk):
     def __init__(self, comic=None):
         super().__init__()
 
-        #list MyComicsList[] initialisation
+        # List MyComicsList[] initialisation
         if not comic:
             self.comic = []
         else:
             self.comic = comic
 
-        w = 300 # width for the Tk
-        h = 600 # height for the Tk
+        w = 300  # width for the Tk
+        h = 600  # height for the Tk
         # get screen width and height
-        ws = self.winfo_screenwidth() # width of the screen
-        hs = self.winfo_screenheight() # height of the screen
+        ws = self.winfo_screenwidth()  # width of the screen
+        hs = self.winfo_screenheight()  # height of the screen
 
         # calculate x and y coordinates for the Tk root window
         x = (ws/2) - (w/2)
         y = (hs/2) - (h/2)
-        longtext = "Ajoutez ou supprimez les séries à chercher dans les derniers posts \n\"Weekly\" de Getcomics.info"
+        longtext = "Ajoutez ou supprimez les séries à chercher dans " \
+            "les derniers posts \n\"Weekly\" de Getcomics.info"
         # ascii_dctrad = """
 # ██████╗  ██████╗    ████████╗██████╗  █████╗ ██████╗
 # ██╔══██╗██╔════╝    ╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗
@@ -68,41 +70,49 @@ class MyComicsList(tk.Tk):
 ╚██████╔╝███████╗   ██║   ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║╚██████╗███████║
  ╚═════╝ ╚══════╝   ╚═╝    ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝ ╚═════╝╚══════╝"""
 
-
-
         self.comic_canvas = tk.Canvas(self)
-        self.message = tk.Label(self, text=longtext, anchor=tk.W, justify=tk.CENTER, wraplength = 250, font=("Helvetica", 12))
-        self.asciititle = tk.Label(self, text=ascii_title, anchor=tk.W, justify=tk.LEFT, font=("Courier", 4))
+        self.message = tk.Label(
+                self, text=longtext, anchor=tk.W, justify=tk.CENTER,
+                wraplength=250, font=("Helvetica", 12))
+        self.asciititle = tk.Label(
+                self, text=ascii_title, anchor=tk.W, justify=tk.LEFT,
+                font=("Courier", 4))
         self.comic_frame = tk.Frame(self.comic_canvas)
         self.text_frame = tk.Frame(self)
         self.output_text = tk.Text(self, bg="black", fg="white")
-        self.button = tk.Button(self, text="Télécharger les comics", command=self.run)
-        self.scrollbar = tk.Scrollbar(self.comic_canvas, orient="vertical", command=self.comic_canvas.yview)
+        self.button = tk.Button(
+                self, text="Télécharger les comics", command=self.run)
+        self.scrollbar = tk.Scrollbar(
+                self.comic_canvas, orient="vertical",
+                command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
         self.title("Télécharger All V1")
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
-        self.comic_create = tk.Text(self.text_frame, height=3, bg="white", fg="black")
+        self.comic_create = tk.Text(
+                self.text_frame, height=3, bg="white", fg="black")
 
         self.asciititle.pack()
         self.message.pack()
         self.comic_canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        self.canvas_frame = self.comic_canvas.create_window((0, 0), window=self.comic_frame, anchor="n")
+        self.canvas_frame = self.comic_canvas.create_window(
+                (0, 0), window=self.comic_frame, anchor="n")
 
-        #self.text_frame.pack(side=tk.BOTTOM, fill=tk.X)
+        # self.text_frame.pack(side=tk.BOTTOM, fill=tk.X)
         self.text_frame.pack()
         self.button.pack()
         self.comic_create.pack()
         self.output_text.pack(side=tk.BOTTOM, fill=tk.X)
-        #self.button.pack(side=tk.BOTTOM, fill=tk.X)
+        # self.button.pack(side=tk.BOTTOM, fill=tk.X)
         self.update_idletasks()
 
-        #self.comic_create.pack(side=tk.BOTTOM, fill=tk.X)
+        # self.comic_create.pack(side=tk.BOTTOM, fill=tk.X)
 
         self.comic_create.focus_set()
 
-        self.colour_schemes = [{"bg": "lightgrey", "fg": "black"}, {"bg": "grey", "fg": "white"}]
+        self.colour_schemes = [
+            {"bg": "lightgrey", "fg": "black"}, {"bg": "grey", "fg": "white"}]
 
         current_comic = self.load_comic()
         for comic in current_comic:
@@ -121,10 +131,10 @@ class MyComicsList(tk.Tk):
         current_comic = self.load_comic()
         comicslist = list()
         for row in current_comic:
-            comicslist.append(row[0].lower().replace(' ','-'))
-        thread1 = threading.Thread(target=getcomics.getWeeklyComics, args=[comicslist])
+            comicslist.append(row[0].lower().replace(' ', '-'))
+        thread1 = threading.Thread(
+                target=getcomics.getWeeklyComics, args=[comicslist])
         thread1.start()
-
 
     def add_comic(self, event=None, comic_text=None, from_db=False):
         if not comic_text:
@@ -147,7 +157,9 @@ class MyComicsList(tk.Tk):
 
     def remove_comic(self, event):
         comic = event.widget
-        if msg.askyesno("Confirmation de suppressions", "Supprimer " + comic.cget("text") + "de la liste ?"):
+        if msg.askyesno(
+                "Confirmation de suppressions",
+                "Supprimer " + comic.cget("text") + "de la liste ?"):
             self.comic.remove(event.widget)
 
             delete_comic_query = "DELETE FROM comics_dc WHERE comic=?"
@@ -175,7 +187,7 @@ class MyComicsList(tk.Tk):
 
     def comic_width(self, event):
         canvas_width = event.width
-        self.comic_canvas.itemconfig(self.canvas_frame, width = canvas_width)
+        self.comic_canvas.itemconfig(self.canvas_frame, width=canvas_width)
 
     def mouse_scroll(self, event):
         if event.delta:
@@ -216,7 +228,7 @@ class MyComicsList(tk.Tk):
 
     @staticmethod
     def firstTimeDB():
-        #create_tables = "CREATE TABLE comics_dc (comic TEXT)"
+        # Create_tables = "CREATE TABLE comics_dc (comic TEXT)"
         create_table1 = "CREATE TABLE IF NOT EXISTS comics_dc (comic TEXT)"
         MyComicsList.runQuery(create_table1)
         create_table2 = "CREATE TABLE IF NOT EXISTS comics_marvel (comic TEXT)"
@@ -236,7 +248,8 @@ class MyComicsList(tk.Tk):
         default_image_query = "INSERT INTO comics_image VALUES (?)"
         MyComicsList.runQuery(default_image_query, default_comic_data)
 
-#thread1 = threading.Thread(target=call_gen)
+# thread1 = threading.Thread(target=call_gen)
+
 
 if __name__ == "__main__":
     if not os.path.isfile(".comics.db"):

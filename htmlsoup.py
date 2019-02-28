@@ -7,7 +7,7 @@ import urllib.request
 import urllib.error
 
 
-#def url 2 soup
+# Def url 2 soup
 def url2soup(url):
     try:
         res = requests.get(url)
@@ -16,22 +16,26 @@ def url2soup(url):
         res.close()
         return soup
     except ValueError as e:
-             print("url2soup error")
-             print(e)
-             raise
+        print("url2soup error")
+        print(e)
+        raise
     except urllib.error.HTTPError as e:
-             print("url2soup error")
-             print(e)
-             raise
-    except:
+        print("url2soup error")
+        print(e)
+        raise
+    except Exception as e:
+        print(e)
         print("Error in URL -> soup")
         raise
 
-#get beautiful soup
+
+# Get beautiful soup
 def html2soup(html):
     soup = BeautifulSoup(html, 'html.parser')
     return soup
 
+
+# Get a lit of all links in input html
 def getaALLhref(html, tag):
     urllist = list()
     soup = html2soup(html)
