@@ -144,6 +144,7 @@ def downComZippy(url):
     return
 
 
+# Compare remote and local list of comics and download
 def getWeeklyComics(mylist):
     print ('Initialisation...')
     print ('Je vais chercher les mots clés :')
@@ -170,6 +171,7 @@ def getWeeklyComics(mylist):
 
 
 # Search Getcomics
+# Returns names and urls of posts returned by input url
 def getresults(url):
     searchlist = list()
     try:

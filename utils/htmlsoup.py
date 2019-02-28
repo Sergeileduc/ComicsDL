@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup  # html parser
 import requests
 import urllib.request
 import urllib.error
