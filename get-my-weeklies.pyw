@@ -2,7 +2,7 @@
 # -*-coding:utf-8 -*-
 import sys
 import os
-import getcomics
+from utils import getcomics
 import tkinter as tk
 import tkinter.messagebox as msg
 import sqlite3
@@ -10,14 +10,6 @@ import threading
 
 exit_thread = False
 exit_success = False
-
-getcomicsurls = ['https://getcomics.info/tag/dc-week/',
-                 'http://getcomics.info/tag/marvel-now/',
-                 'https://getcomics.info/tag/indie-week/',
-                 'https://getcomics.info/tag/image-week/'
-                 ]
-
-getcomicsurl = "https://getcomics.info/tag/dc-week/"
 
 
 class Std_redirector(object):
@@ -46,11 +38,11 @@ class MyComicsList(tk.Tk):
 
         w = 300  # width for the Tk
         h = 600  # height for the Tk
-        # get screen width and height
+        # Get screen width and height
         ws = self.winfo_screenwidth()  # width of the screen
         hs = self.winfo_screenheight()  # height of the screen
 
-        # calculate x and y coordinates for the Tk root window
+        # Calculate x and y coordinates for the Tk root window
         x = (ws/2) - (w/2)
         y = (hs/2) - (h/2)
         longtext = "Ajoutez ou supprimez les séries à chercher dans " \
@@ -86,7 +78,7 @@ class MyComicsList(tk.Tk):
                 self.comic_canvas, orient="vertical",
                 command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.title("Télécharger All V1")
+        self.title("Télécharger All V2")
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
         self.comic_create = tk.Text(
                 self.text_frame, height=3, bg="white", fg="black")
@@ -136,6 +128,7 @@ class MyComicsList(tk.Tk):
                 target=getcomics.getWeeklyComics, args=[comicslist])
         thread1.start()
 
+    # add comic - create new button and add comic in the database
     def add_comic(self, event=None, comic_text=None, from_db=False):
         if not comic_text:
             comic_text = self.comic_create.get(1.0, tk.END).strip()
@@ -155,6 +148,7 @@ class MyComicsList(tk.Tk):
 
         self.comic_create.delete(1.0, tk.END)
 
+    # remove comic - delete button and remove from database
     def remove_comic(self, event):
         comic = event.widget
         if msg.askyesno(
@@ -170,10 +164,12 @@ class MyComicsList(tk.Tk):
 
             self.recolour_comic()
 
+    # recursive recolour comics
     def recolour_comic(self):
         for index, comic in enumerate(self.comic):
             self.set_comic_colour(index, comic)
 
+    # recolour comics (odd or even in the list)
     def set_comic_colour(self, position, comic):
         _, comic_style_choice = divmod(position, 2)
 
@@ -200,11 +196,13 @@ class MyComicsList(tk.Tk):
 
             self.comic_canvas.yview_scroll(move, "units")
 
+    # add new comic in database
     def save_comic(self, comic):
         insert_comic_query = "INSERT INTO comics_dc VALUES (?)"
         insert_comic_data = (comic,)
         self.runQuery(insert_comic_query, insert_comic_data)
 
+    # read database
     def load_comic(self):
         load_comic_query = "SELECT comic FROM comics_dc"
         my_comic = self.runQuery(load_comic_query, receive=True)

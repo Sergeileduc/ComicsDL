@@ -17,16 +17,18 @@ howto = "Video guide on how"
 howtodl = "how to download"
 consistof = "consist of :"
 lower = "or on the lower"
-bloat = ['Language :', 'Image Format :', 'Year :', 'Size :', 'Notes :']
+bloat = ['Language :', 'Image Format :', 'Year :',
+         'Size :', 'Notes :', 'Screenshots :']
 
 
 # Get html from url
 def returnHTML(url):
     hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
-    req = urllib.request.Request(url, headers=hdr)
     try:
+        req = urllib.request.Request(url, headers=hdr)
         response = urllib.request.urlopen(req)
         html = response.read()
+        response.close()
         return html
     except urllib.error.HTTPError as e:
         print (e.fp.read())
@@ -39,6 +41,7 @@ def url2soup(url):
         res = requests.get(url)
         res.raise_for_status()
         soup = BeautifulSoup(res.text, 'html.parser')
+        res.close()
         return soup
     except Exception as e:
         print(e)
@@ -127,15 +130,13 @@ def printOneEditor(url, f, editor):
 
 # For Indie week+
 def printMultipleEditors(url, f):
-    soup = url2soup(url).select('section.post-contents')
-    soup2 = BeautifulSoup(str(soup), 'html.parser')
-
-    publishers = soup2.find_all('span', style="color: #3366ff;")
+    soup = url2soup(url).select_one('section.post-contents')
+    publishers = soup.find_all('span', style="color: #3366ff;")
     indies = []
     for p in publishers:
         indies.append(p.text)
 
-    var = soup2.find_all('strong')
+    var = soup.find_all('strong')
 
     for s in var:
         if s.text in indies:

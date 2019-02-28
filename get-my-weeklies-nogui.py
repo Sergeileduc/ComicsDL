@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
 import os
-import getcomics
+from utils import getcomics
 import time
 
-getcomicsurls = ['https://getcomics.info/tag/dc-week/',
-                 'http://getcomics.info/tag/marvel-now/',
-                 'https://getcomics.info/tag/indie-week/',
-                 'https://getcomics.info/tag/image-week/'
-                 ]
+getcomicsurls = [
+    'https://getcomics.info/tag/dc-week/',
+    'http://getcomics.info/tag/marvel-now/',
+    'https://getcomics.info/tag/indie-week/',
+    'https://getcomics.info/tag/image-week/']
 
 myComicsList = list()
 # myComicsList = ['batman', 'superman', 'fathom, 'deadpool]
@@ -32,22 +32,9 @@ except IOError as e:
           "\n.........\nBatman\nSuperman\nInjustice\netc...\n.........")
 
 try:
-    print("Je vais chercher : " + str(myComicsList))
-
-    # Get list of all comics from the last "Weekly" pack
-    for url in getcomicsurls:
-        remoteComicsList = getcomics.comicsList(url)
-        for newcomic in remoteComicsList:
-            try:
-                for myComic in myComicsList:
-                    if myComic in newcomic:
-                        getcomics.downCom(newcomic)
-                        pass
-            except Exception as e:
-                print(e)
-                pass
-    print("C'est tout. Vous pouvez fermer.")
+    getcomics.getWeeklyComics(myComicsList)
     time.sleep(20)
-except NameError:
+except NameError as e:
+    print(e)
     print("Le script a rencontré une erreur.\nVous pouvez fermer.")
     time.sleep(20)

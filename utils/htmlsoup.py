@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup  # html parser
 import requests
 import urllib.request
 import urllib.error
@@ -39,7 +39,16 @@ def html2soup(html):
 def getaALLhref(html, tag):
     urllist = list()
     soup = html2soup(html)
-    for link in soup.find_all('a'):
+    for link in soup.find_all(tag):
         if link.has_attr('href'):
             urllist.append(link['href'])
+    return urllist
+
+
+# Get href urls based text
+def getHrefwithName(liste_a, name):
+    urllist = list()
+    for a in liste_a:
+        if a.has_attr('href') and a.text == name:
+            urllist.append(a['href'])
     return urllist

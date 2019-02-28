@@ -2,9 +2,10 @@
 # -*-coding:utf-8 -*-
 
 import sys
-import getcomics
-import htmlsoup
-import tools
+from utils import getcomics
+from utils import htmlsoup
+from utils import tools
+from utils import zpshare
 import requests
 import tkinter as tk
 import tkinter.scrolledtext as tkst
@@ -13,15 +14,16 @@ import urllib.request
 import urllib.error
 import threading
 import base64
-import zpshare
 
-url = ''
 BASE = "https://getcomics.info/go.php-url=/"
 
 exit_thread = False
 exit_success = False
 
+user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
+
+# Redirect standard output Std into a frame in the GUI
 class Std_redirector(object):
     def __init__(self, widget):
         self.widget = widget
@@ -35,10 +37,8 @@ class Std_redirector(object):
         pass
 
 
-# our comicsList
+# Main program interface and code
 class Getcomics(tk.Tk):
-
-    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
     def __init__(self):
         def myfunction(event):
@@ -63,12 +63,22 @@ class Getcomics(tk.Tk):
         style = ttk.Style()
         style.configure("deepBG.TFrame", foreground=fg, background=deepbg,
                         border=0, relief='flat')
-        style = ttk.Style()
         style.configure("dark1.TFrame", foreground=fg, background=color1,
                         border=0, relief='flat', highlightthickness=0)
-        style = ttk.Style()
         style.configure("L.TLabel", foreground=fg, background=color1,
                         relief='raised', font=("Verdana", 12))
+        style.configure('pages.TButton', font=("Verdana", 12), relief='raised',
+                        background=dark3, foreground=fg,
+                        border=2, highlightthickness=0)
+        style.map('pages.TButton',
+                  foreground=[('active', 'black')],
+                  background=[('active', fg)])
+        style.configure('dl.TButton', background=color1, foreground=fg,
+                        highlightthickness=0, font=("Verdana", 12, 'bold'))
+        style.map('dl.TButton',
+                  foreground=[('active', 'black')],
+                  background=[('active', fg)])
+
         self.page = 1
         self.currentpercent = tk.IntVar()
         self.percent = tk.IntVar()
@@ -98,14 +108,12 @@ class Getcomics(tk.Tk):
         buttonbar = ttk.Frame(self.resultsframe, style="deepBG.TFrame")
 
         bottombar = ttk.Frame(self, style="deepBG.TFrame")
-        self.prevpage = tk.Button(
-                buttonbar, text="page précédente", bg=dark3, fg=fg,
-                font=("Verdana", 12), relief='raised', border=2,
-                highlightthickness=0, command=self.gotoprevpage)
-        nextpage = tk.Button(
-                buttonbar, text="page suivante", bg=dark3, fg=fg,
-                font=("Verdana", 12), relief='raised', border=2,
-                highlightthickness=0, command=self.gotonextpage)
+        self.prevpage = ttk.Button(buttonbar, text="page précédente",
+                                   style="pages.TButton",
+                                   command=self.gotoprevpage)
+        nextpage = ttk.Button(buttonbar, text="page suivante",
+                              style="pages.TButton",
+                              command=self.gotonextpage)
         # messageRecherche = tk.Label(
         #         topbar, text="Rechercher sur Getcomics", bg=dark2, fg=fg,
         #         justify=tk.CENTER, font=("Helvetica", 12))
@@ -121,32 +129,30 @@ class Getcomics(tk.Tk):
         self.dlframe = ttk.Frame(dlcanva, style="dark1.TFrame")
         scrollbar = ttk.Scrollbar(
                 dlcanva, orient="vertical", command=dlcanva.yview)
-        instructions = ttk.Label(
-                self.resultsframe, style="L.TLabel",
-                text='Cliquez pour ajouter un élément '\
-                     'à votre liste de téléchargement')
+        instructions = ttk.Label(self.resultsframe, style="L.TLabel",
+                                 text='Cliquez pour ajouter un élément '\
+                                 'à votre liste de téléchargement')
         liste = tk.Label(rightframe, width=self.dlwidth, bg=dark2, fg=fg,
                          relief='raised', text="Liste de téléchargement",
                          font=("Verdana", 12))
-        dlall = tk.Button(
-                rightframe, bg=color1, fg=fg, highlightthickness=0,
-                text="Télécharger la liste", font=("Verdana", 12, 'bold'),
-                command=lambda: self.dlcom(self.downloadlist))
+        dlall = ttk.Button(rightframe, text="Télécharger la liste",
+                           style="dl.TButton",
+                           command=lambda: self.dlcom(self.downloadlist))
 
         outputtext = tkst.ScrolledText(
                 bottombar, height=8, bg='black', fg='white', wrap=tk.WORD)
         self.progress = ttk.Progressbar(
                 bottombar, orient="horizontal",
                 variable=self.currentpercent, mode="determinate")
-        self.progress2 = ttk.Progressbar(
-                bottombar, orient="horizontal",
-                variable=self.percent, mode="determinate")
+        self.progress2 = ttk.Progressbar(bottombar, orient="horizontal",
+                                         variable=self.percent,
+                                         mode="determinate")
 
         topbar.pack(fill='x', anchor='n', padx=20, pady=20)
-        mainframe.pack(
-                fill='both', expand=1, anchor='nw', padx=20, pady=(0, 5))
-        self.resultsframe.pack(
-                side='left', anchor='nw', fill='both', expand=1, padx=(0, 20))
+        mainframe.pack(fill='both', expand=1, anchor='nw',
+                       padx=20, pady=(0, 5))
+        self.resultsframe.pack(side='left', anchor='nw', fill='both',
+                               expand=1, padx=(0, 20))
         rightframe.pack(side='left', anchor='ne', fill='y', expand=1)
         buttonbar.pack(side='bottom', anchor='sw', fill='x', expand=1)
 
@@ -172,6 +178,7 @@ class Getcomics(tk.Tk):
 
         self.searchcomics(None)
 
+    # Destroy a list of widgets (like buttons)
     def destroylist(self, widgetlist):
         for w in widgetlist:
             w.destroy()
@@ -209,7 +216,6 @@ class Getcomics(tk.Tk):
             thread1.start()
         except Exception as e:
             print(e)
-            print("Problem")
             pass
 
     # Click to add to DL list
@@ -320,7 +326,7 @@ class Getcomics(tk.Tk):
         # downButton = soup.select('script[type="text/javascript"]')
         downButton = soup.find('a', id="dlbutton").find_next_sibling().text
         try:
-            fullURL, fileName = zpshare.getZippyDL(url, downButton)
+            fullURL, fileName = zpshare.getFileUrl(url, downButton)
             print ("Download from zippyhare into : " + fileName)
             r = requests.get(fullURL, stream=True)
             size = int(r.headers['Content-length'])  # Size in bytes
@@ -369,6 +375,7 @@ class Getcomics(tk.Tk):
         self.searchcomics(None)
 
 
+# Main Loop
 if __name__ == "__main__":
     app = Getcomics()  # constructor, calls method __init__
     app.mainloop()

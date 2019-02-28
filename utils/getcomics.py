@@ -5,12 +5,11 @@ import re  # regex
 import requests  # html
 import urllib.request
 import urllib.error
-from datetime import datetime
-from bs4 import BeautifulSoup
-import htmlsoup
-import zpshare
 import base64
-import tools
+from datetime import datetime
+from utils import htmlsoup
+from utils import zpshare
+from utils import tools
 
 today = datetime.today().strftime("%Y-%m-%d")
 
@@ -49,10 +48,9 @@ def findLastWeekly(url):
 def comicsList(url):
     weeklyUrl = findLastWeekly(url)
     soup = htmlsoup.url2soup(weeklyUrl)
-    interm = soup.select("section.post-contents")
-    soup2 = BeautifulSoup(str(interm), 'html.parser')
-    interm2 = soup2.find_all('li')
-    return htmlsoup.getaALLhref(str(interm2), 'a')
+    liste_a = soup.select_one("section.post-contents")\
+        .find_all('a', style="color: #ff0000;")
+    return htmlsoup.getHrefwithName(liste_a, 'Download')
 
 
 # Find download link
@@ -70,8 +68,8 @@ def downCom(url):
     try:
         soup = htmlsoup.url2soup(finalurl)
         downButtons = soup.select("div.aio-pulse > a")
-    except Exception:
-        print("Here is the Error")
+    except Exception as e:
+        print(e)
     for button in downButtons:
         # if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
         if 'zippyshare' in button.get("href") \
@@ -80,9 +78,9 @@ def downCom(url):
             print(zippylink)
             try:
                 if str(zippylink).startswith(BASE):
+                    finalzippy = base64.b64decode(
+                            zippylink[len(BASE):]).decode()
                     print("Abracadabra !")
-                    finalzippy = \
-                        base64.b64decode(zippylink[len(BASE):]).decode()
                 else:
                     # headers = {'User-Agent': user_agent}
                     req = urllib.request.Request(zippylink, None, headers)
@@ -96,23 +94,34 @@ def downCom(url):
             try:
                 print(finalzippy)
                 downComZippy(finalzippy)
-            except Exception:
+            except Exception as e:
                 print("error in downComZippy")
+                print(e)
+    # except urllib.error.HTTPError:
+        # print("downCom got HTTPError from returnHTML")
+        # raise
     return
 
 
 # Download from zippyshare
 def downComZippy(url):
     soup = htmlsoup.url2soup(url)
-    # downButton = soup.select('script[type="text/javascript"]')
+    # Other beautiful soup selectors :
+    # select("script[type='text/javascript']")
+    # select("table[class='folderlogo'] > tr > td")[0]
+    # find("div", style=re.compile("margin-left"))
+    # find("script", type="text/javascript")
+    # find("div", style=re.compile("width: 303px;"))
+    # find("script", type="text/javascript")
     downButton = soup.find('a', id="dlbutton").find_next_sibling().text
     try:
-        fullURL, fileName = zpshare.getZippyDL(url, downButton)
+        fullURL, fileName = zpshare.getFileUrl(url, downButton)
         print ("Downloading from zippyshare into : " + fileName)
         r = requests.get(fullURL, stream=True)
         size = tools.bytes_2_human_readable(int(r.headers['Content-length']))
         print(size)
-    except Exception:
+    except Exception as e:
+        print(e)
         print("Can't get download link on zippyshare page")
 
     # Download from url & trim it a little bit
@@ -129,19 +138,17 @@ def downComZippy(url):
     return
 
 
+# Compare remote and local list of comics and download
 def getWeeklyComics(mylist):
     print ('Initialisation...')
     print ('Je vais chercher les mots clés :')
     print (mylist)
 
     for url in getcomicsurls:
-        # Get latest archive on the current page
-        weeklyUrl = findLastWeekly(url)
-        soup = htmlsoup.url2soup(weeklyUrl)
-        interm = soup.select("section.post-contents")
-        soup2 = BeautifulSoup(str(interm), 'html.parser')
-        interm2 = soup2.find_all('li')
-        remoteComicsList = htmlsoup.getaALLhref(str(interm2), 'a')
+        # Other soup selectors
+        # select_one("section.post-contents > ul")\
+        # find_all('span', style="color: #ff0000;")
+        remoteComicsList = comicsList(url)
         for newcomic in remoteComicsList:
             try:
                 for myComic in mylist:
@@ -155,6 +162,7 @@ def getWeeklyComics(mylist):
 
 
 # Search Getcomics
+# Returns names and urls of posts returned by input url
 def getresults(url):
     searchlist = list()
     try:
