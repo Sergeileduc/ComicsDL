@@ -121,7 +121,7 @@ def downComZippy(url):
     # soup2 = BeautifulSoup(str(interm), 'html.parser')
     # downButton = soup2.select('script[type="text/javascript"]')
     try:
-        fullURL, fileName = zpshare.getZippyDL(url, downButton)
+        fullURL, fileName = zpshare.getFileUrl(url, downButton)
         print ("Downloading from zippyshare into : " + fileName)
         r = requests.get(fullURL, stream=True)
         size = tools.bytes_2_human_readable(int(r.headers['Content-length']))

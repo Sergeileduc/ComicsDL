@@ -326,7 +326,7 @@ class Getcomics(tk.Tk):
         # downButton = soup.select('script[type="text/javascript"]')
         downButton = soup.find('a', id="dlbutton").find_next_sibling().text
         try:
-            fullURL, fileName = zpshare.getZippyDL(url, downButton)
+            fullURL, fileName = zpshare.getFileUrl(url, downButton)
             print ("Download from zippyhare into : " + fileName)
             r = requests.get(fullURL, stream=True)
             size = int(r.headers['Content-length'])  # Size in bytes
