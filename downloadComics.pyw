@@ -21,6 +21,8 @@ BASE = "https://getcomics.info/go.php-url=/"
 exit_thread = False
 exit_success = False
 
+user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+
 
 class Std_redirector(object):
     def __init__(self, widget):
@@ -37,8 +39,6 @@ class Std_redirector(object):
 
 # our comicsList
 class Getcomics(tk.Tk):
-
-    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
     def __init__(self):
         def myfunction(event):
