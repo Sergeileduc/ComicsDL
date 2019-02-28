@@ -184,13 +184,15 @@ class Getcomics(tk.Tk):
         self.destroylist(self.buttonlist)
         searchmode = self.choices.index(self.mode.get())
         self.searchlist = getcomics.getresults(getcomics.searchurl(
-                                self.usersearch.get(), searchmode, self.page))
+                                                        self.usersearch.get(),
+                                                        searchmode, self.page))
         # buttonlist = list()
         for i in self.searchlist:
             title = i[1] + ' (' + str(i[2]) + ')'
             newButton = tk.Button(
                     self.resultsframe, text=title, width=self.resultwidht,
-                    bg=dark2, fg=fg, relief='flat', border=0,
+                    relief='flat', border=0, bg=dark2, fg=fg,
+                    activebackground='#FAFAFA', activeforeground='black',
                     highlightthickness=0, font=("Verdana", 10))
             newButton.config(
                     command=lambda button=newButton: self.addtodl(button))
@@ -221,6 +223,7 @@ class Getcomics(tk.Tk):
             newDL = tk.Button(
                     self.dlframe, text=button.cget('text').title(),
                     width=self.resultwidht, anchor='w', bg=dark2, fg=fg,
+                    activebackground='#FAFAFA', activeforeground='black',
                     relief='flat', border=0, highlightthickness=0,
                     font=("Verdana", 10))
             newDL.config(command=lambda button=newDL: self.removedl(button))
