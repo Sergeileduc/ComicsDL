@@ -38,6 +38,8 @@ class Std_redirector(object):
 # our comicsList
 class Getcomics(tk.Tk):
 
+    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+
     def __init__(self):
         def myfunction(event):
             dlcanva.configure(
@@ -263,7 +265,7 @@ class Getcomics(tk.Tk):
 
     # Find download link
     def downCom(self, url):
-        user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+        global user_agent
         headers = {'User-Agent': user_agent}
         try:
             req = urllib.request.Request(url, None, headers)
@@ -289,8 +291,6 @@ class Getcomics(tk.Tk):
                             finalzippy = base64.b64decode(
                                                 zippylink[len(BASE):]).decode()
                         else:
-                            user_agent = 'Mozilla/4.0 '\
-                                         '(compatible; MSIE 5.5; Windows NT)'
                             headers = {'User-Agent': user_agent}
                             req = urllib.request.Request(
                                     zippylink, None, headers)

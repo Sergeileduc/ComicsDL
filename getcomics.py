@@ -25,6 +25,8 @@ getcomicsurls = ['https://getcomics.info/tag/dc-week/',
 
 BASE = "https://getcomics.info/go.php-url=/"
 
+user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+
 
 # Find las weekly post
 def findLastWeekly(url):
@@ -55,7 +57,7 @@ def comicsList(url):
 
 # Find download link
 def downCom(url):
-    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+    global user_agent
     headers = {'User-Agent': user_agent}
     try:
         req = urllib.request.Request(url, None, headers)
@@ -82,9 +84,7 @@ def downCom(url):
                     finalzippy = \
                         base64.b64decode(zippylink[len(BASE):]).decode()
                 else:
-                    user_agent = 'Mozilla/4.0 (compatible; \
-                        MSIE 5.5; Windows NT)'
-                    headers = {'User-Agent': user_agent}
+                    # headers = {'User-Agent': user_agent}
                     req = urllib.request.Request(zippylink, None, headers)
                     finalzippy = urllib.request.urlopen(req).geturl()
             except urllib.error.HTTPError as e:
