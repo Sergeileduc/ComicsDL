@@ -11,14 +11,6 @@ import threading
 exit_thread = False
 exit_success = False
 
-getcomicsurls = [
-    'https://getcomics.info/tag/dc-week/',
-    'http://getcomics.info/tag/marvel-now/',
-    'https://getcomics.info/tag/indie-week/',
-    'https://getcomics.info/tag/image-week/']
-
-getcomicsurl = "https://getcomics.info/tag/dc-week/"
-
 
 class Std_redirector(object):
     def __init__(self, widget):
