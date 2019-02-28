@@ -2,9 +2,10 @@
 # -*-coding:utf-8 -*-
 
 import sys
-import getcomics
-import htmlsoup
-import tools
+from utils import getcomics
+from utils import htmlsoup
+from utils import tools
+from utils import zpshare
 import requests
 import tkinter as tk
 import tkinter.scrolledtext as tkst
@@ -13,13 +14,14 @@ import urllib.request
 import urllib.error
 import threading
 import base64
-import zpshare
 
 url = ''
 BASE = "https://getcomics.info/go.php-url=/"
 
 exit_thread = False
 exit_success = False
+
+user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
 
 class Std_redirector(object):
@@ -37,8 +39,6 @@ class Std_redirector(object):
 
 # our comicsList
 class Getcomics(tk.Tk):
-
-    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
     def __init__(self):
         def myfunction(event):
