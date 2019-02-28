@@ -230,7 +230,8 @@ class Getcomics(tk.Tk):
             newDL.pack(fill='both', expand=1, pady=0)
             self.downloadlist.append((self.searchlist[index][0],
                                       self.searchlist[index][1],
-                                      newDL, self.searchlist[index][2]))
+                                      newDL,
+                                      self.searchlist[index][2]))
             print("Taille de la file d'attente (donnée indicative) : "
                   + tools.bytes_2_human_readable(self.listsize))
         else:
