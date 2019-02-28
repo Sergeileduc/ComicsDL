@@ -2,7 +2,7 @@
 # -*-coding:utf-8 -*-
 import sys
 import os
-import getcomics
+from utils import getcomics
 import tkinter as tk
 import tkinter.messagebox as msg
 import sqlite3
