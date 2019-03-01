@@ -17,16 +17,18 @@ howto = "Video guide on how"
 howtodl = "how to download"
 consistof = "consist of :"
 lower = "or on the lower"
-bloat = ['Language :', 'Image Format :', 'Year :', 'Size :', 'Notes :']
+bloat = ['Language :', 'Image Format :', 'Year :',
+         'Size :', 'Notes :', 'Screenshots :']
 
 
 # Get html from url
 def returnHTML(url):
     hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
-    req = urllib.request.Request(url, headers=hdr)
     try:
+        req = urllib.request.Request(url, headers=hdr)
         response = urllib.request.urlopen(req)
         html = response.read()
+        response.close()
         return html
     except urllib.error.HTTPError as e:
         print (e.fp.read())
@@ -39,6 +41,7 @@ def url2soup(url):
         res = requests.get(url)
         res.raise_for_status()
         soup = BeautifulSoup(res.text, 'html.parser')
+        res.close()
         return soup
     except Exception as e:
         print(e)
