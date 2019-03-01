@@ -7,7 +7,6 @@ import urllib.request
 import urllib.error
 import base64
 from datetime import datetime
-from bs4 import BeautifulSoup
 from utils import htmlsoup
 from utils import zpshare
 from utils import tools
@@ -47,12 +46,17 @@ def findLastWeekly(url):
 
 
 def comicsList(url):
+    # weeklyUrl = findLastWeekly(url)
+    # soup = htmlsoup.url2soup(weeklyUrl)
+    # interm = soup.select("section.post-contents")
+    # soup2 = BeautifulSoup(str(interm), 'html.parser')
+    # interm2 = soup2.find_all('li')
+    # return htmlsoup.getaALLhref(str(interm2), 'a')
     weeklyUrl = findLastWeekly(url)
     soup = htmlsoup.url2soup(weeklyUrl)
-    interm = soup.select("section.post-contents")
-    soup2 = BeautifulSoup(str(interm), 'html.parser')
-    interm2 = soup2.find_all('li')
-    return htmlsoup.getaALLhref(str(interm2), 'a')
+    interm = soup.select_one("section.post-contents")\
+        .find_all('a', style="color: #ff0000;")
+    return htmlsoup.getHrefwithName(str(interm), 'Download')
 
 
 # Find download link
@@ -152,11 +156,12 @@ def getWeeklyComics(mylist):
 
     for url in getcomicsurls:
         # Get latest archive on the current page
-        weeklyUrl = findLastWeekly(url)
-        soup = htmlsoup.url2soup(weeklyUrl)
-        interm = soup.select_one("section.post-contents > ul")\
-            .find_all('span', style="color: #ff0000;")
-        remoteComicsList = htmlsoup.getHrefwithName(str(interm), 'Download')
+        # weeklyUrl = findLastWeekly(url)
+        # soup = htmlsoup.url2soup(weeklyUrl)
+        # interm = soup.select_one("section.post-contents > ul")\
+        #     .find_all('span', style="color: #ff0000;")
+        # remoteComicsList = htmlsoup.getHrefwithName(str(interm), 'Download')
+        remoteComicsList = comicsList(url)
         for newcomic in remoteComicsList:
             try:
                 for myComic in mylist:
