@@ -130,15 +130,13 @@ def printOneEditor(url, f, editor):
 
 # For Indie week+
 def printMultipleEditors(url, f):
-    soup = url2soup(url).select('section.post-contents')
-    soup2 = BeautifulSoup(str(soup), 'html.parser')
-
-    publishers = soup2.find_all('span', style="color: #3366ff;")
+    soup = url2soup(url).select_one('section.post-contents')
+    publishers = soup.find_all('span', style="color: #3366ff;")
     indies = []
     for p in publishers:
         indies.append(p.text)
 
-    var = soup2.find_all('strong')
+    var = soup.find_all('strong')
 
     for s in var:
         if s.text in indies:
