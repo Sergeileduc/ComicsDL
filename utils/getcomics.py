@@ -154,10 +154,9 @@ def getWeeklyComics(mylist):
         # Get latest archive on the current page
         weeklyUrl = findLastWeekly(url)
         soup = htmlsoup.url2soup(weeklyUrl)
-        interm = soup.select("section.post-contents")
-        soup2 = BeautifulSoup(str(interm), 'html.parser')
-        interm2 = soup2.find_all('li')
-        remoteComicsList = htmlsoup.getaALLhref(str(interm2), 'a')
+        interm = soup.select_one("section.post-contents > ul")\
+            .find_all('span', style="color: #ff0000;")
+        remoteComicsList = htmlsoup.getHrefwithName(str(interm), 'Download')
         for newcomic in remoteComicsList:
             try:
                 for myComic in mylist:
