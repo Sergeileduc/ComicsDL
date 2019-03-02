@@ -78,9 +78,9 @@ def downCom(url):
             print(zippylink)
             try:
                 if str(zippylink).startswith(BASE):
-                    print("Abracadabra !")
                     finalzippy = base64.b64decode(
                             zippylink[len(BASE):]).decode()
+                    print("Abracadabra !")
                 else:
                     # headers = {'User-Agent': user_agent}
                     req = urllib.request.Request(zippylink, None, headers)
