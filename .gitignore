@@ -1,7 +1,5 @@
 build/
 dist/
-test/
-test2/
 __pycache__/
 .DS_Store
 .vscode/
@@ -9,7 +7,6 @@ __pycache__/
 *.cbz
 *.zip
 *.spec
-*test*
 soup.html
 .comics.db
 liste-comics-semaine.txt
@@ -18,3 +15,4 @@ comics-week.py
 *.ico
 *.png
 *.txt
+test.py
