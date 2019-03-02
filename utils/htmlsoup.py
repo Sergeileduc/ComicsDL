@@ -46,10 +46,9 @@ def getaALLhref(html, tag):
 
 
 # Get href urls based text
-def getHrefwithName(html, name):
+def getHrefwithName(liste_a, name):
     urllist = list()
-    soup = html2soup(html)
-    for a in soup.find_all('a'):
+    for a in liste_a:
         if a.has_attr('href') and a.text == name:
             urllist.append(a['href'])
     return urllist

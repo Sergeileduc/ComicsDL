@@ -46,17 +46,11 @@ def findLastWeekly(url):
 
 
 def comicsList(url):
-    # weeklyUrl = findLastWeekly(url)
-    # soup = htmlsoup.url2soup(weeklyUrl)
-    # interm = soup.select("section.post-contents")
-    # soup2 = BeautifulSoup(str(interm), 'html.parser')
-    # interm2 = soup2.find_all('li')
-    # return htmlsoup.getaALLhref(str(interm2), 'a')
     weeklyUrl = findLastWeekly(url)
     soup = htmlsoup.url2soup(weeklyUrl)
-    interm = soup.select_one("section.post-contents")\
+    liste_a = soup.select_one("section.post-contents")\
         .find_all('a', style="color: #ff0000;")
-    return htmlsoup.getHrefwithName(str(interm), 'Download')
+    return htmlsoup.getHrefwithName(liste_a, 'Download')
 
 
 # Find download link
@@ -112,18 +106,14 @@ def downCom(url):
 # Download from zippyshare
 def downComZippy(url):
     soup = htmlsoup.url2soup(url)
-    # downButton = soup.select("script[type='text/javascript']")
-    # downButton = soup.select(
-    #         "table[class='folderlogo'] > tr > td")[0].find(
-    #                 "div", style=re.compile("margin-left"))
+    # Other beautiful soup selectors :
+    # select("script[type='text/javascript']")
+    # select("table[class='folderlogo'] > tr > td")[0]
+    # find("div", style=re.compile("margin-left"))
+    # find("script", type="text/javascript")
+    # find("div", style=re.compile("width: 303px;"))
+    # find("script", type="text/javascript")
     downButton = soup.find('a', id="dlbutton").find_next_sibling().text
-    # .find("script", type="text/javascript")
-    # .find("div", style=re.compile("width: 303px;"))
-    # downButton = soup.find("script", type="text/javascript")
-    # print(downButton)
-    # interm = soup.select("div.right")
-    # soup2 = BeautifulSoup(str(interm), 'html.parser')
-    # downButton = soup2.select('script[type="text/javascript"]')
     try:
         fullURL, fileName = zpshare.getFileUrl(url, downButton)
         print ("Downloading from zippyshare into : " + fileName)
@@ -155,12 +145,9 @@ def getWeeklyComics(mylist):
     print (mylist)
 
     for url in getcomicsurls:
-        # Get latest archive on the current page
-        # weeklyUrl = findLastWeekly(url)
-        # soup = htmlsoup.url2soup(weeklyUrl)
-        # interm = soup.select_one("section.post-contents > ul")\
-        #     .find_all('span', style="color: #ff0000;")
-        # remoteComicsList = htmlsoup.getHrefwithName(str(interm), 'Download')
+        # Other soup selectors
+        # select_one("section.post-contents > ul")\
+        # find_all('span', style="color: #ff0000;")
         remoteComicsList = comicsList(url)
         for newcomic in remoteComicsList:
             try:
