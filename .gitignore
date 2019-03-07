@@ -7,6 +7,7 @@ __pycache__/
 *.cbz
 *.zip
 *.spec
+*.pyc
 soup.html
 .comics.db
 liste-comics-semaine.txt
@@ -14,5 +15,4 @@ liste-dc.txt
 comics-week.py
 *.ico
 *.png
-*.txt
 test.py
