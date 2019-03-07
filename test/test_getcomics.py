@@ -2,8 +2,7 @@
 # -*-coding:utf-8 -*-
 
 import unittest
-from utils.getcomics import findLastWeekly
-from utils.getcomics import comicsList
+from utils.getcomics import findLastWeekly, comicsList, searchurl, getresults
 
 
 class TestFonctionGet(unittest.TestCase):
@@ -64,6 +63,31 @@ class TestFonctionGet(unittest.TestCase):
         print("Comics list DC")
         result = comicsList(self.getcomicsurls[0])
         print(result)
+
+    def test_searchurl_1(self):
+
+        myurl = searchurl("Batman", 0, 2)
+        expected = "https://getcomics.info/tag/batman/page/2/"
+
+        print(myurl)
+
+        self.assertEqual(myurl, expected)
+
+    def test_searchurl_2(self):
+
+        myurl = searchurl("New X-Men", 1, 3)
+        expected = "https://getcomics.info/page/3/?s=new+x-men"
+
+        print(myurl)
+
+        self.assertEqual(myurl, expected)
+
+    def test_get_results(self):
+
+        searchurl = "https://getcomics.info/tag/batman/page/2/"
+
+        searchlist = getresults(searchurl)
+        print(searchlist)
 
 
 # Ceci lance le test si on exécute le script

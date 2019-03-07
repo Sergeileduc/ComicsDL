@@ -2,7 +2,7 @@
 # -*-coding:utf-8 -*-
 
 import unittest
-from utils.zpshare import getFileUrl
+from utils.zpshare import getFileUrl, removetag
 from utils import htmlsoup
 
 
@@ -28,6 +28,17 @@ class TestFonctionGet(unittest.TestCase):
         # s'attend à ce que les deux éléments soient égaux. Sinon
         # le test échoue.
         # self.assertEqual(myurl, result)
+
+    def test_removetag_1(self):
+        print("Test removetag")
+        old_name = "Doomsday Clock 09 (of 12) (2019) (Webrip) " \
+                   "(The Last Kryptonian-DCP).cbr"
+
+        valid_name = "Doomsday Clock 09 (of 12) (2019).cbr"
+
+        new_name = removetag(old_name)
+
+        self.assertEqual(valid_name, new_name)
 
 
 # Ceci lance le test si on exécute le script
