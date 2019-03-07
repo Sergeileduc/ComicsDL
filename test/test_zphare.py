@@ -3,6 +3,7 @@
 
 import unittest
 from utils.zpshare import getFileUrl
+from utils import htmlsoup
 
 
 class TestFonctionGet(unittest.TestCase):
@@ -13,13 +14,12 @@ class TestFonctionGet(unittest.TestCase):
 
         url = "https://www4.zippyshare.com/v/tbiaf4on/file.html"
 
-        f = open("zippy_button_script.txt", "r")
-        button = f.read()
-        f.close()
+        soup = htmlsoup.url2soup(url)
+        # downButton = soup.select('script[type="text/javascript"]')
+        downButton = soup.find('a', id="dlbutton").find_next_sibling().text
 
-        # result = 'https://getcomics.info/dc/2019-02-27-dc-week/'
-
-        name, out_url = getFileUrl(url, button)
+        name, out_url = getFileUrl(url, downButton)
+        print("--------------------------------------")
         print(name)
         print(out_url)
 
