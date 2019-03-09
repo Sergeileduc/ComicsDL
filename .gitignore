@@ -3,6 +3,7 @@ dist/
 __pycache__/
 .DS_Store
 .vscode/
+.idea/
 *.cbr
 *.cbz
 *.zip
