@@ -1,11 +1,9 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
 
-import requests
 import os
-import urllib.request
-import urllib.error
-from bs4 import BeautifulSoup
+
+from utils import htmlsoup
 
 DCurl = "https://getcomics.info/tag/dc-week/"
 MarvelURL = "https://getcomics.info/tag/marvel-now/"
@@ -21,38 +19,13 @@ bloat = ['Language :', 'Image Format :', 'Year :',
          'Size :', 'Notes :', 'Screenshots :']
 
 
-# Get html from url
-def returnHTML(url):
-    hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
-    try:
-        req = urllib.request.Request(url, headers=hdr)
-        response = urllib.request.urlopen(req)
-        html = response.read()
-        response.close()
-        return html
-    except urllib.error.HTTPError as e:
-        print (e.fp.read())
-        raise
-
-
-# Get BS soup from an url
-def url2soup(url):
-    try:
-        res = requests.get(url)
-        res.raise_for_status()
-        soup = BeautifulSoup(res.text, 'html.parser')
-        res.close()
-        return soup
-    except Exception as e:
-        print(e)
-        print("Error")
-        raise
-
-
-# Get BS soup from html code
-def getSoup(html):
-    soup = BeautifulSoup(html, 'html.parser')
-    return soup
+# Find las weekly post
+def findLastWeekly(url):
+    soup = htmlsoup.url2soup(url)
+    lastPost = soup.find_all('article', class_='type-post')[0]
+    postTitle = lastPost.h1.a.text
+    postUrl = lastPost.h1.a['href']
+    return postTitle, postUrl
 
 
 # Find last weekly and display
@@ -65,22 +38,11 @@ def printLastWeeklies():
 
 # Def print last weekly date
 def printLastWeek(url, editor):
-    htmlMain = returnHTML(url)
-    soup = getSoup(htmlMain)
+    soup = htmlsoup.url2soup(url)
     lastPost = soup.find_all('article', class_='type-post')[0]
     title = lastPost.h1.a.text
     time = lastPost.find('time')
     print(editor + '\t : ' + title + ' :\t' + time.text)
-
-
-# Find las weekly post
-def findLastWeekly(url):
-    htmlMain = returnHTML(url)
-    soup = getSoup(htmlMain)
-    lastPost = soup.find_all('article', class_='type-post')[0]
-    postTitle = lastPost.h1.a.text
-    postUrl = lastPost.h1.a['href']
-    return postTitle, postUrl
 
 
 # Print getcomics weekly post in file f
@@ -106,11 +68,8 @@ def printWeek(url, f, editor):
 
 # For Marvel, DC, or Image weeklies
 def printOneEditor(url, f, editor):
-    soup = url2soup(url)
-    # temp = soup.select('section.post-contents > ul > li')
-    temp = soup.select('section.post-contents > ul')
-    soup2 = BeautifulSoup(str(temp), 'html.parser')
-    var = soup2.find_all('strong')
+    soup = htmlsoup.url2soup(url)
+    var = soup.select_one('section.post-contents > ul').find_all('strong')
 
     f.write(editor + '\n')
     f.write("=====================" + '\n')
@@ -130,7 +89,7 @@ def printOneEditor(url, f, editor):
 
 # For Indie week+
 def printMultipleEditors(url, f):
-    soup = url2soup(url).select_one('section.post-contents')
+    soup = htmlsoup.url2soup(url).select_one('section.post-contents')
     publishers = soup.find_all('span', style="color: #3366ff;")
     indies = []
     for p in publishers:
