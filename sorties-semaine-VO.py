@@ -3,12 +3,12 @@
 
 import os
 
-from utils import htmlsoup
+from utils import htmlsoup, getcomics
 
-DCurl = "https://getcomics.info/tag/dc-week/"
-MarvelURL = "https://getcomics.info/tag/marvel-now/"
-ImageURL = "https://getcomics.info/tag/image-week/"
-IndieURL = "https://getcomics.info/tag/indie-week/"
+DC_URL = "https://getcomics.info/tag/dc-week/"
+MARVEL_URL = "https://getcomics.info/tag/marvel-now/"
+IMAGE_URL = "https://getcomics.info/tag/image-week/"
+INDIE_URL = "https://getcomics.info/tag/indie-week/"
 
 note = "Notes :\n"
 howto = "Video guide on how"
@@ -19,21 +19,12 @@ bloat = ['Language :', 'Image Format :', 'Year :',
          'Size :', 'Notes :', 'Screenshots :']
 
 
-# Find las weekly post
-def findLastWeekly(url):
-    soup = htmlsoup.url2soup(url)
-    lastPost = soup.find_all('article', class_='type-post')[0]
-    postTitle = lastPost.h1.a.text
-    postUrl = lastPost.h1.a['href']
-    return postTitle, postUrl
-
-
 # Find last weekly and display
 def printLastWeeklies():
-    printLastWeek(DCurl, "DC")
-    printLastWeek(MarvelURL, "Marvel")
-    printLastWeek(ImageURL, "Image")
-    printLastWeek(IndieURL, "Indé")
+    printLastWeek(DC_URL, "DC")
+    printLastWeek(MARVEL_URL, "Marvel")
+    printLastWeek(IMAGE_URL, "Image")
+    printLastWeek(INDIE_URL, "Indé")
 
 
 # Def print last weekly date
@@ -49,7 +40,7 @@ def printLastWeek(url, editor):
 def printWeek(url, f, editor):
     global flag
     flag = False
-    postTitle, weeklyUrl = findLastWeekly(url)
+    postTitle, weeklyUrl = getcomics.findLastWeekly2(url)
 
     # Missing post already been done
     if "Missing" in postTitle and flag:
@@ -129,12 +120,12 @@ def generateweekly():
         pass
 
     with open("liste-comics-semaine.txt", "w") as f:
-        printWeek(DCurl, f, "DC week")
-        printWeek(MarvelURL, f, "Marvel week")
+        printWeek(DC_URL, f, "DC week")
+        printWeek(MARVEL_URL, f, "Marvel week")
         f.write("Indé week" + '\n')
         f.write("=====================" + '\n')
-        printWeek(ImageURL, f, "Image week")
-        printWeek(IndieURL, f, "Indé week")
+        printWeek(IMAGE_URL, f, "Image week")
+        printWeek(INDIE_URL, f, "Indé week")
 
 
 # MAIN

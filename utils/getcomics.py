@@ -45,6 +45,15 @@ def findLastWeekly(url):
     return postUrl
 
 
+# Find las weekly post
+def findLastWeekly2(url):
+    soup = htmlsoup.url2soup(url)
+    lastPost = soup.find_all('article', class_='type-post')[0]
+    postTitle = lastPost.h1.a.text
+    postUrl = lastPost.h1.a['href']
+    return postTitle, postUrl
+
+
 def comicsList(url):
     weeklyUrl = findLastWeekly(url)
     soup = htmlsoup.url2soup(weeklyUrl)
