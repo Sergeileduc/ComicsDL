@@ -138,5 +138,6 @@ Join = input('Voulez-vous continuer ? (y/n) ?\n')
 if Join.lower() == 'yes' or Join.lower() == 'y':
     print("Processing")
     generateweekly()
+    print("Done")
 else:
     print ("Exit")
