@@ -11,6 +11,10 @@ __pycache__/
 *.pyc
 *.ico
 *.png
+<<<<<<< HEAD
+=======
+soup.html
+>>>>>>> c2e4239db02de9ecc8ef9a5313cd9c209d714c0d
 .comics.db
 soup.html
 liste-comics-semaine.txt
