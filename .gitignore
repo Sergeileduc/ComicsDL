@@ -9,11 +9,11 @@ __pycache__/
 *.zip
 *.spec
 *.pyc
+*.ico
+*.png
 soup.html
 .comics.db
 liste-comics-semaine.txt
 liste-dc.txt
 comics-week.py
-*.ico
-*.png
 test.py
