@@ -1,9 +1,9 @@
 build/
 dist/
 __pycache__/
-.DS_Store
 .vscode/
 .idea/
+.DS_Store
 *.cbr
 *.cbz
 *.zip
