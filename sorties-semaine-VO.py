@@ -2,7 +2,7 @@
 # -*-coding:utf-8 -*-
 
 import os
-import subprocess
+# import subprocess
 
 from utils import htmlsoup, getcomics
 
@@ -16,8 +16,9 @@ howto = "Video guide on how"
 howtodl = "how to download"
 consistof = "consist of :"
 lower = "or on the lower"
+indieweek = "INDIE Week+"
 bloat = ['Language :', 'Image Format :', 'Year :',
-         'Size :', 'Notes :', 'Screenshots :']
+         'Size :', 'Size : ', 'Notes :', 'Screenshots :']
 
 
 # Find last weekly and display
@@ -82,30 +83,37 @@ def printOneEditor(url, f, editor):
 # For Indie week+
 def printMultipleEditors(url, f):
     soup = htmlsoup.url2soup(url).select_one('section.post-contents')
+
+    # List of comics publishers
     publishers = soup.find_all('span', style="color: #3366ff;")
     indies = []
     for p in publishers:
         indies.append(p.text)
 
+    # List of comics
     var = soup.find_all('strong')
-
     for s in var:
+        # Highlight publishers
         if s.text in indies:
             f.write('\n' + s.text + '\n=====================' + '\n')
+        # blots
         elif note in s.text \
                 or howto in s.text \
                 or consistof in s.text \
                 or howtodl in s.text \
-                or lower in s.text:
+                or lower in s.text \
+                or indieweek in s.text:
             pass
+        # more bloats
         elif s.text in bloat:
             pass
+        # Comics
         else:
             name = s.text.replace(' : ', '').replace('Download', '')\
                         .replace(' | ', '').replace('Read Online', '')
             if s.a and s.a.has_attr('href'):
-                f.write(
-                    '[url=' + s.a.get("href") + ']' + name + '[/url]' + '\n')
+                f.write('[url=' + s.a.get("href") + ']'
+                        + name + '[/url]' + '\n')
             else:
                 f.write(name + '\n')
     f.write('\n')
@@ -140,8 +148,8 @@ if Join.lower() == 'yes' or Join.lower() == 'y':
     print("Processing")
     generateweekly()
     print("Done")
-    cmd = 'zenity --text-info --title="Sorties de la semaine"  ' \
-          '--width=800 --height=600 --filename=liste-comics-semaine.txt'
-    subprocess.call(cmd, shell=True)
+    # cmd = 'zenity --text-info --title="Sorties de la semaine"  ' \
+    #       '--width=800 --height=600 --filename=liste-comics-semaine.txt'
+    # subprocess.call(cmd, shell=True)
 else:
     print ("Exit")
