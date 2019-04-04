@@ -16,8 +16,9 @@ howto = "Video guide on how"
 howtodl = "how to download"
 consistof = "consist of :"
 lower = "or on the lower"
+indieweek = "INDIE Week+"
 bloat = ['Language :', 'Image Format :', 'Year :',
-         'Size :', 'Notes :', 'Screenshots :']
+         'Size :', 'Size : ', 'Notes :', 'Screenshots :']
 
 
 # Find last weekly and display
@@ -100,7 +101,8 @@ def printMultipleEditors(url, f):
                 or howto in s.text \
                 or consistof in s.text \
                 or howtodl in s.text \
-                or lower in s.text:
+                or lower in s.text \
+                or indieweek in s.text:
             pass
         # more bloats
         elif s.text in bloat:
