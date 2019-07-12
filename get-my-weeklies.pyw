@@ -78,7 +78,7 @@ class MyComicsList(tk.Tk):
                 self.comic_canvas, orient="vertical",
                 command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.title("Télécharger All V1")
+        self.title("Télécharger All V2019-07")
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
         self.comic_create = tk.Text(
                 self.text_frame, height=3, bg="white", fg="black")
@@ -128,6 +128,7 @@ class MyComicsList(tk.Tk):
                 target=getcomics.getWeeklyComics, args=[comicslist])
         thread1.start()
 
+    # add comic - create new button and add comic in the database
     def add_comic(self, event=None, comic_text=None, from_db=False):
         if not comic_text:
             comic_text = self.comic_create.get(1.0, tk.END).strip()
@@ -147,6 +148,7 @@ class MyComicsList(tk.Tk):
 
         self.comic_create.delete(1.0, tk.END)
 
+    # remove comic - delete button and remove from database
     def remove_comic(self, event):
         comic = event.widget
         if msg.askyesno(
@@ -162,10 +164,12 @@ class MyComicsList(tk.Tk):
 
             self.recolour_comic()
 
+    # recursive recolour comics
     def recolour_comic(self):
         for index, comic in enumerate(self.comic):
             self.set_comic_colour(index, comic)
 
+    # recolour comics (odd or even in the list)
     def set_comic_colour(self, position, comic):
         _, comic_style_choice = divmod(position, 2)
 
@@ -192,11 +196,13 @@ class MyComicsList(tk.Tk):
 
             self.comic_canvas.yview_scroll(move, "units")
 
+    # add new comic in database
     def save_comic(self, comic):
         insert_comic_query = "INSERT INTO comics_dc VALUES (?)"
         insert_comic_data = (comic,)
         self.runQuery(insert_comic_query, insert_comic_data)
 
+    # read database
     def load_comic(self):
         load_comic_query = "SELECT comic FROM comics_dc"
         my_comic = self.runQuery(load_comic_query, receive=True)

@@ -2,10 +2,6 @@
 # -*-coding:utf-8 -*-
 
 import sys
-from utils import getcomics
-from utils import htmlsoup
-from utils import tools
-from utils import zpshare
 import requests
 import tkinter as tk
 import tkinter.scrolledtext as tkst
@@ -15,7 +11,11 @@ import urllib.error
 import threading
 import base64
 
-url = ''
+from utils import getcomics
+from utils import htmlsoup
+from utils import tools
+from utils import zpshare
+
 BASE = "https://getcomics.info/go.php-url=/"
 
 exit_thread = False
@@ -24,6 +24,7 @@ exit_success = False
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
 
+# Redirect standard output Std into a frame in the GUI
 class Std_redirector(object):
     def __init__(self, widget):
         self.widget = widget
@@ -37,8 +38,16 @@ class Std_redirector(object):
         pass
 
 
-# our comicsList
+# Main program interface and code
 class Getcomics(tk.Tk):
+
+    deepbg = '#263238'
+    fg = 'white'
+    button_dark = '#546E7A'
+    dark2 = '#37474F'
+    color1 = '#37474F'
+    # color2='#455A64'
+    dark3 = '#455A64'
 
     def __init__(self):
         def myfunction(event):
@@ -100,8 +109,8 @@ class Getcomics(tk.Tk):
         self.downloadlist = list()
         self.mylist = list()
         self.wm_geometry("%dx%d+%d+%d" % (sizex, sizey, posx, posy))
-        self.title("Télécharger sur Getcomics V2019-02")
-        self.configure(background=deepbg)
+        self.title("Télécharger sur Getcomics V2019-07")
+        self.configure(background=self.deepbg)
 
         topbar = ttk.Frame(self)  #, style="deepBG.TFrame")
         mainframe = ttk.Frame(self)  #, style="deepBG.TFrame")
@@ -117,7 +126,8 @@ class Getcomics(tk.Tk):
                               #  style="pages.TButton",
                               command=self.gotonextpage)
         # messageRecherche = tk.Label(
-        #         topbar, text="Rechercher sur Getcomics", bg=dark2, fg=fg,
+        #         topbar, text="Rechercher sur Getcomics",
+        #         bg=self.dark2, fg=self.fg,
         #         justify=tk.CENTER, font=("Helvetica", 12))
         choice = tk.OptionMenu(topbar, self.mode, *self.choices)
         choice.config(  #bg=dark3, fg=fg, relief='flat',
@@ -183,6 +193,7 @@ class Getcomics(tk.Tk):
 
         self.searchcomics(None)
 
+    # Destroy a list of widgets (like buttons)
     def destroylist(self, widgetlist):
         for w in widgetlist:
             w.destroy()
@@ -191,8 +202,6 @@ class Getcomics(tk.Tk):
 
     # Search comics function
     def searchcomics(self, event):
-        dark2 = '#546E7A'
-        fg = '#FAFAFA'
         self.searchlist.clear()
         self.destroylist(self.buttonlist)
         searchmode = self.choices.index(self.mode.get())
@@ -220,13 +229,10 @@ class Getcomics(tk.Tk):
             thread1.start()
         except Exception as e:
             print(e)
-            print("Problem")
             pass
 
     # Click to add to DL list
     def addtodl(self, button):
-        dark2 = '#546E7A'
-        fg = '#FAFAFA'
         index = self.buttonlist.index(button)
         comic = button.cget('text')
         if comic not in (item[1] for item in self.downloadlist):
@@ -331,7 +337,7 @@ class Getcomics(tk.Tk):
         # downButton = soup.select('script[type="text/javascript"]')
         downButton = soup.find('a', id="dlbutton").find_next_sibling().text
         try:
-            fullURL, fileName = zpshare.getZippyDL(url, downButton)
+            fullURL, fileName = zpshare.getFileUrl(url, downButton)
             print ("Download from zippyhare into : " + fileName)
             r = requests.get(fullURL, stream=True)
             size = int(r.headers['Content-length'])  # Size in bytes
@@ -380,6 +386,7 @@ class Getcomics(tk.Tk):
         self.searchcomics(None)
 
 
+# Main Loop
 if __name__ == "__main__":
     app = Getcomics()  # constructor, calls method __init__
     app.mainloop()
