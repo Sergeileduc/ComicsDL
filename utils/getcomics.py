@@ -32,7 +32,7 @@ def findLastWeekly(url):
     soup = htmlsoup.url2soup(url)
     lastPost = soup.find('article', class_='type-post')
     # Check if today's archive is there, and retrieve its url
-    print ("Latest weekly post: " + lastPost.time['datetime'])
+    print("Latest weekly post: " + lastPost.time['datetime'])
     if today in lastPost.time['datetime']:
         # print ('There is a new one today. Hurrah!')
         pass
@@ -72,7 +72,7 @@ def downCom(url):
     except urllib.error.HTTPError:
         print("downCom can't get final url")
         raise
-    print ("Trying " + finalurl)
+    print("Trying " + finalurl)
     zippylink = ''
     try:
         soup = htmlsoup.url2soup(finalurl)
@@ -125,7 +125,7 @@ def downComZippy(url):
     downButton = soup.find('a', id="dlbutton").find_next_sibling().text
     try:
         fullURL, fileName = zpshare.getFileUrl(url, downButton)
-        print ("Downloading from zippyshare into : " + fileName)
+        print("Downloading from zippyshare into : " + fileName)
         r = requests.get(fullURL, stream=True)
         size = tools.bytes_2_human_readable(int(r.headers['Content-length']))
         print(size)
@@ -143,15 +143,15 @@ def downComZippy(url):
         except IOError:
             print("Error while writing file")
     r.close()
-    print ('Done\n--')
+    print('Done\n--')
     return
 
 
 # Compare remote and local list of comics and download
 def getWeeklyComics(mylist):
-    print ('Initialisation...')
-    print ('Je vais chercher les mots clés :')
-    print (mylist)
+    print('Initialisation...')
+    print('Je vais chercher les mots clés :')
+    print(mylist)
 
     for url in getcomicsurls:
         # Other soup selectors

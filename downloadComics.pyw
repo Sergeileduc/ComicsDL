@@ -106,7 +106,7 @@ class Getcomics(tk.Tk):
         self.searchlist = list()
         self.downloadlist = list()
         self.mylist = list()
-        self.wm_geometry("%dx%d+%d+%d" % (sizex, sizey, posx, posy))
+        self.wm_geometry(f"{sizex}x{sizey}+{posx}+{posy}")
         self.title("Télécharger sur Getcomics V2019-07")
         self.configure(background=self.deepbg)
 
@@ -149,7 +149,7 @@ class Getcomics(tk.Tk):
                                   orient="vertical",
                                   command=dlcanva.yview)
         instructions = ttk.Label(self.resultsframe, style="L.TLabel",
-                                 text='Cliquez pour ajouter un élément '\
+                                 text='Cliquez pour ajouter un élément '
                                  'à votre liste de téléchargement')
         liste = tk.Label(rightframe, width=self.dlwidth,
                          bg=self.dark2, fg=self.fg,
@@ -297,7 +297,7 @@ class Getcomics(tk.Tk):
         except urllib.error.HTTPError:
             print("downCom got HTTPError from Request")
             raise
-        print ("Trying " + finalurl)
+        print("Trying " + finalurl)
         zippylink = ''
         try:
             soup = htmlsoup.url2soup(finalurl)
@@ -345,7 +345,7 @@ class Getcomics(tk.Tk):
         downButton = soup.find('a', id="dlbutton").find_next_sibling().text
         try:
             fullURL, fileName = zpshare.getFileUrl(url, downButton)
-            print ("Download from zippyhare into : " + fileName)
+            print("Download from zippyhare into : " + fileName)
             r = requests.get(fullURL, stream=True)
             size = int(r.headers['Content-length'])  # Size in bytes
             print(tools.bytes_2_human_readable(size))
@@ -374,7 +374,7 @@ class Getcomics(tk.Tk):
                 r.close()
             except Exception:
                 pass
-            print ('Done\n--')
+            print('Done\n')
         return
 
     # Nexpage button function

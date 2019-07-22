@@ -24,9 +24,9 @@ try:
         userList.sort()
     with open(configfile, 'w+') as f:
         for comic in userList:
-            f.write('%s\n' % comic)
+            f.write('{comic}\n')
             myComicsList.append(comic.lower().replace(' ', '-'))
-except IOError as e:
+except IOError:
     print("Erreur : Il faut créer un fichier " + config +
           " et y ajouter vos séries en ligne,\n comme par exemple"
           "\n.........\nBatman\nSuperman\nInjustice\netc...\n.........")
