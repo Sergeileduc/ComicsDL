@@ -4,6 +4,8 @@
 import re
 from urllib.parse import unquote
 
+from utils.tools import searchRegex, searchRegexName
+
 
 # Regex to detect name, (year) (tag).extension
 regex_tag = r"(.+)(\ \([1|2][9|0]\d{2}\))(.*)(\..{3})"
@@ -16,32 +18,12 @@ regex_abcd = (r'.*?getElementById.*?href = \"(.*?)\"'
 regex_rawname = r'.*?getElementById.*?href = \".*?\" \+ \(.*?\) \+ \"(.*?)\"'
 
 
-def removetag(filename):
+def _removetag(filename):
     if re.match(regex_tag, filename):
         # print("match")
         return re.sub(regex_tag, r"\1\2\4", filename)
     else:
         return filename
-
-
-# Just optimizing
-def searchRegex(html, regex, n):
-    try:
-        urlPattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
-        return urlPattern.search(str(html)).group(n)
-    except Exception as e:
-        print(e)
-        print("Cant't regex html")
-
-
-# or by name
-def searchRegexName(html, regex, name):
-    try:
-        urlPattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
-        return urlPattern.search(str(html)).group(name)
-    except Exception as e:
-        print(e)
-        print("Cant't regex html")
 
 
 def getFileUrl(url, button):
@@ -54,8 +36,8 @@ def getFileUrl(url, button):
 
     raw_name = searchRegex(button, regex_rawname, 1)
     # temp = replace(raw_name[1:], substitutions)
-    # filename = removetag(temp)
-    filename = removetag(unquote(raw_name).strip('/'))
+    # filename = _removetag(temp)
+    filename = _removetag(unquote(raw_name).strip('/'))
     # Calculating the id and forming url
     # that is an extremely dirty way, I know
     try:

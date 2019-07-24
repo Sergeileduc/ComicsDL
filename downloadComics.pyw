@@ -14,7 +14,7 @@ import base64
 from utils import getcomics
 from utils import htmlsoup
 from utils import tools
-from utils import zpshare
+from utils.zpshare import getFileUrl
 
 BASE = "https://getcomics.info/go.php-url=/"
 
@@ -344,7 +344,7 @@ class Getcomics(tk.Tk):
         # downButton = soup.select('script[type="text/javascript"]')
         downButton = soup.find('a', id="dlbutton").find_next_sibling().text
         try:
-            fullURL, fileName = zpshare.getFileUrl(url, downButton)
+            fullURL, fileName = getFileUrl(url, downButton)
             print("Download from zippyhare into : " + fileName)
             r = requests.get(fullURL, stream=True)
             size = int(r.headers['Content-length'])  # Size in bytes
