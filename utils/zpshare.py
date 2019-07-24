@@ -4,9 +4,11 @@
 import re
 import urllib.request
 from urllib.parse import unquote
-from utils.tools import searchRegex, searchRegexName
+from utils.tools import searchRegexName
 from urllib.error import HTTPError
 import base64
+
+from utils.htmlsoup import url2soup
 
 BASE = "https://getcomics.info/go.php-url=/"
 
@@ -20,7 +22,8 @@ regex_first = r'.*?getElementById.*?href = \"(?P<first>.*?)\"'
 regex_abcd = (r'.*?getElementById.*?href = \"(.*?)\"'
               r' \+ \((?P<a>\d+) \% (?P<b>\d+) \+ (?P<c>\d+) \% (?P<d>\d+)\)')
 
-regex_rawname = r'.*?getElementById.*?href = \".*?\" \+ \(.*?\) \+ \"(.*?)\"'
+regex_rawname = (r'.*?getElementById.*?href = '
+                 r'\".*?\" \+ \(.*?\) \+ \"(?P<name>.*?)\"')
 
 
 def _removetag(filename):
@@ -39,7 +42,7 @@ def getFileUrl(url, button):
     c = int(searchRegexName(button, regex_abcd, 'c'))
     d = int(searchRegexName(button, regex_abcd, 'd'))
 
-    raw_name = searchRegex(button, regex_rawname, 1)
+    raw_name = searchRegexName(button, regex_rawname, 'name')
     # temp = replace(raw_name[1:], substitutions)
     # filename = _removetag(temp)
     filename = _removetag(unquote(raw_name).strip('/'))
@@ -65,3 +68,10 @@ def checkurl(zippylink):
         print("can't obtain final zippyshare url")
         print(e)
         raise
+
+
+# TODO : maybe underscore for internal use only
+def find_zippy_download_button(zippyurl):
+    soup = url2soup(zippyurl)
+    # downButton = soup.select('script[type="text/javascript"]')
+    return soup.find('a', id="dlbutton").find_next_sibling().text

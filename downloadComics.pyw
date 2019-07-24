@@ -12,9 +12,8 @@ import threading
 
 from utils import getcomics
 from utils.getcomics import find_buttons, find_zippy_button, ZippyButtonError
-from utils import htmlsoup
 from utils import tools
-from utils.zpshare import getFileUrl, checkurl
+from utils.zpshare import getFileUrl, checkurl, find_zippy_download_button
 from utils.urltools import getfinalurl
 
 BASE = "https://getcomics.info/go.php-url=/"
@@ -317,9 +316,7 @@ class Getcomics(tk.Tk):
     # Download from zippyshare
     def downComZippy(self, url):
         self.progress["value"] = 0
-        soup = htmlsoup.url2soup(url)
-        # downButton = soup.select('script[type="text/javascript"]')
-        downButton = soup.find('a', id="dlbutton").find_next_sibling().text
+        downButton = find_zippy_download_button(url)
         try:
             fullURL, fileName = getFileUrl(url, downButton)
             print("Download from zippyhare into : " + fileName)
