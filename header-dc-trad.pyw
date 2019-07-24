@@ -2,11 +2,10 @@
 # -*-coding:utf-8 -*
 # import io
 import io
+import requests
 from PIL import Image, ImageTk  # pip install pillow
 import tkinter as tk
 from tkinter import font as tkfont  # python 3
-import urllib.request as urllib2
-import urllib.error
 from bs4 import BeautifulSoup
 import webbrowser
 
@@ -27,21 +26,15 @@ cat_image_list = list()
 # image from url
 def imagefromurl(url):
     try:
-        bytes = urllib2.urlopen(url).read()
-    except urllib.error.HTTPError as e:
-        print("Http error in imagefromurl")
-        print(e.fp.read())
+        response = requests.get(url)
+        img = Image.open(io.BytesIO(response.content))
+        return img
+    except requests.exceptions.HTTPError as e:
+        print(e)
         return
-    try:
-        stream = io.BytesIO(bytes)
     except IOError as e:
         print(e)
         return
-    try:
-        pil_image = Image.open(stream)
-        return pil_image
-    except Exception:
-        print("Error Image.open in imagefromurl")
 
 
 # Open url
@@ -54,13 +47,12 @@ def OpenUrl(url):
 # Get html from url
 def returnHTML(url):
     hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
-    req = urllib2.Request(url, headers=hdr)
+    # req = urllib2.Request(url, headers=hdr)
     try:
-        response = urllib2.urlopen(req)
-    except urllib2.HTTPError as e:
-        print(e.fp.read())
-    html = response.read()
-    return html
+        html = requests.get(url, headers=hdr).text
+        return html
+    except requests.exceptions.HTTPError as e:
+        print(e)
 
 
 # Get inner html from tag
