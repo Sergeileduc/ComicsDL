@@ -2,10 +2,8 @@
 # -*-coding:utf-8 -*-
 
 import re
+from urllib.parse import unquote
 
-# Subistitions for getcomics
-substitutions = {'%2c': '', '%20': ' ', '%28': '(',
-                 '%29': ')', '%27': '\'', '%26': '&'}
 
 # Regex to detect name, (year) (tag).extension
 regex_tag = r"(.+)(\ \([1|2][9|0]\d{2}\))(.*)(\..{3})"
@@ -16,13 +14,6 @@ regex_abcd = (r'.*?getElementById.*?href = \"(.*?)\"'
               r' \+ \((\d+) \% (\d+) \+ (\d+) \% (\d+)\)')
 
 regex_rawname = r'.*?getElementById.*?href = \".*?\" \+ \(.*?\) \+ \"(.*?)\"'
-
-
-# Multiple replace function
-def replace(string, substitutions):
-    substrings = sorted(substitutions, key=len, reverse=True)
-    regex = re.compile('|'.join(map(re.escape, substrings)))
-    return regex.sub(lambda match: substitutions[match.group(0)], string)
 
 
 def removetag(filename):
@@ -52,8 +43,9 @@ def getFileUrl(url, button):
     d = int(searchRegex(button, regex_abcd, 5))
 
     raw_name = searchRegex(button, regex_rawname, 1)
-    temp = replace(raw_name[1:], substitutions)
-    filename = removetag(temp)
+    # temp = replace(raw_name[1:], substitutions)
+    # filename = removetag(temp)
+    filename = removetag(unquote(raw_name).strip('/'))
     # Calculating the id and forming url
     # that is an extremely dirty way, I know
     try:
