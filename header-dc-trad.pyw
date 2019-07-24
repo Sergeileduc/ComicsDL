@@ -142,27 +142,26 @@ class DCTradapp(tk.Tk):
         except Exception:
             logo = False
 
-        sidebar = tk.Frame(
-                self, width=200, bg='SteelBlue4', height=500,
-                relief='groove', borderwidth=1)
+        sidebar = tk.Frame(self, width=200, bg='SteelBlue4',
+                           height=500, relief='groove', borderwidth=1)
         sidebar.pack(expand=False, fill='both', side='left', anchor='nw')
 
-        button1 = tk.Button(
-                sidebar, image=cat_image_list[0], bg='SteelBlue4',
-                relief='flat', command=lambda: self.show_frame("DCRebirth"))
-        button2 = tk.Button(
-                sidebar, image=cat_image_list[1], bg='SteelBlue4',
-                relief='flat', command=lambda: self.show_frame("DCPage"))
-        button3 = tk.Button(
-                sidebar, image=cat_image_list[2], bg='SteelBlue4',
-                relief='flat', command=lambda: self.show_frame("Indes"))
-        button4 = tk.Button(
-                sidebar, image=cat_image_list[3], bg='SteelBlue4',
-                relief='flat', command=lambda: self.show_frame("Marvel"))
+        button1 = tk.Button(sidebar, image=cat_image_list[0],
+                            bg='SteelBlue4', relief='flat',
+                            command=lambda: self.show_frame("DCRebirth"))
+        button2 = tk.Button(sidebar, image=cat_image_list[1],
+                            bg='SteelBlue4', relief='flat',
+                            command=lambda: self.show_frame("DCPage"))
+        button3 = tk.Button(sidebar, image=cat_image_list[2],
+                            bg='SteelBlue4', relief='flat',
+                            command=lambda: self.show_frame("Indes"))
+        button4 = tk.Button(sidebar, image=cat_image_list[3],
+                            bg='SteelBlue4', relief='flat',
+                            command=lambda: self.show_frame("Marvel"))
         if logo:
-            button5 = tk.Button(
-                    sidebar, image=cat_image_list[4], bg='SteelBlue4',
-                    relief='flat', command=refresh(comicslist))
+            button5 = tk.Button(sidebar, image=cat_image_list[4],
+                                bg='SteelBlue4', relief='flat',
+                                command=refresh(comicslist))
         else:
             button5 = tk.Button(sidebar, text="Rafraîchir",
                                 command=refresh(comicslist))
@@ -334,41 +333,41 @@ class Marvel(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        coverA1 = tk.Button(
-                self, image=photo[30], bg='SteelBlue3', relief='flat',
-                command=lambda: OpenUrl(urllist[30]))
+        coverA1 = tk.Button(self, image=photo[30],
+                            bg='SteelBlue3', relief='flat',
+                            command=lambda: OpenUrl(urllist[30]))
+        coverA2 = tk.Button(self, image=photo[31],
+                            bg='SteelBlue3', relief='flat',
+                            command=lambda: OpenUrl(urllist[31]))
+        coverA3 = tk.Button(self, image=photo[32],
+                            bg='SteelBlue3', relief='flat',
+                            command=lambda: OpenUrl(urllist[32]))
+        coverA4 = tk.Button(self, image=photo[33],
+                            bg='SteelBlue3', relief='flat',
+                            command=lambda: OpenUrl(urllist[33]))
+        coverA5 = tk.Button(self, image=photo[34],
+                            bg='SteelBlue3', relief='flat',
+                            command=lambda: OpenUrl(urllist[34]))
+        coverA6 = tk.Button(self, image=photo[35],
+                            bg='SteelBlue3', relief='flat',
+                            command=lambda: OpenUrl(urllist[35]))
+        coverA7 = tk.Button(self, image=photo[36],
+                            bg='SteelBlue3', relief='flat',
+                            command=lambda: OpenUrl(urllist[36]))
+        coverA8 = tk.Button(self, image=photo[37],
+                            bg='SteelBlue3', relief='flat',
+                            command=lambda: OpenUrl(urllist[37]))
+        coverA9 = tk.Button(self, image=photo[38],
+                            bg='SteelBlue3', relief='flat',
+                            command=lambda: OpenUrl(urllist[38]))
         coverA1.grid(row=0, column=0)
-        coverA2 = tk.Button(
-                self, image=photo[31], bg='SteelBlue3', relief='flat',
-                command=lambda: OpenUrl(urllist[31]))
         coverA2.grid(row=0, column=1)
-        coverA3 = tk.Button(
-                self, image=photo[32], bg='SteelBlue3', relief='flat',
-                command=lambda: OpenUrl(urllist[32]))
         coverA3.grid(row=0, column=2)
-        coverA4 = tk.Button(
-                self, image=photo[33], bg='SteelBlue3', relief='flat',
-                command=lambda: OpenUrl(urllist[33]))
         coverA4.grid(row=1, column=0)
-        coverA5 = tk.Button(
-                self, image=photo[34], bg='SteelBlue3', relief='flat',
-                command=lambda: OpenUrl(urllist[34]))
         coverA5.grid(row=1, column=1)
-        coverA6 = tk.Button(
-                self, image=photo[35], bg='SteelBlue3', relief='flat',
-                command=lambda: OpenUrl(urllist[35]))
         coverA6.grid(row=1, column=2)
-        coverA7 = tk.Button(
-                self, image=photo[36], bg='SteelBlue3', relief='flat',
-                command=lambda: OpenUrl(urllist[36]))
         coverA7.grid(row=2, column=0)
-        coverA8 = tk.Button(
-                self, image=photo[37], bg='SteelBlue3', relief='flat',
-                command=lambda: OpenUrl(urllist[37]))
         coverA8.grid(row=2, column=1)
-        coverA9 = tk.Button(
-                self, image=photo[38], bg='SteelBlue3', relief='flat',
-                command=lambda: OpenUrl(urllist[38]))
         coverA9.grid(row=2, column=2)
 
 
