@@ -2,10 +2,15 @@
 # -*-coding:utf-8 -*-
 
 import re
+import urllib.request
 from urllib.parse import unquote
-
 from utils.tools import searchRegex, searchRegexName
+from urllib.error import HTTPError
+import base64
 
+BASE = "https://getcomics.info/go.php-url=/"
+
+user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
 # Regex to detect name, (year) (tag).extension
 regex_tag = r"(.+)(\ \([1|2][9|0]\d{2}\))(.*)(\..{3})"
@@ -44,3 +49,19 @@ def getFileUrl(url, button):
     fullURL = url[:-21] + first_part + str(second_part) + raw_name
     print(fullURL)
     return fullURL, filename
+
+
+def checkurl(zippylink):
+    try:
+        if str(zippylink).startswith(BASE):
+            print("Abracadabra !")
+            finalzippy = base64.b64decode(zippylink[len(BASE):]).decode()
+        else:
+            headers = {'User-Agent': user_agent}
+            req = urllib.request.Request(zippylink, None, headers)
+            finalzippy = urllib.request.urlopen(req).geturl()
+        return finalzippy
+    except HTTPError as e:
+        print("can't obtain final zippyshare url")
+        print(e)
+        raise

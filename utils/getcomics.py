@@ -8,8 +8,10 @@ import urllib.error
 import base64
 from datetime import datetime
 from utils import htmlsoup
+from utils.htmlsoup import url2soup
 from utils import zpshare
 from utils import tools
+# from utils.getcomics_exceptions import NoZippyButton
 
 today = datetime.today().strftime("%Y-%m-%d")
 
@@ -210,3 +212,32 @@ def searchurl(user_search, mode, page):
             url = basesearch + '/page/' + str(page) \
                 + '/?s=' + user_search.lower().replace(' ', '+')
     return url
+
+
+# find download buttons in html soup, return list of buttons
+def find_buttons(url):
+    return url2soup(url).select("div.aio-pulse > a")
+
+
+# find the button for zippyshare
+def find_zippy_button(buttons):
+    if not buttons:
+        print("Empty list !")
+        raise ZippyButtonError("Empty button list !")
+    found = False
+    for button in buttons:
+        # if 'zippyshare' in str(button).lower() \
+        #       and 'href' in button.a.attrs:
+        if 'zippyshare' in button.get("href") \
+                        or 'zippyshare' in button.get('title').lower():
+            zippylink = button.get("href")
+            found = True
+    if found:
+        return zippylink
+    else:
+        raise ZippyButtonError("No zippyshare button was found")
+
+
+class ZippyButtonError(Exception):
+    def __init__(self, msg):
+        super().__init__(self, msg)

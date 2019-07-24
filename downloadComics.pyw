@@ -9,12 +9,12 @@ from tkinter import ttk
 import urllib.request
 import urllib.error
 import threading
-import base64
 
 from utils import getcomics
+from utils.getcomics import find_buttons, find_zippy_button, ZippyButtonError
 from utils import htmlsoup
 from utils import tools
-from utils.zpshare import getFileUrl
+from utils.zpshare import getFileUrl, checkurl
 
 BASE = "https://getcomics.info/go.php-url=/"
 
@@ -300,37 +300,18 @@ class Getcomics(tk.Tk):
         print("Trying " + finalurl)
         zippylink = ''
         try:
-            soup = htmlsoup.url2soup(finalurl)
-            downButtons = soup.select("div.aio-pulse > a")
-            for button in downButtons:
-                # if 'zippyshare' in str(button).lower() \
-                #       and 'href' in button.a.attrs:
-                if 'zippyshare' in button.get("href") \
-                                or 'zippyshare' in button.get('title').lower():
-                    zippylink = button.get("href")
-                    print(zippylink)
-                    try:
-                        if str(zippylink).startswith(BASE):
-                            print("Abracadabra !")
-                            finalzippy = base64.b64decode(
-                                                zippylink[len(BASE):]).decode()
-                        else:
-                            headers = {'User-Agent': user_agent}
-                            req = urllib.request.Request(
-                                    zippylink, None, headers)
-                            finalzippy = urllib.request.urlopen(req).geturl()
-                    except urllib.error.HTTPError as e:
-                        print("can't obtain final zippyshare url")
-                        print(e)
-                        raise
-                    except IOError:
-                        print("Zippyhare download failed")
-                    try:
-                        print(finalzippy)
-                        self.downComZippy(finalzippy)
-                    except Exception as e:
-                        print(e)
-                        print("error in downComZippy")
+            # soup = htmlsoup.url2soup(finalurl)
+            buttons = find_buttons(finalurl)
+            zippylink = find_zippy_button(buttons)
+            finalzippy = checkurl(zippylink)
+            try:
+                print(finalzippy)
+                self.downComZippy(finalzippy)
+            except Exception as e:
+                print(e)
+                print("error in downComZippy")
+        except ZippyButtonError as e:
+            print(e)
         except urllib.error.HTTPError as e:
             print("downCom got HTTPError")
             print(e)
