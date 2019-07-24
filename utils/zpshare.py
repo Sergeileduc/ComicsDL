@@ -40,12 +40,7 @@ def getFileUrl(url, button):
     filename = _removetag(unquote(raw_name).strip('/'))
     # Calculating the id and forming url
     # that is an extremely dirty way, I know
-    try:
-        second_part = a % b + c % d
-        fullURL = url[:-21] + first_part + str(second_part) + raw_name
-        print(fullURL)
-    except Exception as e:
-        print("Mon erreur")
-        print(e)
-        raise
+    second_part = a % b + c % d
+    fullURL = url[:-21] + first_part + str(second_part) + raw_name
+    print(fullURL)
     return fullURL, filename

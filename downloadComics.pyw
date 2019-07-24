@@ -366,8 +366,6 @@ class Getcomics(tk.Tk):
                     self.percent.set(
                             int(100 * self.dlbytes.get() / self.listsize))
                     f.write(block)
-            except KeyboardInterrupt:
-                pass
             except IOError:
                 print("Error while writing file")
             try:

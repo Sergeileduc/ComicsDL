@@ -48,19 +48,11 @@ def bytes_2_human_readable(number_of_bytes):
 
 # Just optimizing
 def searchRegex(html, regex, n):
-    try:
-        urlPattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
-        return urlPattern.search(str(html)).group(n)
-    except Exception as e:
-        print(e)
-        print("Cant't regex html")
+    urlPattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
+    return urlPattern.search(str(html)).group(n)
 
 
 # or by name
 def searchRegexName(html, regex, name):
-    try:
-        urlPattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
-        return urlPattern.search(str(html)).group(name)
-    except Exception as e:
-        print(e)
-        print("Cant't regex html")
+    urlPattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
+    return urlPattern.search(str(html)).group(name)
