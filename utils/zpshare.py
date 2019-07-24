@@ -8,10 +8,10 @@ from urllib.parse import unquote
 # Regex to detect name, (year) (tag).extension
 regex_tag = r"(.+)(\ \([1|2][9|0]\d{2}\))(.*)(\..{3})"
 
-regex_first = r'.*?getElementById.*?href = \"(.*?)\"'
+regex_first = r'.*?getElementById.*?href = \"(?P<first>.*?)\"'
 
 regex_abcd = (r'.*?getElementById.*?href = \"(.*?)\"'
-              r' \+ \((\d+) \% (\d+) \+ (\d+) \% (\d+)\)')
+              r' \+ \((?P<a>\d+) \% (?P<b>\d+) \+ (?P<c>\d+) \% (?P<d>\d+)\)')
 
 regex_rawname = r'.*?getElementById.*?href = \".*?\" \+ \(.*?\) \+ \"(.*?)\"'
 
@@ -34,13 +34,23 @@ def searchRegex(html, regex, n):
         print("Cant't regex html")
 
 
+# or by name
+def searchRegexName(html, regex, name):
+    try:
+        urlPattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
+        return urlPattern.search(str(html)).group(name)
+    except Exception as e:
+        print(e)
+        print("Cant't regex html")
+
+
 def getFileUrl(url, button):
     print("Found zippyshare : " + url)
-    first_part = searchRegex(button, regex_first, 1)
-    a = int(searchRegex(button, regex_abcd, 2))
-    b = int(searchRegex(button, regex_abcd, 3))
-    c = int(searchRegex(button, regex_abcd, 4))
-    d = int(searchRegex(button, regex_abcd, 5))
+    first_part = searchRegexName(button, regex_first, 'first')
+    a = int(searchRegexName(button, regex_abcd, 'a'))
+    b = int(searchRegexName(button, regex_abcd, 'b'))
+    c = int(searchRegexName(button, regex_abcd, 'c'))
+    d = int(searchRegexName(button, regex_abcd, 'd'))
 
     raw_name = searchRegex(button, regex_rawname, 1)
     # temp = replace(raw_name[1:], substitutions)
