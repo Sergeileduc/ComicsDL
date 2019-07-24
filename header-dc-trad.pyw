@@ -30,7 +30,7 @@ def imagefromurl(url):
         bytes = urllib2.urlopen(url).read()
     except urllib.error.HTTPError as e:
         print("Http error in imagefromurl")
-        print (e.fp.read())
+        print(e.fp.read())
         return
     try:
         stream = io.BytesIO(bytes)
@@ -58,7 +58,7 @@ def returnHTML(url):
     try:
         response = urllib2.urlopen(req)
     except urllib2.HTTPError as e:
-        print (e.fp.read())
+        print(e.fp.read())
     html = response.read()
     return html
 
