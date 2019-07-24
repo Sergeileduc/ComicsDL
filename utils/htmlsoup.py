@@ -52,3 +52,18 @@ def getHrefwithName(liste_a, name):
         if a.has_attr('href') and a.text == name:
             urllist.append(a['href'])
     return urllist
+
+
+# Get inner html from tag
+def getTagData(html, tag, classname):
+    soup = BeautifulSoup(html, 'html.parser')
+    # prettysoup = soup.prettify()
+    list = soup.find_all(tag, class_=classname)
+    return list
+
+
+# Find all 'tag' in html
+def getAllTag(html, tag):
+    soup = BeautifulSoup(html, 'html.parser')
+    list = soup.find_all(tag)
+    return list
