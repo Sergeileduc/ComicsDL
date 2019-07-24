@@ -15,6 +15,7 @@ from utils.getcomics import find_buttons, find_zippy_button, ZippyButtonError
 from utils import htmlsoup
 from utils import tools
 from utils.zpshare import getFileUrl, checkurl
+from utils.urltools import getfinalurl
 
 BASE = "https://getcomics.info/go.php-url=/"
 
@@ -287,16 +288,11 @@ class Getcomics(tk.Tk):
         print("Terminé, vous pouvez quitter")
         return
 
-    # Find download link
+    # Find Zippyshare Button, explore zippy url, find download url, download
     def downCom(self, url):
         global user_agent
-        headers = {'User-Agent': user_agent}
-        try:
-            req = urllib.request.Request(url, None, headers)
-            finalurl = urllib.request.urlopen(req).geturl()
-        except urllib.error.HTTPError:
-            print("downCom got HTTPError from Request")
-            raise
+        # headers = {'User-Agent': user_agent}
+        finalurl = getfinalurl(url)
         print("Trying " + finalurl)
         zippylink = ''
         try:
