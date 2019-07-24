@@ -45,7 +45,7 @@ def OpenUrl(url):
 
 
 # Get html from url
-def returnHTML(url):
+def _returnHTML(url):
     hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
     # req = urllib2.Request(url, headers=hdr)
     try:
@@ -55,19 +55,9 @@ def returnHTML(url):
         print(e)
 
 
-# Get inner html from tag
-def getTagData(html, tag, classname):
-    soup = BeautifulSoup(html, 'html.parser')
-    # prettysoup = soup.prettify()
-    list = soup.find_all(tag, class_=classname)
-    return list
-
-
-# Find all 'tag' in html
-def getAllTag(html, tag):
-    soup = BeautifulSoup(html, 'html.parser')
-    list = soup.find_all(tag)
-    return list
+# Get soup from url
+def _returnSoup(url):
+    return BeautifulSoup(_returnHTML(url), 'html.parser')
 
 
 # Make images from covers
@@ -103,8 +93,7 @@ def getUrls(comicslist):
 # Refresh images and urls in the header
 def refresh(comicslist):
     coverimgurllist = list()
-    html = returnHTML(dctradpage)
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = _returnSoup(dctradpage)
     # headerlist = soup.find_all('span', class_="btn-cover")
     comicslist = soup.select('span.btn-cover a')
     coverlist = soup.select('span.btn-cover img')
@@ -120,8 +109,7 @@ class DCTradapp(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         logo = False
-        html = returnHTML(dctradpage)
-        soup = BeautifulSoup(html, 'html.parser')
+        soup = _returnSoup(dctradpage)
         # headerlist = soup.find_all('span', class_="btn-cover")
         comicslist = soup.select('span.btn-cover a')
         # coverlist = soup.select('span.btn-cover img')
