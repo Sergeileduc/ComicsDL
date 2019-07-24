@@ -152,4 +152,4 @@ if Join.lower() == 'yes' or Join.lower() == 'y':
     #       '--width=800 --height=600 --filename=liste-comics-semaine.txt'
     # subprocess.call(cmd, shell=True)
 else:
-    print ("Exit")
+    print("Exit")
