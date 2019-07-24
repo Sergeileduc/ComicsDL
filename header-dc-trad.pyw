@@ -104,14 +104,20 @@ def refresh(comicslist):
     return
 
 
+class HeaderPic:
+    def __init__(self, url, image):
+        self.url = url
+        self.image = image
+
+
 class DCTradapp(tk.Tk):
     global cat_image_list
 
     def __init__(self, *args, **kwargs):
         logo = False
-        soup = _returnSoup(dctradpage)
+        # soup = _returnSoup(dctradpage)
         # headerlist = soup.find_all('span', class_="btn-cover")
-        comicslist = soup.select('span.btn-cover a')
+        comicslist = _returnSoup(dctradpage).select('span.btn-cover a')
         # coverlist = soup.select('span.btn-cover img')
 
         tk.Tk.__init__(self, *args, **kwargs)
