@@ -16,12 +16,8 @@ from utils import tools
 from utils.zpshare import getFileUrl, checkurl, find_zippy_download_button
 from utils.urltools import getfinalurl
 
-BASE = "https://getcomics.info/go.php-url=/"
-
 exit_thread = False
 exit_success = False
-
-user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
 
 # Redirect standard output Std into a frame in the GUI
@@ -289,8 +285,6 @@ class Getcomics(tk.Tk):
 
     # Find Zippyshare Button, explore zippy url, find download url, download
     def downCom(self, url):
-        global user_agent
-        # headers = {'User-Agent': user_agent}
         finalurl = getfinalurl(url)
         print("Trying " + finalurl)
         zippylink = ''

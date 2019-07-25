@@ -187,7 +187,8 @@ def getresults(url):
                 searchlist.append((d.h1.a.get("href"), d.h1.a.text, size))
         # print(searchlist)
         return searchlist
-    except urllib.error.HTTPError:
+    except urllib.error.HTTPError as e:
+        print(e)
         print("something wrong happened")
 
 
@@ -224,15 +225,15 @@ def find_zippy_button(buttons):
     if not buttons:
         print("Empty list !")
         raise ZippyButtonError("Empty button list !")
-    found = False
+    # found = False
+    zippylink = None
     for button in buttons:
         # if 'zippyshare' in str(button).lower() \
         #       and 'href' in button.a.attrs:
         if 'zippyshare' in button.get("href") \
                         or 'zippyshare' in button.get('title').lower():
             zippylink = button.get("href")
-            found = True
-    if found:
+    if zippylink:
         return zippylink
     else:
         raise ZippyButtonError("No zippyshare button was found")
