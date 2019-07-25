@@ -196,7 +196,6 @@ class Getcomics(tk.Tk):
                                 self.usersearch.get(), searchmode, self.page))
         # buttonlist = list()
         for i in self.searchlist:
-            # title = i[1] + ' (' + str(i[2]) + ')'
             title = f'{i["title"]} ({i["size"]})'
             newButton = tk.Button(
                     self.resultsframe, text=title, width=self.resultwidht,
@@ -223,7 +222,7 @@ class Getcomics(tk.Tk):
     def addtodl(self, button):
         index = self.buttonlist.index(button)
         comic = button.cget('text')
-        if comic not in (item[1] for item in self.downloadlist):
+        if comic not in (item["title"] for item in self.downloadlist):
             if self.searchlist[index]["size"] is not None:
                 bytes = tools.convert2bytes(self.searchlist[index]["size"])
                 self.listsize += bytes
@@ -236,10 +235,10 @@ class Getcomics(tk.Tk):
                     font=("Verdana", 10))
             newDL.config(command=lambda button=newDL: self.removedl(button))
             newDL.pack(fill='both', expand=1, pady=0)
-            self.downloadlist.append((self.searchlist[index]["url"],
-                                      self.searchlist[index]["title"],
-                                      newDL,
-                                      self.searchlist[index]["size"]))
+            self.downloadlist.append({"url": self.searchlist[index]["url"],
+                                      "title": self.searchlist[index]["title"],
+                                      "button": newDL,
+                                      "size": self.searchlist[index]["size"]})
             print("Taille de la file d'attente (donnée indicative) : "
                   + tools.bytes_2_human_readable(self.listsize))
         else:
@@ -248,9 +247,9 @@ class Getcomics(tk.Tk):
     # Click to remove an item function
     def removedl(self, button):
         for i in self.downloadlist:
-            if button == i[2]:
-                if i[3] is not None:
-                    bytes = tools.convert2bytes(i[3])
+            if button == i["button"]:
+                if i["size"] is not None:
+                    bytes = tools.convert2bytes(i["size"])
                     self.listsize -= bytes
                 self.downloadlist.remove(i)
         button.destroy()
@@ -262,7 +261,7 @@ class Getcomics(tk.Tk):
         self.dlbytes.set(0)
         for dl in liste:
             try:
-                self.downCom(dl[0])
+                self.downCom(dl["url"])
             except Exception as e:
                 print(e)
                 print("Something went wrong")
