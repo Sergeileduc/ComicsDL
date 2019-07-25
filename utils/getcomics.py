@@ -31,22 +31,23 @@ user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
 # Find las weekly post
 def findLastWeekly(url):
-    soup = htmlsoup.url2soup(url)
-    lastPost = soup.find('article', class_='type-post')
+    lastPost = url2soup(url).find('article', class_='type-post')
     # Check if today's archive is there, and retrieve its url
     print("Latest weekly post: " + lastPost.time['datetime'])
-    if today in lastPost.time['datetime']:
-        # print ('There is a new one today. Hurrah!')
-        pass
-    else:
-        # print ('Nothing yet. Exiting...')
-        # print ('Continue anyway...')
-        # quit()
-        pass
+    # TODO : code for auotmate, maybe uncode later
+    # if today in lastPost.time['datetime']:
+    #     # print ('There is a new one today. Hurrah!')
+    #     pass
+    # else:
+    #     # print ('Nothing yet. Exiting...')
+    #     # print ('Continue anyway...')
+    #     # quit()
+    #     pass
     postUrl = lastPost.h1.a['href']
     return postUrl
 
 
+# TODO : what is that ?
 # Find las weekly post
 def findLastWeekly2(url):
     soup = htmlsoup.url2soup(url)
