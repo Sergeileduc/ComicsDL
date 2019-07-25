@@ -43,8 +43,7 @@ def getFileUrl(url, button):
     d = int(searchRegexName(button, regex_abcd, 'd'))
 
     raw_name = searchRegexName(button, regex_rawname, 'name')
-    # temp = replace(raw_name[1:], substitutions)
-    # filename = _removetag(temp)
+    # unquote replace special characters like %2c, etc..
     filename = _removetag(unquote(raw_name).strip('/'))
     # Calculating the id and forming url
     # that is an extremely dirty way, I know

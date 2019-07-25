@@ -43,7 +43,7 @@ def bytes_2_human_readable(number_of_bytes):
     precision = 1
     number_of_bytes = round(number_of_bytes, precision)
 
-    return str(number_of_bytes) + ' ' + unit
+    return f'{number_of_bytes} {unit}'
 
 
 # Just optimizing

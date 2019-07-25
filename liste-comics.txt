@@ -1,7 +1,2 @@
-{comic}
-{comic}
-{comic}
-{comic}
-{comic}
-{comic}
-{comic}
+BATman
+HULK

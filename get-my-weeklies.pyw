@@ -2,11 +2,12 @@
 # -*-coding:utf-8 -*-
 import sys
 import os
-from utils import getcomics
 import tkinter as tk
 import tkinter.messagebox as msg
 import sqlite3
 import threading
+
+from utils.getcomics import getWeeklyComics
 
 exit_thread = False
 exit_success = False
@@ -124,8 +125,7 @@ class MyComicsList(tk.Tk):
         comicslist = list()
         for row in current_comic:
             comicslist.append(row[0].lower().replace(' ', '-'))
-        thread1 = threading.Thread(
-                target=getcomics.getWeeklyComics, args=[comicslist])
+        thread1 = threading.Thread(target=getWeeklyComics, args=[comicslist])
         thread1.start()
 
     # add comic - create new button and add comic in the database
