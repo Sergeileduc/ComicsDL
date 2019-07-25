@@ -17,11 +17,6 @@ cat_img_urls = [
     'http://www.dctrad.fr/images/icons/forum/MarvelK.png']
 refresh_logo_url = 'http://icons.iconarchive.com/icons/graphicloads/' \
                     '100-flat-2/128/arrow-refresh-4-icon.png'
-# shared lists
-# urllist = list()
-# photo = list()
-# headers = list()
-cat_image_list = list()
 
 
 # image from url
@@ -61,26 +56,6 @@ def _returnSoup(url):
     return BeautifulSoup(_returnHTML(url), 'html.parser')
 
 
-# Make images from covers
-def getCatCovers():
-    # Catégories images
-    global cat_image_list
-    del cat_image_list[:]
-    for cat in cat_img_urls:
-        cat_image_list.append(ImageTk.PhotoImage(imagefromurl(cat)))
-    return cat_image_list
-
-
-# Get publication posts urls
-# def getUrls(comicslist):
-#     global urllist
-#     del urllist[:]
-#     for a in comicslist:
-#         if a.has_attr('href'):
-#             urllist.append(a['href'])
-#     return
-
-
 class HeaderPic:
     def __init__(self, url, imageurl):
         self.url = url
@@ -98,25 +73,17 @@ class DCTradapp(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         logo = False
-        # soup = _returnSoup(dctradpage)
-        # headerlist = soup.find_all('span', class_="btn-cover")
-        # comicslist = _returnSoup(dctradpage).select('span.btn-cover a')
         self.headers = self._makeHeaderList(dctradpage)
-        # coverlist = soup.select('span.btn-cover img')
 
         tk.Tk.__init__(self, *args, **kwargs)
         self.configure(background='SteelBlue3')
         self.title("Header DC trad")
         self.title_font = tkfont.Font(
                 family='Helvetica', size=18, weight="bold", slant="italic")
-        cat_image_list = getCatCovers()
-        # self.photos = self._generate_images()
-        # self.headers[0]._generateTKimage()
-        # getHeaderCovers()
-        # refresh(comicslist)
-        # sidebar
+        self.cat_image_list = self._getCatCovers()
+
         try:
-            cat_image_list.append(
+            self.cat_image_list.append(
                     ImageTk.PhotoImage(imagefromurl(refresh_logo_url)))
             logo = True
         except Exception:
@@ -126,20 +93,20 @@ class DCTradapp(tk.Tk):
                            height=500, relief='groove', borderwidth=1)
         sidebar.pack(expand=False, fill='both', side='left', anchor='nw')
 
-        button1 = tk.Button(sidebar, image=cat_image_list[0],
+        button1 = tk.Button(sidebar, image=self.cat_image_list[0],
                             bg='SteelBlue4', relief='flat',
                             command=lambda: self.show_frame("DCRebirth"))
-        button2 = tk.Button(sidebar, image=cat_image_list[1],
+        button2 = tk.Button(sidebar, image=self.cat_image_list[1],
                             bg='SteelBlue4', relief='flat',
                             command=lambda: self.show_frame("DCPage"))
-        button3 = tk.Button(sidebar, image=cat_image_list[2],
+        button3 = tk.Button(sidebar, image=self.cat_image_list[2],
                             bg='SteelBlue4', relief='flat',
                             command=lambda: self.show_frame("Indes"))
-        button4 = tk.Button(sidebar, image=cat_image_list[3],
+        button4 = tk.Button(sidebar, image=self.cat_image_list[3],
                             bg='SteelBlue4', relief='flat',
                             command=lambda: self.show_frame("Marvel"))
         if logo:
-            button5 = tk.Button(sidebar, image=cat_image_list[4],
+            button5 = tk.Button(sidebar, image=self.cat_image_list[4],
                                 bg='SteelBlue4', relief='flat',
                                 command=self._refresh())
         else:
@@ -207,6 +174,16 @@ class DCTradapp(tk.Tk):
 
     def _refresh(self):
         pass
+
+    # Make images from covers
+    def _getCatCovers(self):
+        # Catégories images
+        # global cat_image_list
+        cat_image_list = []
+        for cat in cat_img_urls:
+            print(cat)
+            cat_image_list.append(ImageTk.PhotoImage(imagefromurl(cat)))
+        return cat_image_list
 
 
 class DCRebirth(tk.Frame):
