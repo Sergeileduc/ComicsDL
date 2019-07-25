@@ -12,6 +12,7 @@ import threading
 
 from utils import getcomics
 from utils.getcomics import find_buttons, find_zippy_button, ZippyButtonError
+from utils.getcomics import getresults
 from utils import tools
 from utils.zpshare import getFileUrl, checkurl, find_zippy_download_button
 from utils.urltools import getfinalurl
@@ -191,9 +192,8 @@ class Getcomics(tk.Tk):
         self.searchlist.clear()
         self.destroylist(self.buttonlist)
         searchmode = self.choices.index(self.mode.get())
-        self.searchlist = getcomics.getresults(getcomics.searchurl(
-                                                        self.usersearch.get(),
-                                                        searchmode, self.page))
+        self.searchlist = getresults(getcomics.searchurl(
+                                self.usersearch.get(), searchmode, self.page))
         # buttonlist = list()
         for i in self.searchlist:
             title = i[1] + ' (' + str(i[2]) + ')'
