@@ -28,6 +28,7 @@ class Getcomics(tk.Tk):
     color1 = '#37474F'
     # color2='#455A64'
     dark3 = '#455A64'
+    gray98 = '#FAFAFA'
 
     def __init__(self):
         def myfunction(event):
@@ -200,7 +201,7 @@ class Getcomics(tk.Tk):
                     self.resultsframe, text=title, width=self.resultwidht,
                     relief='flat', border=0,
                     bg=self.button_dark, fg=self.fg,
-                    activebackground='#FAFAFA', activeforeground='black',
+                    activebackground=self.gray98, activeforeground='black',
                     highlightthickness=0, font=("Verdana", 10))
             newButton.config(
                     command=lambda button=newButton: self.addtodl(button))
@@ -229,7 +230,7 @@ class Getcomics(tk.Tk):
                     self.dlframe, text=button.cget('text').title(),
                     width=self.resultwidht, anchor='w',
                     bg=self.button_dark, fg=self.fg,
-                    activebackground='#FAFAFA', activeforeground='black',
+                    activebackground=self.gray98, activeforeground='black',
                     relief='flat', border=0, highlightthickness=0,
                     font=("Verdana", 10))
             newDL.config(command=lambda button=newDL: self.removedl(button))
