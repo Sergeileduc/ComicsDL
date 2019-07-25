@@ -71,6 +71,15 @@ def checkurl(zippylink):
 
 # TODO : maybe underscore for internal use only
 def find_zippy_download_button(zippyurl):
-    soup = url2soup(zippyurl)
-    # downButton = soup.select('script[type="text/javascript"]')
-    return soup.find('a', id="dlbutton").find_next_sibling().text
+    try:
+        soup = url2soup(zippyurl)
+        # downButton = soup.select('script[type="text/javascript"]')
+        return soup.find('a', id="dlbutton").find_next_sibling().text
+    except Exception:
+        raise DownloadButtonError("Error on zp page : "
+                                  "No download button found")
+
+
+class DownloadButtonError(Exception):
+    def __init__(self, msg):
+        super().__init__(self, msg)

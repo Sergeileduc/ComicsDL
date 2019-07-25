@@ -14,7 +14,8 @@ from utils import getcomics
 from utils.getcomics import find_buttons, find_zippy_button, ZippyButtonError
 from utils.getcomics import getresults
 from utils import tools
-from utils.zpshare import getFileUrl, checkurl, find_zippy_download_button
+from utils.zpshare import getFileUrl, checkurl
+from utils.zpshare import find_zippy_download_button, DownloadButtonError
 from utils.urltools import getfinalurl
 from utils.std_redirect import Std_redirector
 
@@ -278,24 +279,29 @@ class Getcomics(tk.Tk):
             buttons = find_buttons(finalurl)
             zippylink = find_zippy_button(buttons)
             finalzippy = checkurl(zippylink)
-            try:
-                print(finalzippy)
-                self.downComZippy(finalzippy)
-            except Exception as e:
-                print(e)
-                print("error in downComZippy")
         except ZippyButtonError as e:
+            return
             print(e)
         except urllib.error.HTTPError as e:
             print("downCom got HTTPError")
             print(e)
             raise
+        try:
+            print(finalzippy)
+            self.downComZippy(finalzippy)
+        except Exception as e:
+            print(e)
+            print("error in downComZippy")
         return
 
     # Download from zippyshare
     def downComZippy(self, url):
         self.progress["value"] = 0
-        downButton = find_zippy_download_button(url)
+        try:
+            downButton = find_zippy_download_button(url)
+        except DownloadButtonError as e:
+            print(e)
+            return
         try:
             fullURL, fileName = getFileUrl(url, downButton)
             print("Download from zippyhare into : " + fileName)
