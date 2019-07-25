@@ -2,7 +2,7 @@
 # -*-coding:utf-8 -*-
 
 import re
-import urllib.request
+import requests
 from urllib.parse import unquote
 from utils.tools import searchRegexName
 from urllib.error import HTTPError
@@ -55,13 +55,12 @@ def getFileUrl(url, button):
 
 def checkurl(zippylink):
     try:
+        # TODO : verify if usefull
         if str(zippylink).startswith(BASE):
             print("Abracadabra !")
             finalzippy = base64.b64decode(zippylink[len(BASE):]).decode()
         else:
-            headers = {'User-Agent': user_agent}
-            req = urllib.request.Request(zippylink, None, headers)
-            finalzippy = urllib.request.urlopen(req).geturl()
+            finalzippy = requests.get(zippylink).url
         return finalzippy
     except HTTPError as e:
         print("can't obtain final zippyshare url")

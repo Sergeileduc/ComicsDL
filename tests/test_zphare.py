@@ -29,7 +29,7 @@ class TestFonctionGet(unittest.TestCase):
         # le test échoue.
         # self.assertEqual(myurl, result)
 
-    def test_removetag_1(self):
+    def test_removetag(self):
         print("Test removetag")
         old_name = "Doomsday Clock 09 (of 12) (2019) (Webrip) " \
                    "(The Last Kryptonian-DCP).cbr"
