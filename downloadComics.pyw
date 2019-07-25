@@ -32,6 +32,8 @@ class Getcomics(tk.Tk):
     dark3 = '#455A64'
     gray98 = '#FAFAFA'
 
+    title_string = "Télécharger sur Getcomics V2019-07"
+
     def __init__(self):
         def myfunction(event):
             dlcanva.configure(
@@ -90,7 +92,7 @@ class Getcomics(tk.Tk):
         self.downloadlist = list()
         self.mylist = list()
         self.wm_geometry(f"{sizex}x{sizey}+{posx}+{posy}")
-        self.title("Télécharger sur Getcomics V2019-07")
+        self.title(self.title_string)
         self.configure(background=self.deepbg)
 
         topbar = ttk.Frame(self, style="deepBG.TFrame")
@@ -142,11 +144,11 @@ class Getcomics(tk.Tk):
                            style="dl.TButton",
                            command=lambda: self.dlcom(self.downloadlist))
 
-        outputtext = tkst.ScrolledText(
-                bottombar, height=8, bg='black', fg='white', wrap=tk.WORD)
-        self.progress = ttk.Progressbar(
-                bottombar, orient="horizontal",
-                variable=self.currentpercent, mode="determinate")
+        outputtext = tkst.ScrolledText(bottombar, height=8, bg='black',
+                                       fg='white', wrap=tk.WORD)
+        self.progress = ttk.Progressbar(bottombar, orient="horizontal",
+                                        variable=self.currentpercent,
+                                        mode="determinate")
         self.progress2 = ttk.Progressbar(bottombar, orient="horizontal",
                                          variable=self.percent,
                                          mode="determinate")
@@ -227,21 +229,22 @@ class Getcomics(tk.Tk):
             if self.searchlist[index]["size"] is not None:
                 bytes = tools.convert2bytes(self.searchlist[index]["size"])
                 self.listsize += bytes
-            newDL = tk.Button(
-                    self.dlframe, text=button.cget('text').title(),
-                    width=self.resultwidht, anchor='w',
-                    bg=self.button_dark, fg=self.fg,
-                    activebackground=self.gray98, activeforeground='black',
-                    relief='flat', border=0, highlightthickness=0,
-                    font=("Verdana", 10))
+            newDL = tk.Button(self.dlframe, text=button.cget('text').title(),
+                              width=self.resultwidht, anchor='w',
+                              bg=self.button_dark, fg=self.fg,
+                              activebackground=self.gray98,
+                              activeforeground='black',
+                              relief='flat', border=0, highlightthickness=0,
+                              font=("Verdana", 10))
             newDL.config(command=lambda button=newDL: self.removedl(button))
             newDL.pack(fill='both', expand=1, pady=0)
             self.downloadlist.append({"url": self.searchlist[index]["url"],
                                       "title": self.searchlist[index]["title"],
                                       "button": newDL,
                                       "size": self.searchlist[index]["size"]})
-            print("Taille de la file d'attente (donnée indicative) : "
-                  + tools.bytes_2_human_readable(self.listsize))
+            total_size = tools.bytes_2_human_readable(self.listsize)
+            print(f"Taille de la file d'attente (donnée indicative) : "
+                  f"{total_size}")
         else:
             print("Already in your DL list")
 
