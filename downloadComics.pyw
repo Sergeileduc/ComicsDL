@@ -254,8 +254,9 @@ class Getcomics(tk.Tk):
                     self.listsize -= bytes
                 self.downloadlist.remove(i)
         button.destroy()
-        print("Taille de la file d'attente (donnée indicative) : "
-              + tools.bytes_2_human_readable(self.listsize))
+        total_size = tools.bytes_2_human_readable(self.listsize)
+        print(f"Taille de la file d'attente (donnée indicative) : "
+              f"{total_size}")
 
     # DL all comics in the liste
     def downAllCom(self, liste):
