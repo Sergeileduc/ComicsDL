@@ -14,9 +14,6 @@ class TestFonctionGet(unittest.TestCase):
 
         url = "https://www4.zippyshare.com/v/tbiaf4on/file.html"
 
-        # soup = htmlsoup.url2soup(url)
-        # downButton = soup.select('script[type="text/javascript"]')
-        # downButton = soup.find('a', id="dlbutton").find_next_sibling().text
         downButton = find_zippy_download_button(url)
 
         name, out_url = getFileUrl(url, downButton)

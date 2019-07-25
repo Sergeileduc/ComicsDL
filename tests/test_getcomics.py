@@ -17,8 +17,6 @@ class TestFonctionGet(unittest.TestCase):
     # est un test.
     def test_findLastWeekly_DC(self):
 
-        # result = 'https://getcomics.info/dc/2019-02-27-dc-week/'
-
         myurl = findLastWeekly(self.getcomicsurls[0])
 
         print(myurl)
@@ -30,33 +28,18 @@ class TestFonctionGet(unittest.TestCase):
         # self.assertEqual(myurl, result)
 
     def test_findLastWeekly_Marvel(self):
-
-        # result = 'https://getcomics.info/marvel/2019-02-27-marvel-week/'
-
         myurl = findLastWeekly(self.getcomicsurls[1])
-
         print(myurl)
-
         # self.assertEqual(myurl, result)
 
     def test_findLastWeekly_Indie(self):
-
-        # result = 'https://getcomics.info/other-comics/2019-02-27-indie-week/'
-
         myurl = findLastWeekly(self.getcomicsurls[2])
-
         print(myurl)
-
         # self.assertEqual(myurl, result)
 
     def test_findLastWeekly_Image(self):
-
-        # result = 'https://getcomics.info/other-comics/2019-02-27-image-week/'
-
         myurl = findLastWeekly(self.getcomicsurls[3])
-
         print(myurl)
-
         # self.assertEqual(myurl, result)
 
     def test_comicsList(self):
@@ -65,27 +48,19 @@ class TestFonctionGet(unittest.TestCase):
         print(result)
 
     def test_searchurl_1(self):
-
         myurl = searchurl("Batman", 0, 2)
         expected = "https://getcomics.info/tag/batman/page/2/"
-
         print(myurl)
-
         self.assertEqual(myurl, expected)
 
     def test_searchurl_2(self):
-
         myurl = searchurl("New X-Men", 1, 3)
         expected = "https://getcomics.info/page/3/?s=new+x-men"
-
         print(myurl)
-
         self.assertEqual(myurl, expected)
 
     def test_get_results(self):
-
         searchurl = "https://getcomics.info/tag/batman/page/2/"
-
         searchlist = getresults(searchurl)
         print(searchlist)
 
