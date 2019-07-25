@@ -170,12 +170,14 @@ class DCTradapp(tk.Tk):
         self.frames["Indes"] = Indes(parent=container,
                                      controller=self,
                                      headers=self.headers)
-        # self.frames["Marvel"] = Marvel(parent=container, controller=self)
+        self.frames["Marvel"] = Marvel(parent=container,
+                                       controller=self,
+                                       headers=self.headers)
 
         self.frames["DCRebirth"].grid(row=0, column=0, sticky="nsew")
         self.frames["DCPage"].grid(row=0, column=0, sticky="nsew")
         self.frames["Indes"].grid(row=0, column=0, sticky="nsew")
-        # self.frames["Marvel"].grid(row=0, column=0, sticky="nsew")
+        self.frames["Marvel"].grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("DCRebirth")
 
@@ -364,44 +366,53 @@ class Indes(tk.Frame):
 
 class Marvel(tk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, headers):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        coverA1 = tk.Button(self, image=photo[30],
-                            bg='SteelBlue3', relief='flat',
-                            command=lambda: OpenUrl(urllist[30]))
-        coverA2 = tk.Button(self, image=photo[31],
-                            bg='SteelBlue3', relief='flat',
-                            command=lambda: OpenUrl(urllist[31]))
-        coverA3 = tk.Button(self, image=photo[32],
-                            bg='SteelBlue3', relief='flat',
-                            command=lambda: OpenUrl(urllist[32]))
-        coverA4 = tk.Button(self, image=photo[33],
-                            bg='SteelBlue3', relief='flat',
-                            command=lambda: OpenUrl(urllist[33]))
-        coverA5 = tk.Button(self, image=photo[34],
-                            bg='SteelBlue3', relief='flat',
-                            command=lambda: OpenUrl(urllist[34]))
-        coverA6 = tk.Button(self, image=photo[35],
-                            bg='SteelBlue3', relief='flat',
-                            command=lambda: OpenUrl(urllist[35]))
-        coverA7 = tk.Button(self, image=photo[36],
-                            bg='SteelBlue3', relief='flat',
-                            command=lambda: OpenUrl(urllist[36]))
-        coverA8 = tk.Button(self, image=photo[37],
-                            bg='SteelBlue3', relief='flat',
-                            command=lambda: OpenUrl(urllist[37]))
-        coverA9 = tk.Button(self, image=photo[38],
-                            bg='SteelBlue3', relief='flat',
-                            command=lambda: OpenUrl(urllist[38]))
+        headers[30]._generateTKimage()
+        coverA1 = tk.Button(
+                self, image=headers[30].img, bg='SteelBlue3', relief='flat',
+                command=lambda: OpenUrl(headers[30].url))
         coverA1.grid(row=0, column=0)
+        headers[31]._generateTKimage()
+        coverA2 = tk.Button(
+                self, image=headers[31].img, bg='SteelBlue3', relief='flat',
+                command=lambda: OpenUrl(headers[31].url))
         coverA2.grid(row=0, column=1)
+        headers[32]._generateTKimage()
+        coverA3 = tk.Button(
+                self, image=headers[32].img, bg='SteelBlue3', relief='flat',
+                command=lambda: OpenUrl(headers[32].url))
         coverA3.grid(row=0, column=2)
+        headers[33]._generateTKimage()
+        coverA4 = tk.Button(
+                self, image=headers[33].img, bg='SteelBlue3', relief='flat',
+                command=lambda: OpenUrl(headers[33].url))
         coverA4.grid(row=1, column=0)
+        headers[34]._generateTKimage()
+        coverA5 = tk.Button(
+                self, image=headers[34].img, bg='SteelBlue3', relief='flat',
+                command=lambda: OpenUrl(headers[34].url))
         coverA5.grid(row=1, column=1)
+        headers[35]._generateTKimage()
+        coverA6 = tk.Button(
+                self, image=headers[35].img, bg='SteelBlue3', relief='flat',
+                command=lambda: OpenUrl(headers[35].url))
         coverA6.grid(row=1, column=2)
+        headers[36]._generateTKimage()
+        coverA7 = tk.Button(
+                self, image=headers[36].img, bg='SteelBlue3', relief='flat',
+                command=lambda: OpenUrl(headers[36].url))
         coverA7.grid(row=2, column=0)
+        headers[37]._generateTKimage()
+        coverA8 = tk.Button(
+                self, image=headers[37].img, bg='SteelBlue3', relief='flat',
+                command=lambda: OpenUrl(headers[37].url))
         coverA8.grid(row=2, column=1)
+        headers[38]._generateTKimage()
+        coverA9 = tk.Button(
+                self, image=headers[38].img, bg='SteelBlue3', relief='flat',
+                command=lambda: OpenUrl(headers[38].url))
         coverA9.grid(row=2, column=2)
 
 
