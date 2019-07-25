@@ -48,6 +48,9 @@ def getFileUrl(url, button):
     # Calculating the id and forming url
     # that is an extremely dirty way, I know
     second_part = a % b + c % d
+    # TODO : we can do better than dirty [:21]
+    # p_url = urlparse(url)
+    # result = f'{p_url.scheme}://{p_url.netloc}'
     fullURL = url[:-21] + first_part + str(second_part) + raw_name
     print(fullURL)
     return fullURL, filename
