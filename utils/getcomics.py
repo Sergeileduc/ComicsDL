@@ -184,7 +184,10 @@ def getresults(url):
                 searchsize = re.search(r'\d+ [KMGT]B', d.p.text, re.M | re.I)
                 if searchsize:
                     size = searchsize.group(0)
-                searchlist.append((d.h1.a.get("href"), d.h1.a.text, size))
+                result = {"url": d.h1.a.get("href"),
+                          "title": d.h1.a.text,
+                          "size": size}
+                searchlist.append(result)
         # print(searchlist)
         return searchlist
     except urllib.error.HTTPError as e:

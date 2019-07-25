@@ -196,7 +196,8 @@ class Getcomics(tk.Tk):
                                 self.usersearch.get(), searchmode, self.page))
         # buttonlist = list()
         for i in self.searchlist:
-            title = i[1] + ' (' + str(i[2]) + ')'
+            # title = i[1] + ' (' + str(i[2]) + ')'
+            title = f'{i["title"]} ({i["size"]})'
             newButton = tk.Button(
                     self.resultsframe, text=title, width=self.resultwidht,
                     relief='flat', border=0,
@@ -223,8 +224,8 @@ class Getcomics(tk.Tk):
         index = self.buttonlist.index(button)
         comic = button.cget('text')
         if comic not in (item[1] for item in self.downloadlist):
-            if self.searchlist[index][2] is not None:
-                bytes = tools.convert2bytes(self.searchlist[index][2])
+            if self.searchlist[index]["size"] is not None:
+                bytes = tools.convert2bytes(self.searchlist[index]["size"])
                 self.listsize += bytes
             newDL = tk.Button(
                     self.dlframe, text=button.cget('text').title(),
@@ -235,10 +236,10 @@ class Getcomics(tk.Tk):
                     font=("Verdana", 10))
             newDL.config(command=lambda button=newDL: self.removedl(button))
             newDL.pack(fill='both', expand=1, pady=0)
-            self.downloadlist.append((self.searchlist[index][0],
-                                      self.searchlist[index][1],
+            self.downloadlist.append((self.searchlist[index]["url"],
+                                      self.searchlist[index]["title"],
                                       newDL,
-                                      self.searchlist[index][2]))
+                                      self.searchlist[index]["size"]))
             print("Taille de la file d'attente (donnée indicative) : "
                   + tools.bytes_2_human_readable(self.listsize))
         else:
