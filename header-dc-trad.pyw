@@ -18,8 +18,9 @@ cat_img_urls = [
 refresh_logo_url = 'http://icons.iconarchive.com/icons/graphicloads/' \
                     '100-flat-2/128/arrow-refresh-4-icon.png'
 # shared lists
-urllist = list()
-photo = list()
+# urllist = list()
+# photo = list()
+# headers = list()
 cat_image_list = list()
 
 
@@ -70,44 +71,31 @@ def getCatCovers():
     return cat_image_list
 
 
-# Make images from images urls
-def getHeaderCovers(imgurllist):
-    # Catégories images
-    global photo
-    del photo[:]
-    for url in imgurllist:
-        photo.append(ImageTk.PhotoImage(imagefromurl(url)))
-    return
-
-
 # Get publication posts urls
-def getUrls(comicslist):
-    global urllist
-    del urllist[:]
-    for a in comicslist:
-        if a.has_attr('href'):
-            urllist.append(a['href'])
-    return
-
-
-# Refresh images and urls in the header
-def refresh(comicslist):
-    coverimgurllist = list()
-    soup = _returnSoup(dctradpage)
-    # headerlist = soup.find_all('span', class_="btn-cover")
-    comicslist = soup.select('span.btn-cover a')
-    coverlist = soup.select('span.btn-cover img')
-    for img in coverlist:
-        coverimgurllist.append(img['src'])
-    getHeaderCovers(coverimgurllist)
-    getUrls(comicslist)
-    return
+# def getUrls(comicslist):
+#     global urllist
+#     del urllist[:]
+#     for a in comicslist:
+#         if a.has_attr('href'):
+#             urllist.append(a['href'])
+#     return
 
 
 class HeaderPic:
-    def __init__(self, url, image):
+    def __init__(self, url, imageurl):
         self.url = url
-        self.image = image
+        self.imageurl = imageurl
+        self.img = self._getimage()
+
+    # Make images from images urls
+    def _getimage(self):
+        # Catégories images
+        # ImageTk.PhotoImage(imagefromurl(h.image))
+        imagefromurl(self.imageurl)
+
+    def _generateTKimage(self):
+        tkim = ImageTk.PhotoImage(self.img)
+        return tkim
 
 
 class DCTradapp(tk.Tk):
@@ -117,7 +105,8 @@ class DCTradapp(tk.Tk):
         logo = False
         # soup = _returnSoup(dctradpage)
         # headerlist = soup.find_all('span', class_="btn-cover")
-        comicslist = _returnSoup(dctradpage).select('span.btn-cover a')
+        # comicslist = _returnSoup(dctradpage).select('span.btn-cover a')
+        self.headers = self._makeHeaderList(dctradpage)
         # coverlist = soup.select('span.btn-cover img')
 
         tk.Tk.__init__(self, *args, **kwargs)
@@ -126,8 +115,10 @@ class DCTradapp(tk.Tk):
         self.title_font = tkfont.Font(
                 family='Helvetica', size=18, weight="bold", slant="italic")
         cat_image_list = getCatCovers()
+        # self.photos = self._generateTKimages()
+        self.headers[0]._generateTKimage()
         # getHeaderCovers()
-        refresh(comicslist)
+        # refresh(comicslist)
         # sidebar
         try:
             cat_image_list.append(
@@ -155,10 +146,10 @@ class DCTradapp(tk.Tk):
         if logo:
             button5 = tk.Button(sidebar, image=cat_image_list[4],
                                 bg='SteelBlue4', relief='flat',
-                                command=refresh(comicslist))
+                                command=self._refresh())
         else:
             button5 = tk.Button(sidebar, text="Rafraîchir",
-                                command=refresh(comicslist))
+                                command=self._refresh())
 
         button1.pack()
         button2.pack()
@@ -191,6 +182,27 @@ class DCTradapp(tk.Tk):
         '''Show a frame for the given page name'''
         frame = self.frames[page_name]
         frame.tkraise()
+
+    # make list of headerPic objects:
+    def _makeHeaderList(self, dctradurl):
+        # global headers
+        list = _returnSoup(dctradpage).select('span.btn-cover a')
+        for a in list:
+            url = a['href']
+            imgurl = a.img['src']
+            headers = []
+            headerpic = HeaderPic(url, imgurl)
+            headers.append(headerpic)
+            return headers
+
+    def _generateTKimages(self):
+        images = []
+        for i in self.headers:
+            i._generateTKimage()
+        return images
+
+    def _refresh(self):
+        pass
 
 
 class DCRebirth(tk.Frame):
