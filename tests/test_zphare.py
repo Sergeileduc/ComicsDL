@@ -2,8 +2,8 @@
 # -*-coding:utf-8 -*-
 
 import unittest
-from utils.zpshare import getFileUrl, removetag
-from utils import htmlsoup
+from utils.zpshare import getFileUrl, _removetag, find_zippy_download_button
+# from utils import htmlsoup
 
 
 class TestFonctionGet(unittest.TestCase):
@@ -14,9 +14,10 @@ class TestFonctionGet(unittest.TestCase):
 
         url = "https://www4.zippyshare.com/v/tbiaf4on/file.html"
 
-        soup = htmlsoup.url2soup(url)
+        # soup = htmlsoup.url2soup(url)
         # downButton = soup.select('script[type="text/javascript"]')
-        downButton = soup.find('a', id="dlbutton").find_next_sibling().text
+        # downButton = soup.find('a', id="dlbutton").find_next_sibling().text
+        downButton = find_zippy_download_button(url)
 
         name, out_url = getFileUrl(url, downButton)
         print("--------------------------------------")
@@ -29,14 +30,14 @@ class TestFonctionGet(unittest.TestCase):
         # le test échoue.
         # self.assertEqual(myurl, result)
 
-    def test_removetag(self):
+    def test__removetag(self):
         print("Test removetag")
         old_name = "Doomsday Clock 09 (of 12) (2019) (Webrip) " \
                    "(The Last Kryptonian-DCP).cbr"
 
         valid_name = "Doomsday Clock 09 (of 12) (2019).cbr"
 
-        new_name = removetag(old_name)
+        new_name = _removetag(old_name)
 
         self.assertEqual(valid_name, new_name)
 
