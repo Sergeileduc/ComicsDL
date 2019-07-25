@@ -7,8 +7,7 @@ import urllib.request
 import urllib.error
 import base64
 from datetime import datetime
-from utils import htmlsoup
-from utils.htmlsoup import url2soup
+from utils.htmlsoup import url2soup, getHrefwithName
 from utils import zpshare
 from utils import tools
 # from utils.getcomics_exceptions import NoZippyButton
@@ -50,8 +49,7 @@ def findLastWeekly(url):
 # TODO : what is that ?
 # Find las weekly post
 def findLastWeekly2(url):
-    soup = htmlsoup.url2soup(url)
-    lastPost = soup.find_all('article', class_='type-post')[0]
+    lastPost = url2soup(url).find_all('article', class_='type-post')[0]
     postTitle = lastPost.h1.a.text
     postUrl = lastPost.h1.a['href']
     return postTitle, postUrl
@@ -59,10 +57,9 @@ def findLastWeekly2(url):
 
 def comicsList(url):
     weeklyUrl = findLastWeekly(url)
-    soup = htmlsoup.url2soup(weeklyUrl)
-    liste_a = soup.select_one("section.post-contents")\
+    liste_a = url2soup(weeklyUrl).select_one("section.post-contents")\
         .find_all('a', style="color: #ff0000;")
-    return htmlsoup.getHrefwithName(liste_a, 'Download')
+    return getHrefwithName(liste_a, 'Download')
 
 
 # Find download link
@@ -78,8 +75,7 @@ def downCom(url):
     print("Trying " + finalurl)
     zippylink = ''
     try:
-        soup = htmlsoup.url2soup(finalurl)
-        downButtons = soup.select("div.aio-pulse > a")
+        downButtons = url2soup(finalurl).select("div.aio-pulse > a")
     except Exception as e:
         print(e)
     for button in downButtons:
@@ -117,7 +113,7 @@ def downCom(url):
 
 # Download from zippyshare
 def downComZippy(url):
-    soup = htmlsoup.url2soup(url)
+    soup = url2soup(url)
     # Other beautiful soup selectors :
     # select("script[type='text/javascript']")
     # select("table[class='folderlogo'] > tr > td")[0]
@@ -178,8 +174,8 @@ def getWeeklyComics(mylist):
 def getresults(url):
     searchlist = list()
     try:
-        soup = htmlsoup.url2soup(url)
-        for d in soup.select("div.post-info"):
+        res = url2soup(url).select("div.post-info")
+        for d in res:
             if d.h1.a.has_attr('href'):
                 size = None
                 searchsize = re.search(r'\d+ [KMGT]B', d.p.text, re.M | re.I)
