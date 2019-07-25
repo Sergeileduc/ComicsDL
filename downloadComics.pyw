@@ -15,23 +15,7 @@ from utils.getcomics import find_buttons, find_zippy_button, ZippyButtonError
 from utils import tools
 from utils.zpshare import getFileUrl, checkurl, find_zippy_download_button
 from utils.urltools import getfinalurl
-
-exit_thread = False
-exit_success = False
-
-
-# Redirect standard output Std into a frame in the GUI
-class Std_redirector(object):
-    def __init__(self, widget):
-        self.widget = widget
-
-    def write(self, string):
-        if not exit_thread:
-            self.widget.insert(tk.END, string)
-            self.widget.see(tk.END)
-
-    def flush(self):
-        pass
+from utils.std_redirect import Std_redirector
 
 
 # Main program interface and code
