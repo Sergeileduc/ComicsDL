@@ -3,13 +3,15 @@
 
 import re  # regex
 import requests  # html
-import urllib.request
-import urllib.error
+from requests.exceptions import HTTPError
+# import urllib.request
+# import urllib.error
 import base64
 from datetime import datetime
 from utils.htmlsoup import url2soup, getHrefwithName
 from utils import zpshare
 from utils import tools
+from utils.urltools import getfinalurl
 # from utils.getcomics_exceptions import NoZippyButton
 
 today = datetime.today().strftime("%Y-%m-%d")
@@ -62,20 +64,27 @@ def comicsList(url):
     return getHrefwithName(liste_a, 'Download')
 
 
+# Find download buttons in a getcomics pages
+def _find_dl_buttons(url):
+    return url2soup(url).select("div.aio-pulse > a")
+
+
 # Find download link
 def downCom(url):
-    global user_agent
-    headers = {'User-Agent': user_agent}
+    # global user_agent
+    # headers = {'User-Agent': user_agent}
     try:
-        req = urllib.request.Request(url, None, headers)
-        finalurl = urllib.request.urlopen(req).geturl()
-    except urllib.error.HTTPError:
+        # req = urllib.request.Request(url, None, headers)
+        # finalurl = urllib.request.urlopen(req).geturl()
+        finalurl = getfinalurl(url)
+    except HTTPError:
         print("downCom can't get final url")
         raise
     print("Trying " + finalurl)
     zippylink = ''
     try:
-        downButtons = url2soup(finalurl).select("div.aio-pulse > a")
+        # downButtons = url2soup(finalurl).select("div.aio-pulse > a")
+        downButtons = _find_dl_buttons(finalurl)
     except Exception as e:
         print(e)
     for button in downButtons:
@@ -91,9 +100,10 @@ def downCom(url):
                     print("Abracadabra !")
                 else:
                     # headers = {'User-Agent': user_agent}
-                    req = urllib.request.Request(zippylink, None, headers)
-                    finalzippy = urllib.request.urlopen(req).geturl()
-            except urllib.error.HTTPError as e:
+                    # req = urllib.request.Request(zippylink, None, headers)
+                    # finalzippy = urllib.request.urlopen(req).geturl()
+                    finalzippy = getfinalurl(zippylink)
+            except HTTPError as e:
                 print("can't obtain final zippyshare page url")
                 print(e)
                 raise
@@ -105,7 +115,7 @@ def downCom(url):
             except Exception as e:
                 print("error in downComZippy")
                 print(e)
-    # except urllib.error.HTTPError:
+    # except HTTPError:
         # print("downCom got HTTPError from returnHTML")
         # raise
     return
@@ -187,7 +197,7 @@ def getresults(url):
                 searchlist.append(result)
         # print(searchlist)
         return searchlist
-    except urllib.error.HTTPError as e:
+    except HTTPError as e:
         print(e)
         print("something wrong happened")
 

@@ -3,6 +3,7 @@
 
 from bs4 import BeautifulSoup  # html parser
 import requests
+from requests.exceptions import HTTPError
 
 
 # Def url 2 soup
@@ -17,7 +18,7 @@ def url2soup(url):
         print("url2soup error")
         print(e)
         raise
-    except requests.exceptions.HTTPError as e:
+    except HTTPError as e:
         print("url2soup error")
         print(e)
         raise
