@@ -3,9 +3,10 @@
 
 import re
 import requests
+from requests.exceptions import HTTPError
 import base64
 from urllib.parse import unquote
-from urllib.error import HTTPError
+# from urllib.error import HTTPError
 # perso
 from utils.tools import searchRegexName
 from utils.htmlsoup import url2soup
