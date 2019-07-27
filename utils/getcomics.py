@@ -217,7 +217,8 @@ def searchurl(user_search, mode, page):
     else:
         # Page 1
         if page == 1:
-            url = basesearch + '/?s=' + user_search.lower().replace(' ', '+')
+            # url = basesearch + '/?s=' + user_search.lower().replace(' ', '+')
+            url = f"{basesearch}/?s={user_search.lower().replace(' ', '+')}"
         # Other pages
         else:
             url = basesearch + '/page/' + str(page) \
