@@ -3,7 +3,7 @@
 
 import os
 # import subprocess
-
+import copy
 from utils import htmlsoup, getcomics
 
 # Constants
@@ -58,8 +58,10 @@ def printOneEditor(url, f, editor):
     f.write(editor + '\n')
     f.write("=====================" + '\n')
     for s in var:
-        name = s.text.replace(' : ', '').replace('Download', '')\
-                    .replace(' | ', '').replace('Read Online', '')
+        s_copy = copy.copy(s)
+        for span in s_copy:
+            s_copy.span.decompose()
+        name = s_copy.text.replace(' : ', '').replace('| ', '')
         a = s.find('a')
         try:
             # if a.has_attr('href'):
@@ -100,8 +102,11 @@ def printMultipleEditors(url, f):
             pass
         # Comics
         else:
-            name = s.text.replace(' : ', '').replace('Download', '')\
-                        .replace(' | ', '').replace('Read Online', '')
+            # make a copy of strong s to remove span
+            s_copy = copy.copy(s)
+            for span in s_copy:
+                s_copy.span.decompose()
+            name = s_copy.text.replace(' : ', '').replace('| ', '')
             if s.a and s.a.has_attr('href'):
                 f.write('[url=' + s.a.get("href") + ']'
                         + name + '[/url]' + '\n')
