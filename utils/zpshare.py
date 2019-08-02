@@ -5,7 +5,7 @@ import re
 import requests
 from requests.exceptions import HTTPError
 import base64
-from urllib.parse import unquote
+from urllib.parse import unquote, urlparse
 # from urllib.error import HTTPError
 # perso
 from utils.tools import searchRegexName
@@ -49,10 +49,10 @@ def getFileUrl(url, button):
     # Calculating the id and forming url
     # that is an extremely dirty way, I know
     second_part = a % b + c % d
-    # TODO : we can do better than dirty [:21]
-    # p_url = urlparse(url)
-    # result = f'{p_url.scheme}://{p_url.netloc}'
-    fullURL = url[:-21] + first_part + str(second_part) + raw_name
+
+    parsed_url = urlparse(url)
+    domain = f"{parsed_url.scheme}://{parsed_url.netloc}"
+    fullURL = f"{domain}{first_part}{second_part}{raw_name}"
     print(fullURL)
     return fullURL, filename
 
