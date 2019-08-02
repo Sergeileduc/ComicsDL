@@ -12,6 +12,7 @@ from utils.htmlsoup import url2soup, getHrefwithName
 from utils import zpshare
 from utils import tools
 from utils.urltools import getfinalurl
+from urllib.parse import quote_plus
 # from utils.getcomics_exceptions import NoZippyButton
 
 today = datetime.today().strftime("%Y-%m-%d")
@@ -34,7 +35,7 @@ user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 def findLastWeekly(url):
     lastPost = url2soup(url).find('article', class_='type-post')
     # Check if today's archive is there, and retrieve its url
-    print("Latest weekly post: " + lastPost.time['datetime'])
+    print(f"Latest weekly post: {lastPost.time['datetime']}")
     # TODO : code for auotmate, maybe uncode later
     # if today in lastPost.time['datetime']:
     #     # print ('There is a new one today. Hurrah!')
@@ -80,7 +81,7 @@ def downCom(url):
     except HTTPError:
         print("downCom can't get final url")
         raise
-    print("Trying " + finalurl)
+    print(f"Trying {finalurl}")
     zippylink = ''
     try:
         # downButtons = url2soup(finalurl).select("div.aio-pulse > a")
@@ -134,7 +135,7 @@ def downComZippy(url):
     downButton = soup.find('a', id="dlbutton").find_next_sibling().text
     try:
         fullURL, fileName = zpshare.getFileUrl(url, downButton)
-        print("Downloading from zippyshare into : " + fileName)
+        print(f"Downloading from zippyshare into : {fileName}")
         r = requests.get(fullURL, stream=True)
         size = tools.bytes_2_human_readable(int(r.headers['Content-length']))
         print(size)
@@ -208,21 +209,21 @@ def searchurl(user_search, mode, page):
     if mode == 0:
         # Page 1 (no page number on this one)
         if page == 1:
-            url = tagsearch + user_search.lower().replace(' ', '-')
+            url = f"{tagsearch}{user_search.lower().replace(' ', '-')}"
         # Other pages
         else:
-            url = tagsearch + user_search.lower().replace(' ', '-') \
-                + '/page/' + str(page) + '/'
+            url = (f"{tagsearch}{user_search.lower().replace(' ', '-')}"
+                   f"/page/{page}/")
     # Classic research https://getcomics.info/?s=
     else:
         # Page 1
         if page == 1:
             # url = basesearch + '/?s=' + user_search.lower().replace(' ', '+')
-            url = f"{basesearch}/?s={user_search.lower().replace(' ', '+')}"
+            url = f"{basesearch}/?s={quote_plus(user_search.lower())}"
         # Other pages
         else:
-            url = basesearch + '/page/' + str(page) \
-                + '/?s=' + user_search.lower().replace(' ', '+')
+            url = (f"{basesearch}/page/{page}/?s="
+                   f"{quote_plus(user_search.lower())}")
     return url
 
 
