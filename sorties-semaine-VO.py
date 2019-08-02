@@ -108,10 +108,9 @@ def printMultipleEditors(url, f):
                 s_copy.span.decompose()
             name = s_copy.text.replace(' : ', '').replace('| ', '')
             if s.a and s.a.has_attr('href'):
-                f.write('[url=' + s.a.get("href") + ']'
-                        + name + '[/url]' + '\n')
+                f.write(f'[url={s.a.get("href")}]{name}[/url]\n')
             else:
-                f.write(name + '\n')
+                f.write(f'{name}\n')
     f.write('\n')
 
 
