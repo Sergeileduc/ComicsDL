@@ -26,7 +26,7 @@ def printLastWeek(url, editor):
     lastPost = soup.find_all('article', class_='type-post')[0]
     title = lastPost.h1.a.text
     time = lastPost.find('time')
-    print(editor + '\t : ' + title + ' :\t' + time.text)
+    print(f'{editor}\t : {title} :\t{time.text}')
 
 
 # Print getcomics weekly post in file f
@@ -41,7 +41,7 @@ def printWeek(url, f, editor):
     # Missing post not done yet
     elif "Missing" in postTitle and not flag:
         f.write(postTitle + '\n')
-        f.write("=====================" + '\n')
+        f.write("=====================\n")
         printMultipleEditors(weeklyUrl, f)
         flag = True
     elif editor == "Indé week":
@@ -56,7 +56,7 @@ def printOneEditor(url, f, editor):
     var = soup.select_one('section.post-contents > ul').find_all('strong')
 
     f.write(editor + '\n')
-    f.write("=====================" + '\n')
+    f.write("=====================\n")
     for s in var:
         s_copy = copy.copy(s)
         for span in s_copy:
@@ -66,10 +66,10 @@ def printOneEditor(url, f, editor):
         try:
             # if a.has_attr('href'):
             if 'href' in a.attrs:
-                f.write('[url=' + a.get("href") + ']' + name + '[/url]' + '\n')
+                f.write(f'[url={a.get("href")}]{name}[/url]\n')
         except Exception:
             f.write(name + '\n')
-    f.write("=====================" + '\n')
+    f.write("=====================\n")
     f.write("" + '\n')
 
 
@@ -88,7 +88,7 @@ def printMultipleEditors(url, f):
     for s in var:
         # Highlight publishers
         if s.text in indies:
-            f.write('\n' + s.text + '\n=====================' + '\n')
+            f.write(f'\n{s.text}\n=====================\n')
         # blots
         elif note in s.text \
                 or howto in s.text \
