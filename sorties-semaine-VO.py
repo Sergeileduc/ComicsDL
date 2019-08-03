@@ -2,7 +2,7 @@
 # -*-coding:utf-8 -*-
 
 import os
-# import subprocess
+import subprocess
 import copy
 from utils import htmlsoup, getcomics
 
@@ -143,8 +143,8 @@ if Join.lower() == 'yes' or Join.lower() == 'y':
     print("Processing")
     generateweekly()
     print("Done")
-    # cmd = 'zenity --text-info --title="Sorties de la semaine"  ' \
-    #       '--width=800 --height=600 --filename=liste-comics-semaine.txt'
-    # subprocess.call(cmd, shell=True)
+    cmd = 'zenity --text-info --title="Sorties de la semaine"  ' \
+          '--width=800 --height=600 --filename=liste-comics-semaine.txt'
+    subprocess.call(cmd, shell=True)
 else:
     print("Exit")
