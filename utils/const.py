@@ -13,4 +13,4 @@ consistof = "consist of :"
 lower = "or on the lower"
 indieweek = "INDIE Week+"
 bloat = ['Language :', 'Image Format :', 'Year :',
-         'Size :', 'Size : ', 'Notes :', 'Screenshots :']
+         'Size :', 'Size : ', 'Notes :', 'Screenshots :', 'UPDATE :']
