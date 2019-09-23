@@ -26,7 +26,7 @@ def getfinalurl(url):
             # print("Request was not redirected")
             return url
     except HTTPError:
-            print("downCom got HTTPError")
+            print("down_com got HTTPError")
             return url
             raise
 
@@ -37,5 +37,5 @@ def getfinalurl(url):
 #         finalurl = urllib.request.urlopen(req).geturl()
 #         return finalurl
 #     except HTTPError:
-#         print("downCom got HTTPError from Request")
+#         print("down_com got HTTPError from Request")
 #         raise
