@@ -2,7 +2,7 @@
 # -*-coding:utf-8 -*-
 
 import unittest
-from utils.getcomics import findLastWeekly, comicsList, searchurl, getresults
+from utils.getcomics import find_last_weekly, comics_list, searchurl, getresults
 
 
 class TestFonctionGet(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestFonctionGet(unittest.TestCase):
     # est un test.
     def test_findLastWeekly_DC(self):
 
-        myurl = findLastWeekly(self.getcomicsurls[0])
+        myurl = find_last_weekly(self.getcomicsurls[0])
 
         print(myurl)
 
@@ -28,23 +28,23 @@ class TestFonctionGet(unittest.TestCase):
         # self.assertEqual(myurl, result)
 
     def test_findLastWeekly_Marvel(self):
-        myurl = findLastWeekly(self.getcomicsurls[1])
+        myurl = find_last_weekly(self.getcomicsurls[1])
         print(myurl)
         # self.assertEqual(myurl, result)
 
     def test_findLastWeekly_Indie(self):
-        myurl = findLastWeekly(self.getcomicsurls[2])
+        myurl = find_last_weekly(self.getcomicsurls[2])
         print(myurl)
         # self.assertEqual(myurl, result)
 
     def test_findLastWeekly_Image(self):
-        myurl = findLastWeekly(self.getcomicsurls[3])
+        myurl = find_last_weekly(self.getcomicsurls[3])
         print(myurl)
         # self.assertEqual(myurl, result)
 
     def test_comicsList(self):
         print("Comics list DC")
-        result = comicsList(self.getcomicsurls[0])
+        result = comics_list(self.getcomicsurls[0])
         print(result)
 
     def test_searchurl_1(self):
