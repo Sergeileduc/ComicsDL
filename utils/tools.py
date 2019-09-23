@@ -11,7 +11,7 @@ def convert2bytes(size):
     parts = size.split()
     size = parts[0]
     unit = parts[1]
-    return int(size)*defs[unit]
+    return int(size) * defs[unit]
 
 
 # Convert with corret unit
