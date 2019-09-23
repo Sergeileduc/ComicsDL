@@ -5,7 +5,7 @@ import tkinter as tk
 
 
 # Redirect standard output Std into a frame in the GUI
-class Std_redirector(object):
+class StdRedirector(object):
 
     exit_thread = False
     exit_success = False
