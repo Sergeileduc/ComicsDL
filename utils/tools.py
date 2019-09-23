@@ -47,12 +47,12 @@ def bytes_2_human_readable(number_of_bytes):
 
 
 # Just optimizing
-def searchRegex(html, regex, n):
-    urlPattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
-    return urlPattern.search(str(html)).group(n)
+def search_regex(html, regex, n):
+    url_pattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
+    return url_pattern.search(str(html)).group(n)
 
 
 # or by name
-def searchRegexName(html, regex, name):
-    urlPattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
-    return urlPattern.search(str(html)).group(name)
+def search_regex_name(html, regex, name):
+    url_pattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
+    return url_pattern.search(str(html)).group(name)
