@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""GUI to download selected comics in getcomics.info weekly packs."""
+
 import sys
 import os
 import tkinter as tk
@@ -14,6 +16,8 @@ exit_success = False
 
 
 class StdRedirector(object):
+    """Redirect std output in a widget."""
+
     def __init__(self, widget):
         self.widget = widget
 
@@ -26,8 +30,9 @@ class StdRedirector(object):
         pass
 
 
-# Our comics_list
 class MyComicsList(tk.Tk):
+    """GUI, made with tk.Tk."""
+    
     def __init__(self, comic=None):
         super().__init__()
 
@@ -44,8 +49,8 @@ class MyComicsList(tk.Tk):
         hs = self.winfo_screenheight()  # height of the screen
 
         # Calculate x and y coordinates for the Tk root window
-        x = (ws/2) - (w/2)
-        y = (hs/2) - (h/2)
+        x = (ws / 2) - (w / 2)
+        y = (hs / 2) - (h / 2)
         longtext = ("Ajoutez ou supprimez les séries à chercher dans "
                     "les derniers posts \n\"Weekly\" de Getcomics.info")
         # ascii_dctrad = """
@@ -65,24 +70,25 @@ class MyComicsList(tk.Tk):
 
         self.comic_canvas = tk.Canvas(self)
         self.message = tk.Label(
-                self, text=longtext, anchor=tk.W, justify=tk.CENTER,
-                wraplength=250, font=("Helvetica", 12))
+            self, text=longtext, anchor=tk.W, justify=tk.CENTER,
+            wraplength=250, font=("Helvetica", 12))
         self.ascii_title = tk.Label(self, text=ascii_title,
                                     anchor=tk.W, justify=tk.LEFT,
                                     font=("Courier", 4))
         self.comic_frame = tk.Frame(self.comic_canvas)
         self.text_frame = tk.Frame(self)
         self.output_text = tk.Text(self, bg="black", fg="white")
-        self.button = tk.Button(
-                self, text="Télécharger les comics", command=self.run)
-        self.scrollbar = tk.Scrollbar(
-                self.comic_canvas, orient="vertical",
-                command=self.comic_canvas.yview)
+        self.button = tk.Button(self,
+                                text="Télécharger les comics",
+                                command=self.run)
+        self.scrollbar = tk.Scrollbar(self.comic_canvas,
+                                      orient="vertical",
+                                      command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
         self.title("Télécharger All V2019-07")
         self.geometry(f"{w}x{h}+{int(x)}+{int(y)}")
-        self.comic_create = tk.Text(
-                self.text_frame, height=3, bg="white", fg="black")
+        self.comic_create = tk.Text(self.text_frame, height=3,
+                                    bg="white", fg="black")
 
         self.ascii_title.pack()
         self.message.pack()
@@ -90,7 +96,7 @@ class MyComicsList(tk.Tk):
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         self.canvas_frame = self.comic_canvas.create_window(
-                (0, 0), window=self.comic_frame, anchor="n")
+            (0, 0), window=self.comic_frame, anchor="n")
 
         # self.text_frame.pack(side=tk.BOTTOM, fill=tk.X)
         self.text_frame.pack()
@@ -187,7 +193,7 @@ class MyComicsList(tk.Tk):
 
     def mouse_scroll(self, event):
         if event.delta:
-            self.comic_canvas.yview_scroll(-1*(event.delta/120), "units")
+            self.comic_canvas.yview_scroll(-1 * (event.delta / 120), "units")
         else:
             if event.num == 5:
                 move = 1

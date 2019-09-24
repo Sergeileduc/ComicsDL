@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""Some functions with urls."""
 
 import requests
 from requests.exceptions import HTTPError
@@ -12,6 +13,7 @@ headers = {'User-Agent': user_agent}
 
 # Find the final url, if redirections occurs
 def getfinalurl(url):
+    """Follow redirections and get final url."""
     try:
         response = requests.get(url)
         if response.history:

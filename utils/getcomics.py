@@ -60,8 +60,8 @@ def find_last_weekly2(url):
 
 def comics_list(url):
     weeklyUrl = find_last_weekly(url)
-    liste_a = url2soup(weeklyUrl).select_one("section.post-contents")\
-        .find_all('a', style="color: #ff0000;")
+    content = url2soup(weeklyUrl).select_one("section.post-contents")
+    liste_a = content.find_all('a', style="color: #ff0000;")
     return get_href_with_name(liste_a, 'Download')
 
 
@@ -97,7 +97,7 @@ def down_com(url):
             try:
                 if str(zippylink).startswith(BASE):
                     finalzippy = base64.b64decode(
-                            zippylink[len(BASE):]).decode()
+                        zippylink[len(BASE):]).decode()
                     print("Abracadabra !")
                 else:
                     # headers = {'User-Agent': user_agent}
@@ -243,7 +243,7 @@ def find_zippy_button(buttons):
         # if 'zippyshare' in str(button).lower() \
         #       and 'href' in button.a.attrs:
         if 'zippyshare' in button.get("href") \
-                        or 'zippyshare' in button.get('title').lower():
+                or 'zippyshare' in button.get('title').lower():
             zippylink = button.get("href")
     if zippylink:
         return zippylink

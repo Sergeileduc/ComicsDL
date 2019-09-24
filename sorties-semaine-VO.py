@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""Get all new comics in getcomics weeklies."""
 
 import os
 import subprocess
@@ -12,16 +13,16 @@ from utils.const import note, howto, howtodl, consistof
 from utils.const import lower, indieweek, bloat
 
 
-# Find last weekly and display
 def print_last_weeklies():
+    """Find last weeklies and print."""
     print_last_week(DC_URL, "DC")
     print_last_week(MARVEL_URL, "Marvel")
     print_last_week(IMAGE_URL, "Image")
     print_last_week(INDIE_URL, "Indé")
 
 
-# Def print last weekly date
 def print_last_week(url, editor):
+    """Print time since last weekly pack."""
     soup = htmlsoup.url2soup(url)
     last_post = soup.find_all('article', class_='type-post')[0]
     title = last_post.h1.a.text
@@ -29,8 +30,8 @@ def print_last_week(url, editor):
     print(f'{editor}\t : {title} :\t{time.text}')
 
 
-# Print getcomics weekly post in file f
 def print_week(url, f, editor):
+    """Write all comics of 'editor' weekly pack in file f."""
     global flag
     flag = False
     post_title, weekly_url = getcomics.find_last_weekly2(url)
@@ -50,14 +51,17 @@ def print_week(url, f, editor):
         print_one_editor(weekly_url, f, editor)
 
 
-# For Marvel, DC, or Image weeklies
 def print_one_editor(url, f, editor):
+    """Write all comics in an editor weekly pack in file f.
+
+    For Marvel, DC, or Image weeklies
+    """
     soup = htmlsoup.url2soup(url)
     var = soup.select_one('section.post-contents > ul').find_all('strong')
 
     f.write(editor + '\n')
     f.write("=====================\n")
-    for s in var:
+    for s in var:  # var is a list of 'strong' divs
         s_copy = copy.copy(s)
         for span in s_copy:
             s_copy.span.decompose()
@@ -73,8 +77,11 @@ def print_one_editor(url, f, editor):
     f.write("" + '\n')
 
 
-# For Indie week+
 def print_multiple_editors(url, f):
+    """Write all comics in an Indies weekly pack in file f.
+
+    For Indie week+.
+    """
     soup = htmlsoup.url2soup(url).select_one('section.post-contents')
 
     # List of comics publishers
@@ -114,8 +121,8 @@ def print_multiple_editors(url, f):
     f.write('\n')
 
 
-# Generate output file
 def generate_weekly():
+    """Write all new comics in a file."""
     global flag
     flag = False
     try:

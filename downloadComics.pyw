@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""GUI to download comics on getcomics.info."""
 
 import sys
 import requests
@@ -22,6 +23,7 @@ from utils.std_redirect import StdRedirector
 
 # Main program interface and code
 class Getcomics(tk.Tk):
+    """GUI made with tk.TK."""
 
     deep_bg = '#263238'
     fg = 'white'
@@ -37,14 +39,14 @@ class Getcomics(tk.Tk):
     def __init__(self):
         def my_function(event):
             dl_canvas.configure(
-                    scrollregion=dl_canvas.bbox("all"), width=200, height=200)
+                scrollregion=dl_canvas.bbox("all"), width=200, height=200)
         super().__init__()
         size_x = 800  # width
         size_y = 600  # height
 
         # Gets both half the screen width/height and window width/height
-        pos_x = int(self.winfo_screenwidth()/2 - size_x/2)
-        pos_y = int(self.winfo_screenheight()/2 - size_y/2)
+        pos_x = int(self.winfo_screenwidth() / 2 - size_x / 2)
+        pos_y = int(self.winfo_screenheight() / 2 - size_y / 2)
 
         self.result_width = 50
         self.dl_width = 40
@@ -182,9 +184,9 @@ class Getcomics(tk.Tk):
 
         self.search_comics(None)
 
-    # Destroy a list of widgets (like buttons)
     @staticmethod
     def destroy_list(widget_list):
+        """Destroy a list of widgets (like buttons)."""
         for w in widget_list:
             w.destroy()
         widget_list.clear()
@@ -195,25 +197,27 @@ class Getcomics(tk.Tk):
         self.search_list.clear()
         self.destroy_list(self.button_list)
         search_mode = self.choices.index(self.mode.get())
-        self.search_list = getresults(getcomics.searchurl(
-                                self.user_search.get(), search_mode, self.page))
+        self.search_list = getresults(
+            getcomics.searchurl(self.user_search.get(), search_mode, self.page)
+            )
         # button_list = list()
         for i in self.search_list:
             title = f'{i["title"]} ({i["size"]})'
             new_button = tk.Button(
-                    self.results_frame, text=title, width=self.result_width,
-                    relief='flat', border=0,
-                    bg=self.button_dark, fg=self.fg,
-                    activebackground=self.gray98, activeforeground='black',
-                    highlightthickness=0, font=("Verdana", 10))
+                self.results_frame, text=title, width=self.result_width,
+                relief='flat', border=0,
+                bg=self.button_dark, fg=self.fg,
+                activebackground=self.gray98, activeforeground='black',
+                highlightthickness=0, font=("Verdana", 10)
+                )
             new_button.config(
-                    command=lambda button=new_button: self.add_to_dl(button))
+                command=lambda button=new_button: self.add_to_dl(button))
             new_button.pack(fill='both', expand=1, pady=0)
             self.button_list.append(new_button)
         return
 
-    # Download one comic
     def dl_com(self, liste):
+        """Download one comic."""
         try:
             thread1 = threading.Thread(target=self.down_all_com, args=[liste])
             thread1.start()
@@ -238,10 +242,11 @@ class Getcomics(tk.Tk):
                                font=("Verdana", 10))
             new_dl.config(command=lambda button=new_dl: self.remove_dl(button))
             new_dl.pack(fill='both', expand=1, pady=0)
-            self.download_list.append({"url": self.search_list[index]["url"],
-                                      "title": self.search_list[index]["title"],
-                                       "button": new_dl,
-                                       "size": self.search_list[index]["size"]})
+            self.download_list.append(
+                {"url": self.search_list[index]["url"],
+                 "title": self.search_list[index]["title"],
+                 "button": new_dl,
+                 "size": self.search_list[index]["size"]})
             total_size = tools.bytes_2_human_readable(self.list_size)
             print(f"Taille de la file d'attente (donnée indicative) : "
                   f"{total_size}")
@@ -261,8 +266,8 @@ class Getcomics(tk.Tk):
         print(f"Taille de la file d'attente (donnée indicative) : "
               f"{total_size}")
 
-    # DL all comics in the liste
     def down_all_com(self, liste):
+        """Download all comics in the list."""
         self.dl_bytes.set(0)
         for dl in liste:
             try:
@@ -273,8 +278,8 @@ class Getcomics(tk.Tk):
         print("Terminé, vous pouvez quitter")
         return
 
-    # Find Zippyshare Button, explore zippy url, find download url, download
     def down_com(self, url):
+        """Find Zippyshare Button, find download url, download."""
         final_url = getfinalurl(url)
         print("Trying " + final_url)
         try:
@@ -296,8 +301,8 @@ class Getcomics(tk.Tk):
             print("error in down_com_zippy")
         return
 
-    # Download from zippyshare
     def down_com_zippy(self, url):
+        """Download from zippyshare."""
         self.progress["value"] = 0
         try:
             down_button = find_zippy_download_button(url)
@@ -326,7 +331,7 @@ class Getcomics(tk.Tk):
                     self.current_percent.set(int(100 * dl / size))
                     self.dl_bytes.set(self.dl_bytes.get() + len(block))
                     self.percent.set(
-                            int(100 * self.dl_bytes.get() / self.list_size))
+                        int(100 * self.dl_bytes.get() / self.list_size))
                     f.write(block)
             except IOError:
                 print("Error while writing file")
@@ -337,14 +342,14 @@ class Getcomics(tk.Tk):
             print('Done\n')
         return
 
-    # Next page button function
     def go_to_next_page(self):
+        """Search next page and pack prev button."""
         self.page = self.page + 1
         self.search_comics(None)
         self.prev_page.pack(side='left', padx=(50, 0))
 
-    # Previous page button function
     def go_to_prev_page(self):
+        """Search previous page."""
         if self.page > 1:
             self.page = self.page - 1
             self.prev_page.pack_forget()
