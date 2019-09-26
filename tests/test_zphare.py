@@ -23,17 +23,11 @@ class TestFonctionGet(unittest.TestCase):
         print(name)
         print(out_url)
 
-        # Le test le plus simple est un test d'égalité. On se
-        # sert de la méthode assertEqual pour dire que l'on
-        # s'attend à ce que les deux éléments soient égaux. Sinon
-        # le test échoue.
-        # self.assertEqual(myurl, result)
-
     def test_remove_tag(self):
         """Test remove tag."""
         print("Test removetag")
-        old_name = "Doomsday Clock 09 (of 12) (2019) (Webrip) " \
-                   "(The Last Kryptonian-DCP).cbr"
+        old_name = ("Doomsday Clock 09 (of 12) (2019) (Webrip) "
+                    "(The Last Kryptonian-DCP).cbr")
 
         valid_name = "Doomsday Clock 09 (of 12) (2019).cbr"
 
@@ -42,7 +36,6 @@ class TestFonctionGet(unittest.TestCase):
         self.assertEqual(valid_name, new_name)
 
 
-# Ceci lance le test si on exécute le script
-# directement.
+# This will launch test if executed.
 if __name__ == '__main__':
     unittest.main()
