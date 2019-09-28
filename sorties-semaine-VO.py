@@ -112,7 +112,10 @@ def print_multiple_editors(url, f):
             # make a copy of strong s to remove span
             s_copy = copy.copy(s)
             for span in s_copy:
-                s_copy.span.decompose()
+                try:
+                    s_copy.span.decompose()
+                except AttributeError:
+                    pass
             name = s_copy.text.replace(' : ', '').replace('| ', '')
             if s.a and s.a.has_attr('href'):
                 f.write(f'[url={s.a.get("href")}]{name}[/url]\n')
