@@ -6,6 +6,6 @@ Vous devez installer Python 3 https://www.python.org/downloads/
 
 Ensuite, pour installer les librairies nécessaires, ouvrez un invité de commande (cmd) ou un terminal et lancer :
 
-python3 -m pip install --upgrade pip
-python3 -m pip install -r requirements.txt
+`python3 -m pip install --upgrade pip`
+`python3 -m pip install -r requirements.txt`
 
