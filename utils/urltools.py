@@ -30,7 +30,6 @@ def getfinalurl(url):
     except HTTPError:
             print("down_com got HTTPError")
             return url
-            raise
 
 # Old method for geting final url
 # def getfinalurl(url):

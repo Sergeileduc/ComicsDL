@@ -1,13 +1,14 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""Module to use requests and BeautifulSoup."""
 
 from bs4 import BeautifulSoup  # html parser
 import requests
 from requests.exceptions import HTTPError
 
 
-# Def url 2 soup
 def url2soup(url):
+    """Return hml soup."""
     try:
         res = requests.get(url)
         res.raise_for_status()
@@ -28,14 +29,14 @@ def url2soup(url):
         raise
 
 
-# Get beautiful soup
 def html2soup(html):
+    """Get beautiful soup (html parser)."""
     soup = BeautifulSoup(html, 'html.parser')
     return soup
 
 
-# Get a lit of all links in input html
 def get_all_href(html, tag):
+    """Get a lit of all links in input html."""
     urllist = list()
     soup = html2soup(html)
     for link in soup.find_all(tag):
@@ -44,8 +45,8 @@ def get_all_href(html, tag):
     return urllist
 
 
-# Get href urls based text
 def get_href_with_name(liste_a, name):
+    """Get href urls based text."""
     urllist = list()
     for a in liste_a:
         if a.has_attr('href') and a.text == name:
@@ -53,16 +54,16 @@ def get_href_with_name(liste_a, name):
     return urllist
 
 
-# Get inner html from tag
 def get_tag_data(html, tag, classname):
+    """Get inner html from tag."""
     soup = BeautifulSoup(html, 'html.parser')
     # prettysoup = soup.prettify()
     my_list = soup.find_all(tag, class_=classname)
     return my_list
 
 
-# Find all 'tag' in html
 def get_all_tag(html, tag):
+    """Find all 'tag' in html."""
     soup = BeautifulSoup(html, 'html.parser')
     my_list = soup.find_all(tag)
     return my_list
