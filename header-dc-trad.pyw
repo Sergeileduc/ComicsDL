@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*
+"""Little app to display DCtrad header."""
+
 # import io
 import io
 import requests
@@ -8,7 +10,9 @@ import tkinter as tk
 from tkinter import font as tkfont  # python 3
 from bs4 import BeautifulSoup
 import webbrowser
+from urllib.parse import urljoin
 
+dctrad_base = 'http://www.dctrad.fr'
 dctradpage = 'http://www.dctrad.fr/index.php'
 cat_img_urls = [
     'http://www.dctrad.fr/images/icons/forum/RebirthK.png',
@@ -19,8 +23,8 @@ refresh_logo_url = 'http://icons.iconarchive.com/icons/graphicloads/' \
                     '100-flat-2/128/arrow-refresh-4-icon.png'
 
 
-# image from url
 def image_from_url(url):
+    """Get image from url."""
     try:
         response = requests.get(url)
         img = Image.open(io.BytesIO(response.content))
@@ -33,8 +37,8 @@ def image_from_url(url):
         return
 
 
-# Open url
 def open_url(url):
+    """Open url."""
     # webbrowser.open_new(url)
     webbrowser.open(url, new=0, autoraise=False)
     return
@@ -51,8 +55,8 @@ def _return_html(url):
         print(e)
 
 
-# Get soup from url
 def _return_soup(url):
+    """Get soup from url."""
     return BeautifulSoup(_return_html(url), 'html.parser')
 
 
@@ -69,6 +73,8 @@ class HeaderPic:
 
 
 class DCTradapp(tk.Tk):
+    """My app with GUI."""
+
     global cat_image_list
 
     def __init__(self, *args, **kwargs):
@@ -160,7 +166,7 @@ class DCTradapp(tk.Tk):
         # list = _return_soup(dctradpage).find_all('span', class_="btn-cover")
         for l in my_list:
             url = l['href']
-            imgurl = l.img['src']
+            imgurl = urljoin(dctrad_base, l.img['src'])
             headerpic = HeaderPic(url, imgurl)
             headers.append(headerpic)
         return headers
