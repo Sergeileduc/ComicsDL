@@ -6,10 +6,6 @@ Vous devez installer Python 3 https://www.python.org/downloads/
 
 Ensuite, pour installer les librairies nécessaires, ouvrez un invité de commande (cmd) ou un terminal et lancer :
 
-python -m pip install --upgrade pip
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
 
-Ensuite (si pip n'est pas reconnu, essayer pip3 à la pace "pip3 install .....")
-
-pip install requests  
-pip install bs4  
-pip install Pillow  
