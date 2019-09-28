@@ -61,23 +61,27 @@ def _return_soup(url):
 
 
 class HeaderPic:
+    """Class to build header object with url and image url."""
+
     def __init__(self, url, imageurl):
+        """Init with topic url and image url."""
         self.url = url
         self.imageurl = imageurl
 
     def __str__(self):
+        """Str with topic url and image url."""
         return f'{self.url} -- {self.imageurl}'
 
     def generate_tk_image(self):
+        """Generate Tk PhotoImage from image url."""
         self.img = ImageTk.PhotoImage(image_from_url(self.imageurl))
 
 
 class DCTradapp(tk.Tk):
     """My app with GUI."""
 
-    global cat_image_list
-
     def __init__(self, *args, **kwargs):
+        """Init Tkinter GUI application."""
         logo = False
         self.headers = self._make_header_list(dctradpage)
 
@@ -154,7 +158,7 @@ class DCTradapp(tk.Tk):
         self.show_frame("DCRebirth")
 
     def show_frame(self, page_name):
-        """Show a frame for the given page name"""
+        """Show a frame for the given page name."""
         frame = self.frames[page_name]
         frame.tkraise()
 
@@ -186,13 +190,15 @@ class DCTradapp(tk.Tk):
         # global cat_image_list
         image_list = []
         for cat in cat_img_urls:
-            print(cat)
             image_list.append(ImageTk.PhotoImage(image_from_url(cat)))
         return image_list
 
 
 class DCRebirth(tk.Frame):
+    """Tk frame DC Rebirth."""
+
     def __init__(self, parent, controller, headers):
+        """Init frame."""
         tk.Frame.__init__(self, parent)
         self.controller = controller
         headers[0].generate_tk_image()
@@ -243,8 +249,10 @@ class DCRebirth(tk.Frame):
 
 
 class DCPage(tk.Frame):
+    """Tk frame DC."""
+
     def __init__(self, parent, controller, headers):
-        global photo
+        """Init frame."""
         tk.Frame.__init__(self, parent)
         self.controller = controller
         headers[10].generate_tk_image()
@@ -295,8 +303,10 @@ class DCPage(tk.Frame):
 
 
 class Indes(tk.Frame):
+    """Tk frame DC Indies."""
 
     def __init__(self, parent, controller, headers):
+        """Init frame."""
         tk.Frame.__init__(self, parent)
         self.controller = controller
         headers[20].generate_tk_image()
@@ -347,8 +357,10 @@ class Indes(tk.Frame):
 
 
 class Marvel(tk.Frame):
+    """Tk frame Marvel."""
 
     def __init__(self, parent, controller, headers):
+        """Init frame."""
         tk.Frame.__init__(self, parent)
         self.controller = controller
         headers[30].generate_tk_image()
