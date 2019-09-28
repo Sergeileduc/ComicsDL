@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""Module for various tools."""
 
 import re
 
@@ -8,6 +9,7 @@ defs = {'KB': 1024, 'MB': 1024**2, 'GB': 1024**3, 'TB': 1024**4}
 
 # Convert to bytes
 def convert2bytes(size):
+    """Convert size string with unit into bytes."""
     parts = size.split()
     size = parts[0]
     unit = parts[1]
@@ -16,6 +18,7 @@ def convert2bytes(size):
 
 # Convert with corret unit
 def bytes_2_human_readable(number_of_bytes):
+    """Convert bytes (int) into readable string with unit."""
     if number_of_bytes < 0:
         raise ValueError("!!! number_of_bytes can't be smaller than 0 !!!")
 
@@ -46,13 +49,13 @@ def bytes_2_human_readable(number_of_bytes):
     return f'{number_of_bytes} {unit}'
 
 
-# Just optimizing
 def search_regex(html, regex, n):
+    """Regex search."""
     url_pattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
     return url_pattern.search(str(html)).group(n)
 
 
-# or by name
 def search_regex_name(html, regex, name):
+    """Regex search with group name."""
     url_pattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
     return url_pattern.search(str(html)).group(name)

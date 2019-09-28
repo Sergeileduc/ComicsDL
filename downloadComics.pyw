@@ -14,7 +14,7 @@ import threading
 from utils import getcomics
 from utils.getcomics import find_buttons, find_zippy_button, ZippyButtonError
 from utils.getcomics import getresults
-from utils import tools
+from utils.tools import convert2bytes, bytes_2_human_readable
 from utils.zpshare import get_file_url, check_url
 from utils.zpshare import find_zippy_download_button, DownloadButtonError
 from utils.urltools import getfinalurl
@@ -37,6 +37,7 @@ class Getcomics(tk.Tk):
     title_string = "Télécharger sur Getcomics V2019-07"
 
     def __init__(self):
+        """Init Tkinter program with GUI."""
         def my_function(event):
             dl_canvas.configure(
                 scrollregion=dl_canvas.bbox("all"), width=200, height=200)
@@ -194,6 +195,7 @@ class Getcomics(tk.Tk):
 
     # Search comics function
     def search_comics(self, event):
+        """Search comic on getcomics.info."""
         self.search_list.clear()
         self.destroy_list(self.button_list)
         search_mode = self.choices.index(self.mode.get())
@@ -225,13 +227,13 @@ class Getcomics(tk.Tk):
             print(e)
             pass
 
-    # Click to add to DL list
     def add_to_dl(self, button):
+        """Click to add to DL list."""
         index = self.button_list.index(button)
         comic = button.cget('text')
         if comic not in (item["title"] for item in self.download_list):
             if self.search_list[index]["size"] is not None:
-                size_bytes = tools.convert2bytes(self.search_list[index]["size"])
+                size_bytes = convert2bytes(self.search_list[index]["size"])
                 self.list_size += size_bytes
             new_dl = tk.Button(self.dl_frame, text=button.cget('text').title(),
                                width=self.result_width, anchor='w',
@@ -247,22 +249,22 @@ class Getcomics(tk.Tk):
                  "title": self.search_list[index]["title"],
                  "button": new_dl,
                  "size": self.search_list[index]["size"]})
-            total_size = tools.bytes_2_human_readable(self.list_size)
+            total_size = bytes_2_human_readable(self.list_size)
             print(f"Taille de la file d'attente (donnée indicative) : "
                   f"{total_size}")
         else:
             print("Already in your DL list")
 
-    # Click to remove an item function
     def remove_dl(self, button):
+        """Click to remove an item function."""
         for i in self.download_list:
             if button == i["button"]:
                 if i["size"] is not None:
-                    bytes = tools.convert2bytes(i["size"])
+                    bytes = convert2bytes(i["size"])
                     self.list_size -= bytes
                 self.download_list.remove(i)
         button.destroy()
-        total_size = tools.bytes_2_human_readable(self.list_size)
+        total_size = bytes_2_human_readable(self.list_size)
         print(f"Taille de la file d'attente (donnée indicative) : "
               f"{total_size}")
 
@@ -314,7 +316,7 @@ class Getcomics(tk.Tk):
             print("Download from zippyshare into : " + filename)
             r = requests.get(full_url, stream=True)
             size = int(r.headers['Content-length'])  # Size in bytes
-            print(tools.bytes_2_human_readable(size))
+            print(bytes_2_human_readable(size))
         except Exception as e:
             size = 0
             print(e)
