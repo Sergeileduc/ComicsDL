@@ -16,16 +16,18 @@ class TestFonctionGet(unittest.TestCase):
         """Test get_file_url()."""
         url = "https://www4.zippyshare.com/v/tbiaf4on/file.html"
 
+        ref = "Batman v3 066 (2019).cbr"
+
         down_button = find_zippy_download_button(url)
 
-        name, out_url = get_file_url(url, down_button)
-        print("--------------------------------------")
-        print(name)
-        print(out_url)
+        _, name = get_file_url(url, down_button)
+        # print("--------------------------------------")
+        # print(name)
+        # print(out_url)
+        self.assertEqual(ref, name)
 
     def test_remove_tag(self):
         """Test remove tag."""
-        print("Test removetag")
         old_name = ("Doomsday Clock 09 (of 12) (2019) (Webrip) "
                     "(The Last Kryptonian-DCP).cbr")
 
