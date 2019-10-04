@@ -46,13 +46,14 @@ def find_last_weekly(url):
     #     # print ('Continue anyway...')
     #     # quit()
     #     pass
+    postTitle = lastPost.h1.a.text
     postUrl = lastPost.h1.a['href']
-    return postUrl
+    return postTitle, postUrl
 
 
 def comics_list(url):
     """Get comics in a weekly pack."""
-    weeklyUrl = find_last_weekly(url)
+    weeklyUrl = find_last_weekly(url)[1]
     content = url2soup(weeklyUrl).select_one("section.post-contents")
     liste_a = content.find_all('a', style="color: #ff0000;")
     return get_href_with_name(liste_a, 'Download')

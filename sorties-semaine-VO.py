@@ -34,7 +34,7 @@ def print_week(url, f, editor):
     """Write all comics of 'editor' weekly pack in file f."""
     global flag
     flag = False
-    post_title, weekly_url = getcomics.find_last_weekly2(url)
+    post_title, weekly_url = getcomics.find_last_weekly(url)
 
     # Missing post already been done
     if "Missing" in post_title and flag:
