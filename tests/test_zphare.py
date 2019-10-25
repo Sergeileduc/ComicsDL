@@ -20,7 +20,7 @@ class TestFonctionGet(unittest.TestCase):
 
         down_button = find_zippy_download_button(url)
 
-        out_url, name = get_file_url(url, down_button)
+        _, name = get_file_url(url, down_button)
         # print("--------------------------------------")
         # print(name)
         # print(out_url)

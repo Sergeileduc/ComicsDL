@@ -28,8 +28,8 @@ def getfinalurl(url):
             # print("Request was not redirected")
             return url
     except HTTPError:
-            print("down_com got HTTPError")
-            return url
+        print("down_com got HTTPError")
+        return url
 
 # Old method for geting final url
 # def getfinalurl(url):
