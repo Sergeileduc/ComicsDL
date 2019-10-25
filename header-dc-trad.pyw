@@ -103,18 +103,16 @@ class DCTradapp(tk.Tk):
                            height=500, relief='groove', borderwidth=1)
         sidebar.pack(expand=False, fill='both', side='left', anchor='nw')
 
-        button1 = tk.Button(sidebar, image=self.cat_image_list[0],
+        cat_list = ["DCRebirth", "DCPage", "Indes", "Marvel"]
+
+        # Create cat buttons
+        for i in range(len(cat_list)):
+            btn = tk.Button(sidebar, image=self.cat_image_list[i],
                             bg='SteelBlue4', relief='flat',
-                            command=lambda: self.show_frame("DCRebirth"))
-        button2 = tk.Button(sidebar, image=self.cat_image_list[1],
-                            bg='SteelBlue4', relief='flat',
-                            command=lambda: self.show_frame("DCPage"))
-        button3 = tk.Button(sidebar, image=self.cat_image_list[2],
-                            bg='SteelBlue4', relief='flat',
-                            command=lambda: self.show_frame("Indes"))
-        button4 = tk.Button(sidebar, image=self.cat_image_list[3],
-                            bg='SteelBlue4', relief='flat',
-                            command=lambda: self.show_frame("Marvel"))
+                            command=lambda x=cat_list[i]: self.show_frame(x))
+            btn.pack()
+
+        # Refresh button
         if logo:
             button5 = tk.Button(sidebar, image=self.cat_image_list[4],
                                 bg='SteelBlue4', relief='flat',
@@ -122,11 +120,6 @@ class DCTradapp(tk.Tk):
         else:
             button5 = tk.Button(sidebar, text="Rafraîchir",
                                 command=self._refresh())
-
-        button1.pack()
-        button2.pack()
-        button3.pack()
-        button4.pack()
         button5.pack(side='bottom')
 
         # the container is where we'll stack a bunch of frames
