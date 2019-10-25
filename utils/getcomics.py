@@ -36,7 +36,7 @@ def find_last_weekly(url):
     """Find las weekly post."""
     lastPost = url2soup(url).find('article', class_='type-post')
     # Check if today's archive is there, and retrieve its url
-    print(f"Latest weekly post: {lastPost.time['datetime']}")
+    # print(f"Latest weekly post: {lastPost.time['datetime']}")
     # TODO : code for auotmate, maybe uncode later
     # if today in lastPost.time['datetime']:
     #     # print ('There is a new one today. Hurrah!')
@@ -59,8 +59,8 @@ def comics_list(url):
     return get_href_with_name(liste_a, 'Download')
 
 
-# Find download buttons in a getcomics pages
 def _find_dl_buttons(url):
+    """Find download buttons in a getcomics pages."""
     return url2soup(url).select("div.aio-pulse > a")
 
 
