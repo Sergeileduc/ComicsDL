@@ -86,9 +86,7 @@ def print_multiple_editors(url, f):
 
     # List of comics publishers
     publishers = soup.find_all('span', style="color: #3366ff;")
-    indies = []
-    for p in publishers:
-        indies.append(p.text)
+    indies = [p.text for p in publishers]
 
     # List of comics
     var = soup.find_all('strong')
