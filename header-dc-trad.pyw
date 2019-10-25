@@ -176,21 +176,16 @@ class DCTradapp(tk.Tk):
         return headers
 
     def _generate_images(self):
-        images = []
         for i in self.headers:
             i.generate_tk_image()
-        return images
 
     def _refresh(self):
         pass
 
     # Make images from covers
     def _get_cat_covers(self):
-        # Catégories images
-        # global cat_image_list
-        image_list = []
-        for cat in cat_img_urls:
-            image_list.append(ImageTk.PhotoImage(image_from_url(cat)))
+        image_list = [ImageTk.PhotoImage(image_from_url(c))
+                      for c in cat_img_urls]
         return image_list
 
 
