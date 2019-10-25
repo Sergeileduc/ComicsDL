@@ -19,21 +19,25 @@ class StdRedirector(object):
     """Redirect std output in a widget."""
 
     def __init__(self, widget):
+        """Init Stdredirector (debug) widget."""
         self.widget = widget
 
     def write(self, string):
+        """Insert stdout in widget."""
         if not exit_thread:
             self.widget.insert(tk.END, string)
             self.widget.see(tk.END)
 
     def flush(self):
+        """Flush."""
         pass
 
 
 class MyComicsList(tk.Tk):
     """GUI, made with tk.Tk."""
-    
+
     def __init__(self, comic=None):
+        """Init."""
         super().__init__()
 
         # List MyComicsList[] initialisation
@@ -49,8 +53,8 @@ class MyComicsList(tk.Tk):
         hs = self.winfo_screenheight()  # height of the screen
 
         # Calculate x and y coordinates for the Tk root window
-        x = (ws / 2) - (w / 2)
-        y = (hs / 2) - (h / 2)
+        x = (ws/2) - (w/2)
+        y = (hs/2) - (h/2)
         longtext = ("Ajoutez ou supprimez les séries à chercher dans "
                     "les derniers posts \n\"Weekly\" de Getcomics.info")
         # ascii_dctrad = """
@@ -119,23 +123,24 @@ class MyComicsList(tk.Tk):
             self.add_comic(None, comic_text, True)
 
         self.bind("<Return>", self.add_comic)
-        self.bind("<Configure>", self.on_frame_configure)
-        self.bind_all("<MouseWheel>", self.mouse_scroll)
-        self.bind_all("<Button-4>", self.mouse_scroll)
-        self.bind_all("<Button-5>", self.mouse_scroll)
-        self.comic_canvas.bind("<Configure>", self.comic_width)
+        self.bind("<Configure>", self._on_frame_configure)
+        self.bind_all("<MouseWheel>", self._mouse_scroll)
+        self.bind_all("<Button-4>", self._mouse_scroll)
+        self.bind_all("<Button-5>", self._mouse_scroll)
+        self.comic_canvas.bind("<Configure>", self._comic_width)
 
     def run(self):
+        """Run download."""
         sys.stdout = StdRedirector(self.output_text)
         current_comic = self.load_comic()
         comics_list = list()
         for row in current_comic:
             comics_list.append(row[0].lower().replace(' ', '-'))
-        thread1 = threading.Thread(target=get_weekly_comics, args=[comics_list])
+        thread1 = threading.Thread(target=get_weekly_comics, args=[comics_list])  # noqa: E501
         thread1.start()
 
-    # add comic - create new button and add comic in the database
     def add_comic(self, event=None, comic_text=None, from_db=False):
+        """Add comic - create new button and add comic in the database."""
         if not comic_text:
             comic_text = self.comic_create.get(1.0, tk.END).strip()
 
@@ -154,8 +159,8 @@ class MyComicsList(tk.Tk):
 
         self.comic_create.delete(1.0, tk.END)
 
-    # remove comic - delete button and remove from database
     def remove_comic(self, event):
+        """Remove comic - delete button and remove from database."""
         comic = event.widget
         if msg.askyesno(
                 "Confirmation de suppressions",
@@ -170,13 +175,13 @@ class MyComicsList(tk.Tk):
 
             self.recolour_comic()
 
-    # recursive recolour comics
     def recolour_comic(self):
+        """Recolor comics recursively."""
         for index, comic in enumerate(self.comic):
             self.set_comic_colour(index, comic)
 
-    # recolour comics (odd or even in the list)
     def set_comic_colour(self, position, comic):
+        """Recolour comics (odd or even in the list)."""
         _, comic_style_choice = divmod(position, 2)
 
         my_scheme_choice = self.colour_schemes[comic_style_choice]
@@ -184,38 +189,35 @@ class MyComicsList(tk.Tk):
         comic.configure(bg=my_scheme_choice["bg"])
         comic.configure(fg=my_scheme_choice["fg"])
 
-    def on_frame_configure(self, event=None):
+    def _on_frame_configure(self, event=None):
         self.comic_canvas.configure(scrollregion=self.comic_canvas.bbox("all"))
 
-    def comic_width(self, event):
+    def _comic_width(self, event):
         canvas_width = event.width
         self.comic_canvas.itemconfig(self.canvas_frame, width=canvas_width)
 
-    def mouse_scroll(self, event):
+    def _mouse_scroll(self, event):
         if event.delta:
             self.comic_canvas.yview_scroll(-1 * (event.delta / 120), "units")
         else:
-            if event.num == 5:
-                move = 1
-            else:
-                move = -1
-
+            move = 1 if event.num == 5 else -1
             self.comic_canvas.yview_scroll(move, "units")
 
-    # add new comic in database
     def save_comic(self, comic):
+        """Add new comic in database."""
         insert_comic_query = "INSERT INTO comics_dc VALUES (?)"
         insert_comic_data = (comic,)
         self.run_query(insert_comic_query, insert_comic_data)
 
-    # read database
     def load_comic(self):
+        """Read database."""
         load_comic_query = "SELECT comic FROM comics_dc"
         my_comic = self.run_query(load_comic_query, receive=True)
         return my_comic
 
     @staticmethod
     def run_query(sql, data=None, receive=False):
+        """Run sql query."""
         conn = sqlite3.connect(".comics.db")
         cursor = conn.cursor()
         if data:
@@ -232,7 +234,7 @@ class MyComicsList(tk.Tk):
 
     @staticmethod
     def first_time_db():
-        # Create_tables = "CREATE TABLE comics_dc (comic TEXT)"
+        """Create database tables."""
         create_table1 = "CREATE TABLE IF NOT EXISTS comics_dc (comic TEXT)"
         MyComicsList.run_query(create_table1)
         create_table2 = "CREATE TABLE IF NOT EXISTS comics_marvel (comic TEXT)"
