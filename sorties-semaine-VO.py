@@ -63,7 +63,7 @@ def print_one_editor(url, f, editor):
     f.write("=====================\n")
     for s in var:  # var is a list of 'strong' divs
         s_copy = copy.copy(s)
-        for span in s_copy:
+        for _ in s_copy:
             s_copy.span.decompose()
         name = s_copy.text.replace(' : ', '').replace('| ', '')
         a = s.find('a')
@@ -97,12 +97,12 @@ def print_multiple_editors(url, f):
         if s.text in indies:
             f.write(f'\n{s.text}\n=====================\n')
         # blots
-        elif note in s.text \
-                or howto in s.text \
-                or consistof in s.text \
-                or howtodl in s.text \
-                or lower in s.text \
-                or indieweek in s.text:
+        elif (note in s.text
+              or howto in s.text
+              or consistof in s.text
+              or howtodl in s.text
+              or lower in s.text
+              or indieweek in s.text):
             pass
         # more bloats
         elif s.text in bloat:
@@ -111,7 +111,7 @@ def print_multiple_editors(url, f):
         else:
             # make a copy of strong s to remove span
             s_copy = copy.copy(s)
-            for span in s_copy:
+            for _ in s_copy:
                 try:
                     s_copy.span.decompose()
                 except AttributeError:
