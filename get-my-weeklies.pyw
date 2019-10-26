@@ -133,9 +133,7 @@ class MyComicsList(tk.Tk):
         """Run download."""
         sys.stdout = StdRedirector(self.output_text)
         current_comic = self.load_comic()
-        comics_list = list()
-        for row in current_comic:
-            comics_list.append(row[0].lower().replace(' ', '-'))
+        comics_list = [row[0].lower().replace(' ', '-') for row in current_comic]  # noqa: E501
         thread1 = threading.Thread(target=get_weekly_comics, args=[comics_list])  # noqa: E501
         thread1.start()
 
@@ -164,7 +162,7 @@ class MyComicsList(tk.Tk):
         comic = event.widget
         if msg.askyesno(
                 "Confirmation de suppressions",
-                "Supprimer " + comic.cget("text") + "de la liste ?"):
+                f"Supprimer {comic.cget('text')} de la liste ?"):
             self.comic.remove(event.widget)
 
             delete_comic_query = "DELETE FROM comics_dc WHERE comic=?"
