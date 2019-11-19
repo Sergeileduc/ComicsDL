@@ -2,15 +2,15 @@
 # -*-coding:utf-8 -*
 """Little app to display DCtrad header."""
 
-# import io
 import io
 import requests
-from PIL import Image, ImageTk  # pip install pillow
 import tkinter as tk
 from tkinter import font as tkfont  # python 3
-from bs4 import BeautifulSoup
-import webbrowser
 from urllib.parse import urljoin
+import webbrowser
+
+from bs4 import BeautifulSoup
+from PIL import Image, ImageTk  # pip install pillow
 
 dctrad_base = 'http://www.dctrad.fr'
 dctradpage = 'http://www.dctrad.fr/index.php'

@@ -4,8 +4,9 @@
 
 import os
 import sys
-from utils.getcomics import get_weekly_comics
 import time
+
+from utils.getcomics import get_weekly_comics
 
 getcomicsurls = [
     'https://getcomics.info/tag/dc-week/',

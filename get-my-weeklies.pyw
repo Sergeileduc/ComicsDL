@@ -2,12 +2,12 @@
 # -*-coding:utf-8 -*-
 """GUI to download selected comics in getcomics.info weekly packs."""
 
-import sys
 import os
+import sqlite3
+import sys
+import threading
 import tkinter as tk
 import tkinter.messagebox as msg
-import sqlite3
-import threading
 
 from utils.getcomics import get_weekly_comics
 

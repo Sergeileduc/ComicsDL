@@ -2,11 +2,11 @@
 # -*-coding:utf-8 -*-
 """Get all new comics in getcomics weeklies."""
 
+import copy
 import os
 import subprocess
-import copy
-from utils import htmlsoup, getcomics
 
+from utils import htmlsoup, getcomics
 # Constants
 from utils.const import DC_URL, MARVEL_URL, IMAGE_URL, INDIE_URL
 from utils.const import note, howto, howtodl, consistof
