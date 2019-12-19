@@ -4,7 +4,9 @@
 
 import copy
 import os
-import subprocess
+# import subprocess
+import tkinter as tk
+import tkinter.scrolledtext as scrolledtext
 
 from utils import htmlsoup, getcomics
 # Constants
@@ -140,6 +142,14 @@ def generate_weekly():
         print_week(INDIE_URL, f, "Indé week")
 
 
+# Select all the text in textbox
+def select_all(event):
+    text_widget.tag_add(tk.SEL, "1.0", tk.END)
+    text_widget.mark_set(tk.INSERT, "1.0")
+    text_widget.see(tk.INSERT)
+    return 'break'
+
+
 # MAIN
 print("Les derniers 'weekly packs' de Getcomics sont :")
 print("----------------")
@@ -151,8 +161,25 @@ if Join.lower() == 'yes' or Join.lower() == 'y':
     print("Processing")
     generate_weekly()
     print("Done")
-    cmd = 'zenity --text-info --title="Sorties de la semaine"  ' \
-          '--width=800 --height=600 --filename=liste-comics-semaine.txt'
-    subprocess.call(cmd, shell=True)
+    # cmd = 'zenity --text-info --title="Sorties de la semaine"  ' \
+    #       '--width=800 --height=600 --filename=liste-comics-semaine.txt'
+    # subprocess.call(cmd, shell=True)
+
+    with open("liste-comics-semaine.txt", "r") as f:
+        txt = f.read()
+
+    root = tk.Tk()
+    root.title("Sorties Getcomics")
+
+    text_widget = scrolledtext.ScrolledText(root, width=150)
+    text_widget.insert(tk.END, txt)
+    text_widget.pack(expand=True, fill='both')
+
+    # Add the binding
+    text_widget.bind("<Control-Key-a>", select_all)
+    text_widget.bind("<Control-Key-A>", select_all)  # just in case caps lock is on  # noqa: E501
+
+    tk.mainloop()
+
 else:
     print("Exit")
