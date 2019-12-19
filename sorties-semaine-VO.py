@@ -4,7 +4,8 @@
 
 import copy
 import os
-import subprocess
+# import subprocess
+import tkinter as tk
 
 from utils import htmlsoup, getcomics
 # Constants
@@ -151,8 +152,18 @@ if Join.lower() == 'yes' or Join.lower() == 'y':
     print("Processing")
     generate_weekly()
     print("Done")
-    cmd = 'zenity --text-info --title="Sorties de la semaine"  ' \
-          '--width=800 --height=600 --filename=liste-comics-semaine.txt'
-    subprocess.call(cmd, shell=True)
+    # cmd = 'zenity --text-info --title="Sorties de la semaine"  ' \
+    #       '--width=800 --height=600 --filename=liste-comics-semaine.txt'
+    # subprocess.call(cmd, shell=True)
+
+    with open("liste-comics-semaine.txt", "r") as f:
+        txt = f.read()
+
+    root = tk.Tk()
+    T = tk.Text(root, width=150)
+    T.pack(fill="both", expand=1)
+    T.insert(tk.END, txt)
+    tk.mainloop()
+
 else:
     print("Exit")
