@@ -1,5 +1,0 @@
-
-    document.getElementById('dlbutton').href = "/d/tbiaf4on/" + (707813 % 51245 + 707813 % 913) + "/Batman%20v3%20066%20%282019%29%20%28Webrip%29%20%28The%20Last%20Kryptonian-DCP%29.cbr";
-    if (document.getElementById('fimage')) {
-        document.getElementById('fimage').href = "/i/tbiaf4on/" + (707813 % 51245 + 707813 % 913) + "/Batman%20v3%20066%20%282019%29%20%28Webrip%29%20%28The%20Last%20Kryptonian-DCP%29.cbr";
-    }
