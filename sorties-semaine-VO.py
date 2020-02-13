@@ -177,7 +177,7 @@ if Join.lower() == 'yes' or Join.lower() == 'y':
 
     # Add the binding
     text_widget.bind("<Control-Key-a>", select_all)
-    text_widget.bind("<Control-Key-A>", select_all)  # just in case caps lock is on  #noqa: E501
+    text_widget.bind("<Control-Key-A>", select_all)  # just in case caps lock is on  # noqa: E501
 
     tk.mainloop()
 
