@@ -1,3 +1,5 @@
+![Python application](https://github.com/Sergeileduc/ComicsDL/workflows/Python%20application/badge.svg)
+
 # ComicsDL
 Scripts for download from getcomics and other things
 
