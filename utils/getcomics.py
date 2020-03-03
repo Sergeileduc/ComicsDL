@@ -5,15 +5,13 @@
 import re  # regex
 import requests  # html
 from requests.exceptions import HTTPError
-# import urllib.request
-# import urllib.error
-import base64
 from datetime import datetime
 from utils.htmlsoup import url2soup, get_href_with_name
 from utils import zpshare
 from utils import tools
 from utils.urltools import getfinalurl
 from urllib.parse import quote_plus
+from utils.zpshare import check_url
 # from utils.getcomics_exceptions import NoZippyButton
 
 today = datetime.today().strftime("%Y-%m-%d")
@@ -65,51 +63,26 @@ def _find_dl_buttons(url):
 
 
 def down_com(url):
-    """Find download link."""
-    # global user_agent
-    # headers = {'User-Agent': user_agent}
+    """Find Zippyshare Button, find download url, download."""
+    final_url = getfinalurl(url)
+    print("Trying " + final_url)
     try:
-        # req = urllib.request.Request(url, None, headers)
-        # finalurl = urllib.request.urlopen(req).geturl()
-        finalurl = getfinalurl(url)
-    except HTTPError:
-        print("down_com can't get final url")
+        buttons = find_buttons(final_url)
+        zippylink = find_zippy_button(buttons)
+        finalzippy = check_url(zippylink)
+    except ZippyButtonError as e:
+        print(e)
+        return
+    except HTTPError as e:
+        print("down_com got HTTPError")
+        print(e)
         raise
-    print(f"Trying {finalurl}")
-    zippylink = ''
     try:
-        # downButtons = url2soup(finalurl).select("div.aio-pulse > a")
-        downButtons = _find_dl_buttons(finalurl)
+        print(finalzippy)
+        down_com_zippy(finalzippy)
     except Exception as e:
         print(e)
-    for button in downButtons:
-        # if 'zippyshare' in str(button).lower() and 'href' in button.a.attrs:
-        if 'zippyshare' in button.get("href") \
-                or 'zippyshare' in button.get('title').lower():
-            zippylink = button.get("href")
-            print(zippylink)
-            try:
-                if str(zippylink).startswith(BASE):
-                    finalzippy = base64.b64decode(
-                        zippylink[len(BASE):]).decode()
-                    print("Abracadabra !")
-                else:
-                    # headers = {'User-Agent': user_agent}
-                    # req = urllib.request.Request(zippylink, None, headers)
-                    # finalzippy = urllib.request.urlopen(req).geturl()
-                    finalzippy = getfinalurl(zippylink)
-            except HTTPError as e:
-                print("can't obtain final zippyshare page url")
-                print(e)
-                raise
-            except IOError:
-                print("Zippyhare download failed")
-            try:
-                print(finalzippy)
-                down_com_zippy(finalzippy)
-            except Exception as e:
-                print("error in down_com_zippy")
-                print(e)
+        print("error in down_com_zippy")
 
 
 def down_com_zippy(url):
