@@ -18,3 +18,7 @@ liste-comics-semaine.txt
 liste-dc.txt
 comics-week.py
 test.py
+
+# Virtual envs :
+venv/
+.venv/

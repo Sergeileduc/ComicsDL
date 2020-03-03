@@ -110,10 +110,6 @@ def down_com(url):
             except Exception as e:
                 print("error in down_com_zippy")
                 print(e)
-    # except HTTPError:
-        # print("down_com got HTTPError from returnHTML")
-        # raise
-    return
 
 
 def down_com_zippy(url):
