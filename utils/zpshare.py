@@ -24,8 +24,11 @@ regex_first = r'.*?getElementById.*?href = \"(?P<first>.*?)\"'
 regex_abcd = (r'.*?getElementById.*?href = \"(.*?)\"'
               r' \+ \((?P<a>\d+) \% (?P<b>\d+) \+ (?P<c>\d+) \% (?P<d>\d+)\)')
 
-regex_rawname = (r'.*?getElementById.*?href = '
-                 r'\".*?\" \+ \(.*?\) \+ \"(?P<name>.*?)\"')
+# regex_rawname = (r'.*?getElementById.*?href = '
+#                  r'\".*?\" \+ \(.*?\) \+ \"(?P<name>.*?)\"')
+regex_rawname = r".*?getElementById.*?href = \".*?\"\+\(.*\)\+\"/(?P<name>.*?)\""  # noqa: E501
+
+regex_vara = r"var a = (?P<A>\d+)"
 
 
 def _remove_tag(filename):
@@ -40,21 +43,24 @@ def get_file_url(url, button):
     """Find filename and download url."""
     print("Found zippyshare : " + url)
     first_part = search_regex_name(button, regex_first, 'first')
-    a = int(search_regex_name(button, regex_abcd, 'a'))
-    b = int(search_regex_name(button, regex_abcd, 'b'))
-    c = int(search_regex_name(button, regex_abcd, 'c'))
-    d = int(search_regex_name(button, regex_abcd, 'd'))
+    # a = int(search_regex_name(button, regex_abcd, 'a'))
+    a = int(search_regex_name(button, regex_vara, 'A'))
+    # b = int(search_regex_name(button, regex_abcd, 'b'))
+    b = 3
+    # c = int(search_regex_name(button, regex_abcd, 'c'))
+    # d = int(search_regex_name(button, regex_abcd, 'd'))
 
     raw_name = search_regex_name(button, regex_rawname, 'name')
     # unquote replace special characters like %2c, etc..
     filename = _remove_tag(unquote(raw_name).strip('/'))
     # Calculating the id and forming url
     # that is an extremely dirty way, I know
-    second_part = a % b + c % d
+    # second_part = a % b + c % d
+    second_part = a**3+b
 
     parsed_url = urlparse(url)
     domain = f"{parsed_url.scheme}://{parsed_url.netloc}"
-    full_url = f"{domain}{first_part}{second_part}{raw_name}"
+    full_url = f"{domain}{first_part}{second_part}/{raw_name}"
     print(full_url)
     return full_url, filename
 
@@ -80,7 +86,19 @@ def find_zippy_download_button(zippy_url):
     try:
         soup = url2soup(zippy_url)
         # downButton = soup.select('script[type="text/javascript"]')
-        return soup.find('a', id="dlbutton").find_next_sibling().text
+        # a = soup.find('a', id="dlbutton")
+        # b = a.find_next_sibling()
+        # c = b.text
+        # print("BUTTON")
+        # print("a")
+        # print(a)
+        # print("b")
+        # print(b)
+        # print("c")
+        # print(c)
+        # return b
+        # return soup.find('a', id="dlbutton").find_next_sibling().text
+        return soup.find('a', id="dlbutton").find_next_sibling()
     except Exception:
         raise DownloadButtonError("Error on zp page : "
                                   "No download button found")
