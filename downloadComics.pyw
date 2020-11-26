@@ -92,10 +92,10 @@ class Getcomics(tk.Tk):
         self.mode = tk.StringVar()
         self.mode.set('Recherche simple')
         self.user_search = tk.StringVar()
-        self.button_list = list()
-        self.search_list = list()
-        self.download_list = list()
-        self.my_list = list()
+        self.button_list = []
+        self.search_list = []
+        self.download_list = []
+        self.my_list = []
         self.wm_geometry(f"{size_x}x{size_y}+{pos_x}+{pos_y}")
         self.title(self.title_string)
         self.configure(background=self.deep_bg)
@@ -186,7 +186,7 @@ class Getcomics(tk.Tk):
         output_text.pack(padx=10, pady=(0, 10), fill=tk.BOTH, expand=True)
         sys.stdout = StdRedirector(output_text)
 
-        self.search_comics(None)
+        # self.search_comics(None)
 
     @staticmethod
     def destroy_list(widget_list):
@@ -219,7 +219,6 @@ class Getcomics(tk.Tk):
                 command=lambda button=new_button: self.add_to_dl(button))
             new_button.pack(fill='both', expand=1, pady=0)
             self.button_list.append(new_button)
-        return
 
     def dl_com(self, liste):
         """Download one comic."""
@@ -281,7 +280,6 @@ class Getcomics(tk.Tk):
                 print(e)
                 print("Something went wrong")
         print("Terminé, vous pouvez quitter")
-        return
 
     def down_com(self, url):
         """Find Zippyshare Button, find download url, download."""
@@ -304,7 +302,6 @@ class Getcomics(tk.Tk):
         except Exception as e:
             print(e)
             print("error in down_com_zippy")
-        return
 
     def down_com_zippy(self, url):
         """Download from zippyshare."""
@@ -345,7 +342,6 @@ class Getcomics(tk.Tk):
             except Exception:
                 pass
             print('Done\n')
-        return
 
     def go_to_next_page(self):
         """Search next page and pack prev button."""

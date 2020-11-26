@@ -27,7 +27,7 @@ getcomicsurls = ['https://getcomics.info/tag/dc-week/',
 
 BASE = "https://getcomics.info/go.php-url=/"
 
-user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'  # noqa: E501
 
 
 def find_last_weekly(url):
@@ -148,7 +148,7 @@ def getresults(url):
 
     Returns names and urls of posts returned by input url.
     """
-    searchlist = list()
+    searchlist = []
     try:
         res = url2soup(url).select("div.post-info")
         for d in res:
@@ -162,11 +162,10 @@ def getresults(url):
                           "size": size}
                 searchlist.append(result)
         # print(searchlist)
-        return searchlist
     except HTTPError as e:
         print(e)
         print("something wrong happened")
-
+    return searchlist
 
 def searchurl(user_search, mode, page):
     """Return a getcomics research URL."""
