@@ -26,7 +26,8 @@ regex_abcd = (r'.*?getElementById.*?href = \"(.*?)\"'
 
 # regex_rawname = (r'.*?getElementById.*?href = '
 #                  r'\".*?\" \+ \(.*?\) \+ \"(?P<name>.*?)\"')
-regex_rawname = r".*?getElementById.*?href = \".*?\"\+\(.*\)\+\"/(?P<name>.*?)\""  # noqa: E501
+# regex_rawname = r".*?getElementById.*?href = \".*?\"\+\(.*\)\+\"/(?P<name>.*?)\""  # noqa: E501
+regex_rawname = r".*?getElementById.*?href = \".*?\" \+ \(.*\) \+ \"/(?P<name>.*?)\""  # noqa: E501
 
 regex_vara = r"var a = (?P<A>\d+)"
 
@@ -43,20 +44,20 @@ def get_file_url(url, button):
     """Find filename and download url."""
     print("Found zippyshare : " + url)
     first_part = search_regex_name(button, regex_first, 'first')
-    # a = int(search_regex_name(button, regex_abcd, 'a'))
-    a = int(search_regex_name(button, regex_vara, 'A'))
-    # b = int(search_regex_name(button, regex_abcd, 'b'))
-    b = 3
-    # c = int(search_regex_name(button, regex_abcd, 'c'))
-    # d = int(search_regex_name(button, regex_abcd, 'd'))
+    a = int(search_regex_name(button, regex_abcd, 'a'))
+    # a = int(search_regex_name(button, regex_vara, 'A'))
+    b = int(search_regex_name(button, regex_abcd, 'b'))
+    # b = 3
+    c = int(search_regex_name(button, regex_abcd, 'c'))
+    d = int(search_regex_name(button, regex_abcd, 'd'))
 
     raw_name = search_regex_name(button, regex_rawname, 'name')
     # unquote replace special characters like %2c, etc..
     filename = _remove_tag(unquote(raw_name).strip('/'))
     # Calculating the id and forming url
     # that is an extremely dirty way, I know
-    # second_part = a % b + c % d
-    second_part = a**3+b
+    second_part = a % b + c % d
+    # second_part = a**3+b
 
     parsed_url = urlparse(url)
     domain = f"{parsed_url.scheme}://{parsed_url.netloc}"
