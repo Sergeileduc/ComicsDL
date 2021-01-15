@@ -19,15 +19,14 @@ user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 # Regex to detect name, (year) (tag).extension
 regex_tag = r"(.+)(\ \([1|2][9|0]\d{2}\))(.*)(\..{3})"
 
-regex_first = r'.*?getElementById.*?href = \"(?P<first>.*?)\"'
+regex_first = r'.*?getElementById.*?href ?= ?\"(?P<first>.*?)\"'
 
-regex_abcd = (r'.*?getElementById.*?href = \"(.*?)\"'
-              r' \+ \((?P<a>\d+) \% (?P<b>\d+) \+ (?P<c>\d+) \% (?P<d>\d+)\)')
+regex_abcd = r'.*?getElementById.*?href = \"(.*?)\" \+ \((?P<a>\d+) \% (?P<b>\d+) \+ (?P<c>\d+) \% (?P<d>\d+)\)'  # noqa: E501
 
 # regex_rawname = (r'.*?getElementById.*?href = '
 #                  r'\".*?\" \+ \(.*?\) \+ \"(?P<name>.*?)\"')
 # regex_rawname = r".*?getElementById.*?href = \".*?\"\+\(.*\)\+\"/(?P<name>.*?)\""  # noqa: E501
-regex_rawname = r".*?getElementById.*?href = \".*?\" \+ \(.*\) \+ \"/(?P<name>.*?)\""  # noqa: E501
+regex_rawname = r'.*?getElementById.*?href ?= ?\".*?\" ?\+ ?\(.*\) ?\+ ?\"\/?(?P<name>.*?)\"'  # noqa: E501
 
 regex_vara = r"var a = (?P<A>\d+)"
 
@@ -44,6 +43,7 @@ def get_file_url(url, button):
     """Find filename and download url."""
     print("Found zippyshare : " + url)
     first_part = search_regex_name(button, regex_first, 'first')
+    print(first_part)
     a = int(search_regex_name(button, regex_abcd, 'a'))
     # a = int(search_regex_name(button, regex_vara, 'A'))
     b = int(search_regex_name(button, regex_abcd, 'b'))
@@ -71,7 +71,6 @@ def check_url(zippylink):
     try:
         # TODO : verify if useful
         if str(zippylink).startswith(BASE):
-            print("Abracadabra !")
             finalzippy = base64.b64decode(zippylink[len(BASE):]).decode()
         else:
             finalzippy = requests.get(zippylink).url
@@ -86,19 +85,6 @@ def find_zippy_download_button(zippy_url):
     """Find download button on zippyshare page."""
     try:
         soup = url2soup(zippy_url)
-        # downButton = soup.select('script[type="text/javascript"]')
-        # a = soup.find('a', id="dlbutton")
-        # b = a.find_next_sibling()
-        # c = b.text
-        # print("BUTTON")
-        # print("a")
-        # print(a)
-        # print("b")
-        # print(b)
-        # print("c")
-        # print(c)
-        # return b
-        # return soup.find('a', id="dlbutton").find_next_sibling().text
         return soup.find('a', id="dlbutton").find_next_sibling()
     except Exception:
         raise DownloadButtonError("Error on zp page : "

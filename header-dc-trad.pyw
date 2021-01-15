@@ -3,24 +3,24 @@
 """Little app to display DCtrad header."""
 
 import io
-import requests
 import tkinter as tk
+import webbrowser
 from tkinter import font as tkfont  # python 3
 from urllib.parse import urljoin
-import webbrowser
 
+import requests
 from bs4 import BeautifulSoup
 from PIL import Image, ImageTk  # pip install pillow
 
-dctrad_base = 'http://www.dctrad.fr'
-dctradpage = 'http://www.dctrad.fr/index.php'
+DCTRAD_BASE = 'http://www.dctrad.fr'
+DCTRAD_PAGE = 'http://www.dctrad.fr/index.php'
 cat_img_urls = [
     'http://www.dctrad.fr/images/icons/forum/RebirthK.png',
     'http://www.dctrad.fr//images/icons/forum/dccomicsv2.png',
     'http://www.dctrad.fr//images/icons/forum/IconindiedctK.png',
     'http://www.dctrad.fr/images/icons/forum/MarvelK.png']
-refresh_logo_url = 'http://icons.iconarchive.com/icons/graphicloads/' \
-                    '100-flat-2/128/arrow-refresh-4-icon.png'
+REFRESH_LOGO_URL = 'http://icons.iconarchive.com/icons/graphicloads/' \
+                   '100-flat-2/128/arrow-refresh-4-icon.png'
 
 
 def image_from_url(url):
@@ -31,17 +31,14 @@ def image_from_url(url):
         return img
     except requests.exceptions.HTTPError as e:
         print(e)
-        return
     except IOError as e:
         print(e)
-        return
 
 
 def open_url(url):
     """Open url."""
     # webbrowser.open_new(url)
     webbrowser.open(url, new=0, autoraise=False)
-    return
 
 
 # Get html from url
@@ -60,6 +57,18 @@ def _return_soup(url):
     return BeautifulSoup(_return_html(url), 'html.parser')
 
 
+def _make_header_list():
+    """Return list of headerPic objects."""
+    headers = []
+    my_list = _return_soup(DCTRAD_PAGE).select('span.btn-cover a')
+    for i in my_list:
+        url = i['href']
+        imgurl = urljoin(DCTRAD_BASE, i.img['src'])
+        headerpic = HeaderPic(url, imgurl)
+        headers.append(headerpic)
+    return headers
+
+
 class HeaderPic:
     """Class to build header object with url and image url."""
 
@@ -67,6 +76,7 @@ class HeaderPic:
         """Init with topic url and image url."""
         self.url = url
         self.imageurl = imageurl
+        self.img = None
 
     def __str__(self):
         """Str with topic url and image url."""
@@ -83,18 +93,18 @@ class DCTradapp(tk.Tk):
     def __init__(self, *args, **kwargs):
         """Init Tkinter GUI application."""
         logo = False
-        self.headers = self._make_header_list(dctradpage)
+        self.headers = _make_header_list()
 
         tk.Tk.__init__(self, *args, **kwargs)
         self.configure(background='SteelBlue3')
         self.title("Header DC trad")
         self.title_font = tkfont.Font(
-                family='Helvetica', size=18, weight="bold", slant="italic")
+            family='Helvetica', size=18, weight="bold", slant="italic")
         self.cat_image_list = self._get_cat_covers()
 
         try:
             self.cat_image_list.append(
-                    ImageTk.PhotoImage(image_from_url(refresh_logo_url)))
+                ImageTk.PhotoImage(image_from_url(REFRESH_LOGO_URL)))
             logo = True
         except Exception:
             logo = False
@@ -159,17 +169,6 @@ class DCTradapp(tk.Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
-    def _make_header_list(self, dctradurl):
-        """Return list of headerPic objects."""
-        headers = []
-        my_list = _return_soup(dctradpage).select('span.btn-cover a')
-        for l in my_list:
-            url = l['href']
-            imgurl = urljoin(dctrad_base, l.img['src'])
-            headerpic = HeaderPic(url, imgurl)
-            headers.append(headerpic)
-        return headers
-
     def _generate_images(self):
         for i in self.headers:
             i.generate_tk_image()
@@ -194,7 +193,7 @@ class HeaderGrid(tk.Frame):
         """Init frame."""
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        for index, header in enumerate(headers[start:start+9]):
+        for index, header in enumerate(headers[start:start + 9]):
             i, j = divmod(index, 3)
             header.generate_tk_image()
             btn = tk.Button(

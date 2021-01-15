@@ -16,6 +16,6 @@ Ensuite, pour installer les librairies nécessaires, ouvrez un invité de comman
 
 ## Demo
 
-### downloadComics
+### download-comics
 
 ![example](https://github.com/Sergeileduc/ComicsDL/blob/master/ressources/download-comics-demo-1.gif)

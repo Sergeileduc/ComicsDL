@@ -1,30 +1,28 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
 """GUI to download comics on getcomics.info."""
-
-import requests
 import sys
 import threading
-import urllib.request
-import urllib.error
-
 import tkinter as tk
 import tkinter.scrolledtext as tkst
+import urllib.error
+import urllib.request
 from tkinter import ttk
 
-from utils import getcomics
-from utils.getcomics import (find_buttons, find_zippy_button,
-                             getresults, ZippyButtonError)
+import requests
 
+from utils import getcomics
+from utils.getcomics import (
+    ZippyButtonError, find_buttons, find_zippy_button, getresults)
 from utils.std_redirect import StdRedirector
-from utils.tools import convert2bytes, bytes_2_human_readable
+from utils.tools import bytes_2_human_readable, convert2bytes
 from utils.urltools import getfinalurl
-from utils.zpshare import (check_url, DownloadButtonError,
+from utils.zpshare import (DownloadButtonError, check_url,
                            find_zippy_download_button, get_file_url)
 
 
 # Main program interface and code
-class Getcomics(tk.Tk):
+class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
     """GUI made with tk.TK."""
 
     deep_bg = '#263238'
@@ -38,7 +36,7 @@ class Getcomics(tk.Tk):
 
     title_string = "Télécharger sur Getcomics V2019-07"
 
-    def __init__(self):
+    def __init__(self):  # pylint: disable=too-many-locals
         """Init Tkinter program with GUI."""
         def my_function(event):
             dl_canvas.configure(
@@ -194,7 +192,6 @@ class Getcomics(tk.Tk):
         for w in widget_list:
             w.destroy()
         widget_list.clear()
-        pass
 
     # Search comics function
     def search_comics(self, event):
@@ -225,9 +222,8 @@ class Getcomics(tk.Tk):
         try:
             thread1 = threading.Thread(target=self.down_all_com, args=[liste])
             thread1.start()
-        except Exception as e:
-            print(e)
-            pass
+        except Exception as exc:
+            print(exc)
 
     def add_to_dl(self, button):
         """Click to add to DL list."""
@@ -262,8 +258,8 @@ class Getcomics(tk.Tk):
         for i in self.download_list:
             if button == i["button"]:
                 if i["size"] is not None:
-                    bytes = convert2bytes(i["size"])
-                    self.list_size -= bytes
+                    bytes_ = convert2bytes(i["size"])
+                    self.list_size -= bytes_
                 self.download_list.remove(i)
         button.destroy()
         total_size = bytes_2_human_readable(self.list_size)
@@ -276,8 +272,8 @@ class Getcomics(tk.Tk):
         for dl in liste:
             try:
                 self.down_com(dl["url"])
-            except Exception as e:
-                print(e)
+            except Exception as exc:
+                print(exc)
                 print("Something went wrong")
         print("Terminé, vous pouvez quitter")
 
@@ -289,18 +285,18 @@ class Getcomics(tk.Tk):
             buttons = find_buttons(final_url)
             zippylink = find_zippy_button(buttons)
             finalzippy = check_url(zippylink)
-        except ZippyButtonError as e:
-            print(e)
+        except ZippyButtonError as err:
+            print(err)
             return
-        except urllib.error.HTTPError as e:
+        except urllib.error.HTTPError as err:
             print("down_com got HTTPError")
-            print(e)
+            print(err)
             raise
         try:
             print(finalzippy)
             self.down_com_zippy(finalzippy)
-        except Exception as e:
-            print(e)
+        except Exception as exc:
+            print(exc)
             print("error in down_com_zippy")
 
     def down_com_zippy(self, url):
@@ -308,8 +304,8 @@ class Getcomics(tk.Tk):
         self.progress["value"] = 0
         try:
             down_button = find_zippy_download_button(url)
-        except DownloadButtonError as e:
-            print(e)
+        except DownloadButtonError as err:
+            print(err)
             return
         try:
             full_url, filename = get_file_url(url, down_button)
@@ -317,9 +313,9 @@ class Getcomics(tk.Tk):
             r = requests.get(full_url, stream=True)
             size = int(r.headers['Content-length'])  # Size in bytes
             print(bytes_2_human_readable(size))
-        except Exception as e:
+        except Exception as exc:
             size = 0
-            print(e)
+            print(exc)
             print("Can't get download link on zippyshare page")
 
         # Download from url & trim it a little bit

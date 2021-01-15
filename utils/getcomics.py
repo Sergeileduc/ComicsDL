@@ -20,9 +20,9 @@ basesearch = 'https://getcomics.info'
 tagsearch = 'https://getcomics.info/tag/'
 
 getcomicsurls = ['https://getcomics.info/tag/dc-week/',
-                 'http://getcomics.info/tag/marvel-now/',
-                 'https://getcomics.info/tag/indie-week/',
-                 'https://getcomics.info/tag/image-week/'
+                 #  'http://getcomics.info/tag/marvel-now/',
+                 #  'https://getcomics.info/tag/indie-week/',
+                 #  'https://getcomics.info/tag/image-week/'
                  ]
 
 BASE = "https://getcomics.info/go.php-url=/"
@@ -95,7 +95,8 @@ def down_com_zippy(url):
     # find("script", type="text/javascript")
     # find("div", style=re.compile("width: 303px;"))
     # find("script", type="text/javascript")
-    downButton = soup.find('a', id="dlbutton").find_next_sibling().text
+    # downButton = soup.find('a', id="dlbutton").find_next_sibling().text
+    downButton = soup.find('a', id="dlbutton").find_next_sibling().string
     try:
         fullURL, fileName = zpshare.get_file_url(url, downButton)
         print(f"Downloading from zippyshare into : {fileName}")
@@ -166,6 +167,7 @@ def getresults(url):
         print(e)
         print("something wrong happened")
     return searchlist
+
 
 def searchurl(user_search, mode, page):
     """Return a getcomics research URL."""

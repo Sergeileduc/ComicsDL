@@ -53,8 +53,8 @@ class MyComicsList(tk.Tk):
         hs = self.winfo_screenheight()  # height of the screen
 
         # Calculate x and y coordinates for the Tk root window
-        x = (ws/2) - (w/2)
-        y = (hs/2) - (h/2)
+        x = (ws / 2) - (w / 2)
+        y = (hs / 2) - (h / 2)
         longtext = ("Ajoutez ou supprimez les séries à chercher dans "
                     "les derniers posts \n\"Weekly\" de Getcomics.info")
         # ascii_dctrad = """
