@@ -89,7 +89,7 @@ class MyComicsList(tk.Tk):
                                       orient="vertical",
                                       command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.title("Télécharger All V2019-07")
+        self.title("Télécharger All V2021-03")
         self.geometry(f"{w}x{h}+{int(x)}+{int(y)}")
         self.comic_create = tk.Text(self.text_frame, height=3,
                                     bg="white", fg="black")

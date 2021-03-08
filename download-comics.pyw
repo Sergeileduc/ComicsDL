@@ -34,7 +34,7 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
     dark3 = '#455A64'
     gray98 = '#FAFAFA'
 
-    title_string = "Télécharger sur Getcomics V2019-07"
+    title_string = "Télécharger sur Getcomics 2021-03"
 
     def __init__(self):  # pylint: disable=too-many-locals
         """Init Tkinter program with GUI."""
