@@ -3,22 +3,13 @@
 
 import os
 # import subprocess
-
+import copy
 from utils import htmlsoup, getcomics
 
-DC_URL = "https://getcomics.info/tag/dc-week/"
-MARVEL_URL = "https://getcomics.info/tag/marvel-now/"
-IMAGE_URL = "https://getcomics.info/tag/image-week/"
-INDIE_URL = "https://getcomics.info/tag/indie-week/"
-
-note = "Notes :\n"
-howto = "Video guide on how"
-howtodl = "how to download"
-consistof = "consist of :"
-lower = "or on the lower"
-indieweek = "INDIE Week+"
-bloat = ['Language :', 'Image Format :', 'Year :',
-         'Size :', 'Size : ', 'Notes :', 'Screenshots :']
+# Constants
+from utils.const import DC_URL, MARVEL_URL, IMAGE_URL, INDIE_URL
+from utils.const import note, howto, howtodl, consistof
+from utils.const import lower, indieweek, bloat
 
 
 # Find last weekly and display
@@ -35,7 +26,7 @@ def printLastWeek(url, editor):
     lastPost = soup.find_all('article', class_='type-post')[0]
     title = lastPost.h1.a.text
     time = lastPost.find('time')
-    print(editor + '\t : ' + title + ' :\t' + time.text)
+    print(f'{editor}\t : {title} :\t{time.text}')
 
 
 # Print getcomics weekly post in file f
@@ -50,7 +41,7 @@ def printWeek(url, f, editor):
     # Missing post not done yet
     elif "Missing" in postTitle and not flag:
         f.write(postTitle + '\n')
-        f.write("=====================" + '\n')
+        f.write("=====================\n")
         printMultipleEditors(weeklyUrl, f)
         flag = True
     elif editor == "Indé week":
@@ -65,18 +56,20 @@ def printOneEditor(url, f, editor):
     var = soup.select_one('section.post-contents > ul').find_all('strong')
 
     f.write(editor + '\n')
-    f.write("=====================" + '\n')
+    f.write("=====================\n")
     for s in var:
-        name = s.text.replace(' : ', '').replace('Download', '')\
-                    .replace(' | ', '').replace('Read Online', '')
+        s_copy = copy.copy(s)
+        for span in s_copy:
+            s_copy.span.decompose()
+        name = s_copy.text.replace(' : ', '').replace('| ', '')
         a = s.find('a')
         try:
             # if a.has_attr('href'):
             if 'href' in a.attrs:
-                f.write('[url=' + a.get("href") + ']' + name + '[/url]' + '\n')
+                f.write(f'[url={a.get("href")}]{name}[/url]\n')
         except Exception:
             f.write(name + '\n')
-    f.write("=====================" + '\n')
+    f.write("=====================\n")
     f.write("" + '\n')
 
 
@@ -95,7 +88,7 @@ def printMultipleEditors(url, f):
     for s in var:
         # Highlight publishers
         if s.text in indies:
-            f.write('\n' + s.text + '\n=====================' + '\n')
+            f.write(f'\n{s.text}\n=====================\n')
         # blots
         elif note in s.text \
                 or howto in s.text \
@@ -109,13 +102,15 @@ def printMultipleEditors(url, f):
             pass
         # Comics
         else:
-            name = s.text.replace(' : ', '').replace('Download', '')\
-                        .replace(' | ', '').replace('Read Online', '')
+            # make a copy of strong s to remove span
+            s_copy = copy.copy(s)
+            for span in s_copy:
+                s_copy.span.decompose()
+            name = s_copy.text.replace(' : ', '').replace('| ', '')
             if s.a and s.a.has_attr('href'):
-                f.write('[url=' + s.a.get("href") + ']'
-                        + name + '[/url]' + '\n')
+                f.write(f'[url={s.a.get("href")}]{name}[/url]\n')
             else:
-                f.write(name + '\n')
+                f.write(f'{name}\n')
     f.write('\n')
 
 
@@ -152,4 +147,4 @@ if Join.lower() == 'yes' or Join.lower() == 'y':
     #       '--width=800 --height=600 --filename=liste-comics-semaine.txt'
     # subprocess.call(cmd, shell=True)
 else:
-    print ("Exit")
+    print("Exit")

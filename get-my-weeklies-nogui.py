@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
 import os
-from utils import getcomics
+import sys
+from utils.getcomics import getWeeklyComics
 import time
 
 getcomicsurls = [
@@ -19,20 +20,23 @@ config = 'liste-comics.txt'
 try:
     configfile = os.path.join(os.path.dirname(__file__), config)
     userList = list()
-    with open(configfile, 'r+') as f:
+    with open(configfile, 'r') as f:
         userList = f.read().splitlines()
         userList.sort()
-    with open(configfile, 'w+') as f:
+        f.close()
+    with open(configfile, 'w') as f:
         for comic in userList:
-            f.write('%s\n' % comic)
+            f.write(f'{comic}\n')
             myComicsList.append(comic.lower().replace(' ', '-'))
-except IOError as e:
-    print("Erreur : Il faut créer un fichier " + config +
+        f.close()
+except IOError:
+    print(f"Erreur : Il faut créer un fichier {config}"
           " et y ajouter vos séries en ligne,\n comme par exemple"
           "\n.........\nBatman\nSuperman\nInjustice\netc...\n.........")
+    sys.exit(1)
 
 try:
-    getcomics.getWeeklyComics(myComicsList)
+    getWeeklyComics(myComicsList)
     time.sleep(20)
 except NameError as e:
     print(e)

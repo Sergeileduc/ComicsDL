@@ -2,11 +2,12 @@
 # -*-coding:utf-8 -*-
 import sys
 import os
-from utils import getcomics
 import tkinter as tk
 import tkinter.messagebox as msg
 import sqlite3
 import threading
+
+from utils.getcomics import getWeeklyComics
 
 exit_thread = False
 exit_success = False
@@ -79,7 +80,7 @@ class MyComicsList(tk.Tk):
                 command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
         self.title("Télécharger All V2019-07")
-        self.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        self.geometry(f"{w}x{h}+{int(x)}+{int(y)}")
         self.comic_create = tk.Text(
                 self.text_frame, height=3, bg="white", fg="black")
 
@@ -124,8 +125,7 @@ class MyComicsList(tk.Tk):
         comicslist = list()
         for row in current_comic:
             comicslist.append(row[0].lower().replace(' ', '-'))
-        thread1 = threading.Thread(
-                target=getcomics.getWeeklyComics, args=[comicslist])
+        thread1 = threading.Thread(target=getWeeklyComics, args=[comicslist])
         thread1.start()
 
     # add comic - create new button and add comic in the database

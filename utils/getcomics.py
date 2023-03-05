@@ -3,13 +3,17 @@
 
 import re  # regex
 import requests  # html
-import urllib.request
-import urllib.error
+from requests.exceptions import HTTPError
+# import urllib.request
+# import urllib.error
 import base64
 from datetime import datetime
-from utils import htmlsoup
+from utils.htmlsoup import url2soup, getHrefwithName
 from utils import zpshare
 from utils import tools
+from utils.urltools import getfinalurl
+from urllib.parse import quote_plus
+# from utils.getcomics_exceptions import NoZippyButton
 
 today = datetime.today().strftime("%Y-%m-%d")
 
@@ -29,26 +33,26 @@ user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
 # Find las weekly post
 def findLastWeekly(url):
-    soup = htmlsoup.url2soup(url)
-    lastPost = soup.find('article', class_='type-post')
+    lastPost = url2soup(url).find('article', class_='type-post')
     # Check if today's archive is there, and retrieve its url
-    print ("Latest weekly post: " + lastPost.time['datetime'])
-    if today in lastPost.time['datetime']:
-        # print ('There is a new one today. Hurrah!')
-        pass
-    else:
-        # print ('Nothing yet. Exiting...')
-        # print ('Continue anyway...')
-        # quit()
-        pass
+    print(f"Latest weekly post: {lastPost.time['datetime']}")
+    # TODO : code for auotmate, maybe uncode later
+    # if today in lastPost.time['datetime']:
+    #     # print ('There is a new one today. Hurrah!')
+    #     pass
+    # else:
+    #     # print ('Nothing yet. Exiting...')
+    #     # print ('Continue anyway...')
+    #     # quit()
+    #     pass
     postUrl = lastPost.h1.a['href']
     return postUrl
 
 
+# TODO : what is that ?
 # Find las weekly post
 def findLastWeekly2(url):
-    soup = htmlsoup.url2soup(url)
-    lastPost = soup.find_all('article', class_='type-post')[0]
+    lastPost = url2soup(url).find_all('article', class_='type-post')[0]
     postTitle = lastPost.h1.a.text
     postUrl = lastPost.h1.a['href']
     return postTitle, postUrl
@@ -56,27 +60,32 @@ def findLastWeekly2(url):
 
 def comicsList(url):
     weeklyUrl = findLastWeekly(url)
-    soup = htmlsoup.url2soup(weeklyUrl)
-    liste_a = soup.select_one("section.post-contents")\
+    liste_a = url2soup(weeklyUrl).select_one("section.post-contents")\
         .find_all('a', style="color: #ff0000;")
-    return htmlsoup.getHrefwithName(liste_a, 'Download')
+    return getHrefwithName(liste_a, 'Download')
+
+
+# Find download buttons in a getcomics pages
+def _find_dl_buttons(url):
+    return url2soup(url).select("div.aio-pulse > a")
 
 
 # Find download link
 def downCom(url):
-    global user_agent
-    headers = {'User-Agent': user_agent}
+    # global user_agent
+    # headers = {'User-Agent': user_agent}
     try:
-        req = urllib.request.Request(url, None, headers)
-        finalurl = urllib.request.urlopen(req).geturl()
-    except urllib.error.HTTPError:
+        # req = urllib.request.Request(url, None, headers)
+        # finalurl = urllib.request.urlopen(req).geturl()
+        finalurl = getfinalurl(url)
+    except HTTPError:
         print("downCom can't get final url")
         raise
-    print ("Trying " + finalurl)
+    print(f"Trying {finalurl}")
     zippylink = ''
     try:
-        soup = htmlsoup.url2soup(finalurl)
-        downButtons = soup.select("div.aio-pulse > a")
+        # downButtons = url2soup(finalurl).select("div.aio-pulse > a")
+        downButtons = _find_dl_buttons(finalurl)
     except Exception as e:
         print(e)
     for button in downButtons:
@@ -92,9 +101,10 @@ def downCom(url):
                     print("Abracadabra !")
                 else:
                     # headers = {'User-Agent': user_agent}
-                    req = urllib.request.Request(zippylink, None, headers)
-                    finalzippy = urllib.request.urlopen(req).geturl()
-            except urllib.error.HTTPError as e:
+                    # req = urllib.request.Request(zippylink, None, headers)
+                    # finalzippy = urllib.request.urlopen(req).geturl()
+                    finalzippy = getfinalurl(zippylink)
+            except HTTPError as e:
                 print("can't obtain final zippyshare page url")
                 print(e)
                 raise
@@ -106,7 +116,7 @@ def downCom(url):
             except Exception as e:
                 print("error in downComZippy")
                 print(e)
-    # except urllib.error.HTTPError:
+    # except HTTPError:
         # print("downCom got HTTPError from returnHTML")
         # raise
     return
@@ -114,7 +124,7 @@ def downCom(url):
 
 # Download from zippyshare
 def downComZippy(url):
-    soup = htmlsoup.url2soup(url)
+    soup = url2soup(url)
     # Other beautiful soup selectors :
     # select("script[type='text/javascript']")
     # select("table[class='folderlogo'] > tr > td")[0]
@@ -125,7 +135,7 @@ def downComZippy(url):
     downButton = soup.find('a', id="dlbutton").find_next_sibling().text
     try:
         fullURL, fileName = zpshare.getFileUrl(url, downButton)
-        print ("Downloading from zippyshare into : " + fileName)
+        print(f"Downloading from zippyshare into : {fileName}")
         r = requests.get(fullURL, stream=True)
         size = tools.bytes_2_human_readable(int(r.headers['Content-length']))
         print(size)
@@ -143,15 +153,15 @@ def downComZippy(url):
         except IOError:
             print("Error while writing file")
     r.close()
-    print ('Done\n--')
+    print('Done\n--')
     return
 
 
 # Compare remote and local list of comics and download
 def getWeeklyComics(mylist):
-    print ('Initialisation...')
-    print ('Je vais chercher les mots clés :')
-    print (mylist)
+    print('Initialisation...')
+    print('Je vais chercher les mots clés :')
+    print(mylist)
 
     for url in getcomicsurls:
         # Other soup selectors
@@ -175,17 +185,21 @@ def getWeeklyComics(mylist):
 def getresults(url):
     searchlist = list()
     try:
-        soup = htmlsoup.url2soup(url)
-        for d in soup.select("div.post-info"):
+        res = url2soup(url).select("div.post-info")
+        for d in res:
             if d.h1.a.has_attr('href'):
                 size = None
                 searchsize = re.search(r'\d+ [KMGT]B', d.p.text, re.M | re.I)
                 if searchsize:
                     size = searchsize.group(0)
-                searchlist.append((d.h1.a.get("href"), d.h1.a.text, size))
+                result = {"url": d.h1.a.get("href"),
+                          "title": d.h1.a.text,
+                          "size": size}
+                searchlist.append(result)
         # print(searchlist)
         return searchlist
-    except urllib.error.HTTPError:
+    except HTTPError as e:
+        print(e)
         print("something wrong happened")
 
 
@@ -195,18 +209,48 @@ def searchurl(user_search, mode, page):
     if mode == 0:
         # Page 1 (no page number on this one)
         if page == 1:
-            url = tagsearch + user_search.lower().replace(' ', '-')
+            url = f"{tagsearch}{user_search.lower().replace(' ', '-')}"
         # Other pages
         else:
-            url = tagsearch + user_search.lower().replace(' ', '-') \
-                + '/page/' + str(page) + '/'
+            url = (f"{tagsearch}{user_search.lower().replace(' ', '-')}"
+                   f"/page/{page}/")
     # Classic research https://getcomics.info/?s=
     else:
         # Page 1
         if page == 1:
-            url = basesearch + '/?s=' + user_search.lower().replace(' ', '+')
+            # url = basesearch + '/?s=' + user_search.lower().replace(' ', '+')
+            url = f"{basesearch}/?s={quote_plus(user_search.lower())}"
         # Other pages
         else:
-            url = basesearch + '/page/' + str(page) \
-                + '/?s=' + user_search.lower().replace(' ', '+')
+            url = (f"{basesearch}/page/{page}/?s="
+                   f"{quote_plus(user_search.lower())}")
     return url
+
+
+# find download buttons in html soup, return list of buttons
+def find_buttons(url):
+    return url2soup(url).select("div.aio-pulse > a")
+
+
+# find the button for zippyshare
+def find_zippy_button(buttons):
+    if not buttons:
+        print("Empty list !")
+        raise ZippyButtonError("Empty button list !")
+    # found = False
+    zippylink = None
+    for button in buttons:
+        # if 'zippyshare' in str(button).lower() \
+        #       and 'href' in button.a.attrs:
+        if 'zippyshare' in button.get("href") \
+                        or 'zippyshare' in button.get('title').lower():
+            zippylink = button.get("href")
+    if zippylink:
+        return zippylink
+    else:
+        raise ZippyButtonError("No zippyshare button was found")
+
+
+class ZippyButtonError(Exception):
+    def __init__(self, msg):
+        super().__init__(self, msg)

@@ -9,33 +9,15 @@ from tkinter import ttk
 import urllib.request
 import urllib.error
 import threading
-import base64
 
 from utils import getcomics
-from utils import htmlsoup
+from utils.getcomics import find_buttons, find_zippy_button, ZippyButtonError
+from utils.getcomics import getresults
 from utils import tools
-from utils import zpshare
-
-BASE = "https://getcomics.info/go.php-url=/"
-
-exit_thread = False
-exit_success = False
-
-user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
-
-
-# Redirect standard output Std into a frame in the GUI
-class Std_redirector(object):
-    def __init__(self, widget):
-        self.widget = widget
-
-    def write(self, string):
-        if not exit_thread:
-            self.widget.insert(tk.END, string)
-            self.widget.see(tk.END)
-
-    def flush(self):
-        pass
+from utils.zpshare import getFileUrl, checkurl
+from utils.zpshare import find_zippy_download_button, DownloadButtonError
+from utils.urltools import getfinalurl
+from utils.std_redirect import Std_redirector
 
 
 # Main program interface and code
@@ -48,6 +30,9 @@ class Getcomics(tk.Tk):
     color1 = '#37474F'
     # color2='#455A64'
     dark3 = '#455A64'
+    gray98 = '#FAFAFA'
+
+    title_string = "Télécharger sur Getcomics V2019-07"
 
     def __init__(self):
         def myfunction(event):
@@ -106,8 +91,8 @@ class Getcomics(tk.Tk):
         self.searchlist = list()
         self.downloadlist = list()
         self.mylist = list()
-        self.wm_geometry("%dx%d+%d+%d" % (sizex, sizey, posx, posy))
-        self.title("Télécharger sur Getcomics V2019-07")
+        self.wm_geometry(f"{sizex}x{sizey}+{posx}+{posy}")
+        self.title(self.title_string)
         self.configure(background=self.deepbg)
 
         topbar = ttk.Frame(self, style="deepBG.TFrame")
@@ -149,7 +134,7 @@ class Getcomics(tk.Tk):
                                   orient="vertical",
                                   command=dlcanva.yview)
         instructions = ttk.Label(self.resultsframe, style="L.TLabel",
-                                 text='Cliquez pour ajouter un élément '\
+                                 text='Cliquez pour ajouter un élément '
                                  'à votre liste de téléchargement')
         liste = tk.Label(rightframe, width=self.dlwidth,
                          bg=self.dark2, fg=self.fg,
@@ -159,11 +144,11 @@ class Getcomics(tk.Tk):
                            style="dl.TButton",
                            command=lambda: self.dlcom(self.downloadlist))
 
-        outputtext = tkst.ScrolledText(
-                bottombar, height=8, bg='black', fg='white', wrap=tk.WORD)
-        self.progress = ttk.Progressbar(
-                bottombar, orient="horizontal",
-                variable=self.currentpercent, mode="determinate")
+        outputtext = tkst.ScrolledText(bottombar, height=8, bg='black',
+                                       fg='white', wrap=tk.WORD)
+        self.progress = ttk.Progressbar(bottombar, orient="horizontal",
+                                        variable=self.currentpercent,
+                                        mode="determinate")
         self.progress2 = ttk.Progressbar(bottombar, orient="horizontal",
                                          variable=self.percent,
                                          mode="determinate")
@@ -210,17 +195,16 @@ class Getcomics(tk.Tk):
         self.searchlist.clear()
         self.destroylist(self.buttonlist)
         searchmode = self.choices.index(self.mode.get())
-        self.searchlist = getcomics.getresults(getcomics.searchurl(
-                                                        self.usersearch.get(),
-                                                        searchmode, self.page))
+        self.searchlist = getresults(getcomics.searchurl(
+                                self.usersearch.get(), searchmode, self.page))
         # buttonlist = list()
         for i in self.searchlist:
-            title = i[1] + ' (' + str(i[2]) + ')'
+            title = f'{i["title"]} ({i["size"]})'
             newButton = tk.Button(
                     self.resultsframe, text=title, width=self.resultwidht,
                     relief='flat', border=0,
                     bg=self.button_dark, fg=self.fg,
-                    activebackground='#FAFAFA', activeforeground='black',
+                    activebackground=self.gray98, activeforeground='black',
                     highlightthickness=0, font=("Verdana", 10))
             newButton.config(
                     command=lambda button=newButton: self.addtodl(button))
@@ -241,111 +225,90 @@ class Getcomics(tk.Tk):
     def addtodl(self, button):
         index = self.buttonlist.index(button)
         comic = button.cget('text')
-        if comic not in (item[1] for item in self.downloadlist):
-            if self.searchlist[index][2] is not None:
-                bytes = tools.convert2bytes(self.searchlist[index][2])
+        if comic not in (item["title"] for item in self.downloadlist):
+            if self.searchlist[index]["size"] is not None:
+                bytes = tools.convert2bytes(self.searchlist[index]["size"])
                 self.listsize += bytes
-            newDL = tk.Button(
-                    self.dlframe, text=button.cget('text').title(),
-                    width=self.resultwidht, anchor='w',
-                    bg=self.button_dark, fg=self.fg,
-                    activebackground='#FAFAFA', activeforeground='black',
-                    relief='flat', border=0, highlightthickness=0,
-                    font=("Verdana", 10))
+            newDL = tk.Button(self.dlframe, text=button.cget('text').title(),
+                              width=self.resultwidht, anchor='w',
+                              bg=self.button_dark, fg=self.fg,
+                              activebackground=self.gray98,
+                              activeforeground='black',
+                              relief='flat', border=0, highlightthickness=0,
+                              font=("Verdana", 10))
             newDL.config(command=lambda button=newDL: self.removedl(button))
             newDL.pack(fill='both', expand=1, pady=0)
-            self.downloadlist.append((self.searchlist[index][0],
-                                      self.searchlist[index][1],
-                                      newDL,
-                                      self.searchlist[index][2]))
-            print("Taille de la file d'attente (donnée indicative) : "
-                  + tools.bytes_2_human_readable(self.listsize))
+            self.downloadlist.append({"url": self.searchlist[index]["url"],
+                                      "title": self.searchlist[index]["title"],
+                                      "button": newDL,
+                                      "size": self.searchlist[index]["size"]})
+            total_size = tools.bytes_2_human_readable(self.listsize)
+            print(f"Taille de la file d'attente (donnée indicative) : "
+                  f"{total_size}")
         else:
             print("Already in your DL list")
 
     # Click to remove an item function
     def removedl(self, button):
         for i in self.downloadlist:
-            if button == i[2]:
-                if i[3] is not None:
-                    bytes = tools.convert2bytes(i[3])
+            if button == i["button"]:
+                if i["size"] is not None:
+                    bytes = tools.convert2bytes(i["size"])
                     self.listsize -= bytes
                 self.downloadlist.remove(i)
         button.destroy()
-        print("Taille de la file d'attente (donnée indicative) : "
-              + tools.bytes_2_human_readable(self.listsize))
+        total_size = tools.bytes_2_human_readable(self.listsize)
+        print(f"Taille de la file d'attente (donnée indicative) : "
+              f"{total_size}")
 
     # DL all comics in the liste
     def downAllCom(self, liste):
         self.dlbytes.set(0)
         for dl in liste:
             try:
-                self.downCom(dl[0])
+                self.downCom(dl["url"])
             except Exception as e:
                 print(e)
                 print("Something went wrong")
         print("Terminé, vous pouvez quitter")
         return
 
-    # Find download link
+    # Find Zippyshare Button, explore zippy url, find download url, download
     def downCom(self, url):
-        global user_agent
-        headers = {'User-Agent': user_agent}
-        try:
-            req = urllib.request.Request(url, None, headers)
-            finalurl = urllib.request.urlopen(req).geturl()
-        except urllib.error.HTTPError:
-            print("downCom got HTTPError from Request")
-            raise
-        print ("Trying " + finalurl)
+        finalurl = getfinalurl(url)
+        print("Trying " + finalurl)
         zippylink = ''
         try:
-            soup = htmlsoup.url2soup(finalurl)
-            downButtons = soup.select("div.aio-pulse > a")
-            for button in downButtons:
-                # if 'zippyshare' in str(button).lower() \
-                #       and 'href' in button.a.attrs:
-                if 'zippyshare' in button.get("href") \
-                                or 'zippyshare' in button.get('title').lower():
-                    zippylink = button.get("href")
-                    print(zippylink)
-                    try:
-                        if str(zippylink).startswith(BASE):
-                            print("Abracadabra !")
-                            finalzippy = base64.b64decode(
-                                                zippylink[len(BASE):]).decode()
-                        else:
-                            headers = {'User-Agent': user_agent}
-                            req = urllib.request.Request(
-                                    zippylink, None, headers)
-                            finalzippy = urllib.request.urlopen(req).geturl()
-                    except urllib.error.HTTPError as e:
-                        print("can't obtain final zippyshare url")
-                        print(e)
-                        raise
-                    except IOError:
-                        print("Zippyhare download failed")
-                    try:
-                        print(finalzippy)
-                        self.downComZippy(finalzippy)
-                    except Exception as e:
-                        print(e)
-                        print("error in downComZippy")
+            # soup = htmlsoup.url2soup(finalurl)
+            buttons = find_buttons(finalurl)
+            zippylink = find_zippy_button(buttons)
+            finalzippy = checkurl(zippylink)
+        except ZippyButtonError as e:
+            return
+            print(e)
         except urllib.error.HTTPError as e:
             print("downCom got HTTPError")
             print(e)
             raise
+        try:
+            print(finalzippy)
+            self.downComZippy(finalzippy)
+        except Exception as e:
+            print(e)
+            print("error in downComZippy")
         return
 
     # Download from zippyshare
     def downComZippy(self, url):
         self.progress["value"] = 0
-        soup = htmlsoup.url2soup(url)
-        # downButton = soup.select('script[type="text/javascript"]')
-        downButton = soup.find('a', id="dlbutton").find_next_sibling().text
         try:
-            fullURL, fileName = zpshare.getFileUrl(url, downButton)
-            print ("Download from zippyhare into : " + fileName)
+            downButton = find_zippy_download_button(url)
+        except DownloadButtonError as e:
+            print(e)
+            return
+        try:
+            fullURL, fileName = getFileUrl(url, downButton)
+            print("Download from zippyhare into : " + fileName)
             r = requests.get(fullURL, stream=True)
             size = int(r.headers['Content-length'])  # Size in bytes
             print(tools.bytes_2_human_readable(size))
@@ -366,15 +329,13 @@ class Getcomics(tk.Tk):
                     self.percent.set(
                             int(100 * self.dlbytes.get() / self.listsize))
                     f.write(block)
-            except KeyboardInterrupt:
-                pass
             except IOError:
                 print("Error while writing file")
             try:
                 r.close()
             except Exception:
                 pass
-            print ('Done\n--')
+            print('Done\n')
         return
 
     # Nexpage button function

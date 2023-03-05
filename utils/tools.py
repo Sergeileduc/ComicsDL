@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
 
+import re
+
 defs = {'KB': 1024, 'MB': 1024**2, 'GB': 1024**3, 'TB': 1024**4}
 
 
@@ -41,4 +43,16 @@ def bytes_2_human_readable(number_of_bytes):
     precision = 1
     number_of_bytes = round(number_of_bytes, precision)
 
-    return str(number_of_bytes) + ' ' + unit
+    return f'{number_of_bytes} {unit}'
+
+
+# Just optimizing
+def searchRegex(html, regex, n):
+    urlPattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
+    return urlPattern.search(str(html)).group(n)
+
+
+# or by name
+def searchRegexName(html, regex, name):
+    urlPattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
+    return urlPattern.search(str(html)).group(name)
