@@ -2,11 +2,11 @@
 # -*-coding:utf-8 -*-
 """Get all new comics in getcomics weeklies."""
 
+import copy
 import os
 import subprocess
-import copy
-from utils import htmlsoup, getcomics
 
+from utils import htmlsoup, getcomics
 # Constants
 from utils.const import DC_URL, MARVEL_URL, IMAGE_URL, INDIE_URL
 from utils.const import note, howto, howtodl, consistof
@@ -34,7 +34,7 @@ def print_week(url, f, editor):
     """Write all comics of 'editor' weekly pack in file f."""
     global flag
     flag = False
-    post_title, weekly_url = getcomics.find_last_weekly2(url)
+    post_title, weekly_url = getcomics.find_last_weekly(url)
 
     # Missing post already been done
     if "Missing" in post_title and flag:
@@ -63,7 +63,7 @@ def print_one_editor(url, f, editor):
     f.write("=====================\n")
     for s in var:  # var is a list of 'strong' divs
         s_copy = copy.copy(s)
-        for span in s_copy:
+        for _ in s_copy:
             s_copy.span.decompose()
         name = s_copy.text.replace(' : ', '').replace('| ', '')
         a = s.find('a')
@@ -86,9 +86,7 @@ def print_multiple_editors(url, f):
 
     # List of comics publishers
     publishers = soup.find_all('span', style="color: #3366ff;")
-    indies = []
-    for p in publishers:
-        indies.append(p.text)
+    indies = [p.text for p in publishers]
 
     # List of comics
     var = soup.find_all('strong')
@@ -97,12 +95,12 @@ def print_multiple_editors(url, f):
         if s.text in indies:
             f.write(f'\n{s.text}\n=====================\n')
         # blots
-        elif note in s.text \
-                or howto in s.text \
-                or consistof in s.text \
-                or howtodl in s.text \
-                or lower in s.text \
-                or indieweek in s.text:
+        elif (note in s.text
+              or howto in s.text
+              or consistof in s.text
+              or howtodl in s.text
+              or lower in s.text
+              or indieweek in s.text):
             pass
         # more bloats
         elif s.text in bloat:
@@ -111,7 +109,7 @@ def print_multiple_editors(url, f):
         else:
             # make a copy of strong s to remove span
             s_copy = copy.copy(s)
-            for span in s_copy:
+            for _ in s_copy:
                 try:
                     s_copy.span.decompose()
                 except AttributeError:

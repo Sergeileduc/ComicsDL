@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""Download selected comics in getcomics.info weekly packs."""
+
 import os
 import sys
-from utils.getcomics import get_weekly_comics
 import time
+
+from utils.getcomics import get_weekly_comics
 
 getcomicsurls = [
     'https://getcomics.info/tag/dc-week/',

@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""Module to download on zippyshare."""
 
 import re
 import requests
@@ -36,6 +37,7 @@ def _remove_tag(filename):
 
 
 def get_file_url(url, button):
+    """Find filename and download url."""
     print("Found zippyshare : " + url)
     first_part = search_regex_name(button, regex_first, 'first')
     a = int(search_regex_name(button, regex_abcd, 'a'))
@@ -58,6 +60,7 @@ def get_file_url(url, button):
 
 
 def check_url(zippylink):
+    """Check url."""
     try:
         # TODO : verify if useful
         if str(zippylink).startswith(BASE):
@@ -72,8 +75,8 @@ def check_url(zippylink):
         raise
 
 
-# TODO : maybe underscore for internal use only
 def find_zippy_download_button(zippy_url):
+    """Find download button on zippyshare page."""
     try:
         soup = url2soup(zippy_url)
         # downButton = soup.select('script[type="text/javascript"]')
@@ -84,5 +87,8 @@ def find_zippy_download_button(zippy_url):
 
 
 class DownloadButtonError(Exception):
+    """Error."""
+
     def __init__(self, msg):
+        """Init with msg."""
         super().__init__(self, msg)

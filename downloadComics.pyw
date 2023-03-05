@@ -2,23 +2,25 @@
 # -*-coding:utf-8 -*-
 """GUI to download comics on getcomics.info."""
 
-import sys
 import requests
+import sys
+import threading
+import urllib.request
+import urllib.error
+
 import tkinter as tk
 import tkinter.scrolledtext as tkst
 from tkinter import ttk
-import urllib.request
-import urllib.error
-import threading
 
 from utils import getcomics
-from utils.getcomics import find_buttons, find_zippy_button, ZippyButtonError
-from utils.getcomics import getresults
-from utils.tools import convert2bytes, bytes_2_human_readable
-from utils.zpshare import get_file_url, check_url
-from utils.zpshare import find_zippy_download_button, DownloadButtonError
-from utils.urltools import getfinalurl
+from utils.getcomics import (find_buttons, find_zippy_button,
+                             getresults, ZippyButtonError)
+
 from utils.std_redirect import StdRedirector
+from utils.tools import convert2bytes, bytes_2_human_readable
+from utils.urltools import getfinalurl
+from utils.zpshare import (check_url, DownloadButtonError,
+                           find_zippy_download_button, get_file_url)
 
 
 # Main program interface and code

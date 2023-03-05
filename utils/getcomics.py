@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""Module to parse getcomics.info."""
 
 import re  # regex
 import requests  # html
@@ -31,11 +32,11 @@ BASE = "https://getcomics.info/go.php-url=/"
 user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
 
 
-# Find las weekly post
 def find_last_weekly(url):
+    """Find las weekly post."""
     lastPost = url2soup(url).find('article', class_='type-post')
     # Check if today's archive is there, and retrieve its url
-    print(f"Latest weekly post: {lastPost.time['datetime']}")
+    # print(f"Latest weekly post: {lastPost.time['datetime']}")
     # TODO : code for auotmate, maybe uncode later
     # if today in lastPost.time['datetime']:
     #     # print ('There is a new one today. Hurrah!')
@@ -45,33 +46,26 @@ def find_last_weekly(url):
     #     # print ('Continue anyway...')
     #     # quit()
     #     pass
-    postUrl = lastPost.h1.a['href']
-    return postUrl
-
-
-# TODO : what is that ?
-# Find las weekly post
-def find_last_weekly2(url):
-    lastPost = url2soup(url).find_all('article', class_='type-post')[0]
     postTitle = lastPost.h1.a.text
     postUrl = lastPost.h1.a['href']
     return postTitle, postUrl
 
 
 def comics_list(url):
-    weeklyUrl = find_last_weekly(url)
+    """Get comics in a weekly pack."""
+    weeklyUrl = find_last_weekly(url)[1]
     content = url2soup(weeklyUrl).select_one("section.post-contents")
     liste_a = content.find_all('a', style="color: #ff0000;")
     return get_href_with_name(liste_a, 'Download')
 
 
-# Find download buttons in a getcomics pages
 def _find_dl_buttons(url):
+    """Find download buttons in a getcomics pages."""
     return url2soup(url).select("div.aio-pulse > a")
 
 
-# Find download link
 def down_com(url):
+    """Find download link."""
     # global user_agent
     # headers = {'User-Agent': user_agent}
     try:
@@ -122,8 +116,8 @@ def down_com(url):
     return
 
 
-# Download from zippyshare
 def down_com_zippy(url):
+    """Download from zippyshare."""
     soup = url2soup(url)
     # Other beautiful soup selectors :
     # select("script[type='text/javascript']")
@@ -157,8 +151,8 @@ def down_com_zippy(url):
     return
 
 
-# Compare remote and local list of comics and download
 def get_weekly_comics(mylist):
+    """Compare remote and local list of comics and download."""
     print('Initialisation...')
     print('Je vais chercher les mots clés :')
     print(mylist)
@@ -180,9 +174,11 @@ def get_weekly_comics(mylist):
     print("C'est tout. Vous pouvez fermer.")
 
 
-# Search Getcomics
-# Returns names and urls of posts returned by input url
 def getresults(url):
+    """Search Getcomics.
+
+    Returns names and urls of posts returned by input url.
+    """
     searchlist = list()
     try:
         res = url2soup(url).select("div.post-info")
@@ -203,8 +199,8 @@ def getresults(url):
         print("something wrong happened")
 
 
-# Returns a getcomics research URL
 def searchurl(user_search, mode, page):
+    """Return a getcomics research URL."""
     # Research with tag (https://getcomics.info/tag/......)
     if mode == 0:
         # Page 1 (no page number on this one)
@@ -227,13 +223,13 @@ def searchurl(user_search, mode, page):
     return url
 
 
-# find download buttons in html soup, return list of buttons
 def find_buttons(url):
+    """Find download buttons in html soup, return list of buttons."""
     return url2soup(url).select("div.aio-pulse > a")
 
 
-# find the button for zippyshare
 def find_zippy_button(buttons):
+    """Find the button for zippyshare."""
     if not buttons:
         print("Empty list !")
         raise ZippyButtonError("Empty button list !")
@@ -252,5 +248,8 @@ def find_zippy_button(buttons):
 
 
 class ZippyButtonError(Exception):
+    """Exception for zippyshare."""
+
     def __init__(self, msg):
+        """Init error with msg."""
         super().__init__(self, msg)
