@@ -12,13 +12,13 @@ import requests
 from bs4 import BeautifulSoup
 from PIL import Image, ImageTk  # pip install pillow
 
-DCTRAD_BASE = 'http://www.dctrad.fr'
-DCTRAD_PAGE = 'http://www.dctrad.fr/index.php'
+DCTRAD_BASE = 'https://www.dctrad.fr'
+DCTRAD_PAGE = f'{DCTRAD_BASE}/index.php'
 cat_img_urls = [
-    'http://www.dctrad.fr/images/icons/forum/RebirthK.png',
-    'http://www.dctrad.fr//images/icons/forum/dccomicsv2.png',
-    'http://www.dctrad.fr//images/icons/forum/IconindiedctK.png',
-    'http://www.dctrad.fr/images/icons/forum/MarvelK.png']
+    'https://www.dctrad.fr/images/icons/forum/RebirthK.png',
+    'https://www.dctrad.fr//images/icons/forum/dccomicsv2.png',
+    'https://www.dctrad.fr//images/icons/forum/IconindiedctK.png',
+    'https://www.dctrad.fr/images/icons/forum/MarvelK.png']
 REFRESH_LOGO_URL = 'http://icons.iconarchive.com/icons/graphicloads/' \
                    '100-flat-2/128/arrow-refresh-4-icon.png'
 
@@ -43,10 +43,10 @@ def open_url(url):
 
 # Get html from url
 def _return_html(url):
-    hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
+    # hdr = {'Accept': 'text/html', 'User-Agent': "Fiddler"}
     # req = urllib2.Request(url, headers=hdr)
     try:
-        html = requests.get(url, headers=hdr).text
+        html = requests.get(url).text
         return html
     except requests.exceptions.HTTPError as e:
         print(e)

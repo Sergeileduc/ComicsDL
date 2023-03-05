@@ -8,23 +8,23 @@ import time
 
 from utils.getcomics import get_weekly_comics
 
-myComicsList = []
-
+my_comics_list = []
 config = 'liste-comics.txt'
 
 # Read configfile
 try:
     configfile = os.path.join(os.path.dirname(__file__), config)
-    userList = list()
+    user_list = []
     with open(configfile, 'r') as f:
-        userList = f.read().splitlines()
-        userList.sort()
-        f.close()
+        user_list = f.read().splitlines()
+    user_list.sort()
+
     with open(configfile, 'w') as f:
-        for comic in userList:
+        for comic in user_list:
             f.write(f'{comic}\n')
-            myComicsList.append(comic.lower().replace(' ', '-'))
-        f.close()
+
+    my_comics_list = [comic.lower() for comic in user_list]
+
 except IOError:
     print(f"Erreur : Il faut créer un fichier {config}"
           " et y ajouter vos séries en ligne,\n comme par exemple"
@@ -32,9 +32,9 @@ except IOError:
     sys.exit(1)
 
 try:
-    get_weekly_comics(myComicsList)
-    time.sleep(20)
+    get_weekly_comics(my_comics_list)
+    time.sleep(5)
 except NameError as e:
     print(e)
     print("Le script a rencontré une erreur.\nVous pouvez fermer.")
-    time.sleep(20)
+    time.sleep(5)

@@ -12,13 +12,11 @@ from tkinter import ttk
 import requests
 
 from utils import getcomics
-from utils.getcomics import (
-    ZippyButtonError, find_buttons, find_zippy_button, getresults)
+from utils.getcomics import ZippyButtonError, find_buttons, find_zippyshare_url, getresults
 from utils.std_redirect import StdRedirector
 from utils.tools import bytes_2_human_readable, convert2bytes
 from utils.urltools import getfinalurl
-from utils.zpshare import (DownloadButtonError, check_url,
-                           find_zippy_download_button, get_file_url)
+from utils.zpshare import check_url, get_file_filename_url
 
 
 # Main program interface and code
@@ -199,9 +197,9 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
         self.search_list.clear()
         self.destroy_list(self.button_list)
         search_mode = self.choices.index(self.mode.get())
-        self.search_list = getresults(
-            getcomics.searchurl(self.user_search.get(), search_mode, self.page)
-        )
+        search_url = getcomics.searchurl(self.user_search.get(), search_mode, self.page)
+        print(search_url)
+        self.search_list = getresults(search_url)
         # button_list = list()
         for i in self.search_list:
             title = f'{i["title"]} ({i["size"]})'
@@ -283,7 +281,7 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
         print("Trying " + final_url)
         try:
             buttons = find_buttons(final_url)
-            zippylink = find_zippy_button(buttons)
+            zippylink = find_zippyshare_url(buttons)
             finalzippy = check_url(zippylink)
         except ZippyButtonError as err:
             print(err)
@@ -299,16 +297,11 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
             print(exc)
             print("error in down_com_zippy")
 
-    def down_com_zippy(self, url):
+    def down_com_zippy(self, url: str):
         """Download from zippyshare."""
         self.progress["value"] = 0
         try:
-            down_button = find_zippy_download_button(url)
-        except DownloadButtonError as err:
-            print(err)
-            return
-        try:
-            full_url, filename = get_file_url(url, down_button)
+            full_url, filename = get_file_filename_url(url)
             print("Download from zippyshare into : " + filename)
             r = requests.get(full_url, stream=True)
             size = int(r.headers['Content-length'])  # Size in bytes

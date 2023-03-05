@@ -5,9 +5,7 @@
 import pandas as pd
 import pytest
 from utils.tools import search_regex_name
-from utils.zpshare import (get_file_url, _remove_tag,
-                           find_zippy_download_button,
-                           regex_abcd)
+from utils.zpshare import get_file_filename_url, _remove_tag
 
 
 # Read abcd from file and make a list of tuples
@@ -22,20 +20,22 @@ def button_html(datadir):
     return contents
 
 
+@pytest.mark.deprecated("This test is no longer required")
+@pytest.mark.skip(reason="no way of currently testing this")
 @pytest.mark.parametrize("field,expected", abcd)
 def test_search_regex_name(button_html, field, expected):
     """Doc."""
+    regex_abcd = r'.*?getElementById.*?href = \"(.*?)\" \+ \((?P<a>\d+) \% (?P<b>\d+) \+ (?P<c>\d+) \% (?P<d>\d+)\)'  # noqa: E501
     res = int(search_regex_name(button_html, regex_abcd, field))
     assert res == expected
 
 
 @pytest.mark.parametrize("url,expected_name",
-                         [("https://www90.zippyshare.com/v/T3CXRVue/file.html",
-                           "Batman 088 (2020).cbr")])
+                         [("https://www32.zippyshare.com/v/gIpN3vBt/file.html",
+                           "X-Force 038 (2023).cbr")])
 def test_get_file_url(url, expected_name):
     """Test get_file_url()."""
-    down_button = find_zippy_download_button(url)
-    _, name = get_file_url(url, down_button)
+    _, name = get_file_filename_url(url)
     assert name == expected_name
 
 

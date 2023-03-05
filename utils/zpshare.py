@@ -2,33 +2,30 @@
 # -*-coding:utf-8 -*-
 """Module to download on zippyshare."""
 
-import re
-import requests
-from requests.exceptions import HTTPError
+import asyncio
 import base64
+import re
 from urllib.parse import unquote, urlparse
-# from urllib.error import HTTPError
-# perso
-from utils.tools import search_regex_name
+
+import pyppeteer
+import requests
+from requests_html import AsyncHTMLSession
+from requests.exceptions import HTTPError
+
 from utils.htmlsoup import url2soup
+# from urllib.error import HTTPError
+
+from utils.tools import search_regex_name
 
 BASE = "https://getcomics.info/go.php-url=/"
 
-user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}  # noqa:E501
+
 
 # Regex to detect name, (year) (tag).extension
 regex_tag = r"(.+)(\ \([1|2][9|0]\d{2}\))(.*)(\..{3})"
-
-regex_first = r'.*?getElementById.*?href ?= ?\"(?P<first>.*?)\"'
-
-regex_abcd = r'.*?getElementById.*?href = \"(.*?)\" \+ \((?P<a>\d+) \% (?P<b>\d+) \+ (?P<c>\d+) \% (?P<d>\d+)\)'  # noqa: E501
-
-# regex_rawname = (r'.*?getElementById.*?href = '
-#                  r'\".*?\" \+ \(.*?\) \+ \"(?P<name>.*?)\"')
-# regex_rawname = r".*?getElementById.*?href = \".*?\"\+\(.*\)\+\"/(?P<name>.*?)\""  # noqa: E501
-regex_rawname = r'.*?getElementById.*?href ?= ?\".*?\" ?\+ ?\(.*\) ?\+ ?\"\/?(?P<name>.*?)\"'  # noqa: E501
-
-regex_vara = r"var a = (?P<A>\d+)"
+#  Regex for finding the name of the file
+regex_rawname = r"/d/.*./*.?/(?P<name>.*)"
 
 
 def _remove_tag(filename):
@@ -39,34 +36,52 @@ def _remove_tag(filename):
         return filename
 
 
-def get_file_url(url, button):
-    """Find filename and download url."""
+def get_file_filename_url(url: str) -> tuple[str, str]:
+    """Find filename and download url in a zippyshare page.
+
+    Args:
+        url (str): zippyshare page url
+
+    Returns:
+        tuple[str, str]: full download URL, filename
+    """
     print("Found zippyshare : " + url)
-    first_part = search_regex_name(button, regex_first, 'first')
-    print(first_part)
-    a = int(search_regex_name(button, regex_abcd, 'a'))
-    # a = int(search_regex_name(button, regex_vara, 'A'))
-    b = int(search_regex_name(button, regex_abcd, 'b'))
-    # b = 3
-    c = int(search_regex_name(button, regex_abcd, 'c'))
-    d = int(search_regex_name(button, regex_abcd, 'd'))
-
-    raw_name = search_regex_name(button, regex_rawname, 'name')
-    # unquote replace special characters like %2c, etc..
-    filename = _remove_tag(unquote(raw_name).strip('/'))
-    # Calculating the id and forming url
-    # that is an extremely dirty way, I know
-    second_part = a % b + c % d
-    # second_part = a**3+b
-
+    # session = HTMLSession()
+    # print("HTML session created")
+    # r = session.get(url, headers=headers)
+    # session.close()
+    # print("HTML session closed")
+    # r.html.render()
+    # print("r.html.render() is OK")
+    html = asyncio.run(async_render(url))
+    button = html.find("a#dlbutton", first=True)
+    partial_url = button.attrs["href"]
+    raw_name = search_regex_name(partial_url, regex_rawname, 'name')
+    file_name = _remove_tag(unquote(raw_name).strip('/'))
     parsed_url = urlparse(url)
     domain = f"{parsed_url.scheme}://{parsed_url.netloc}"
-    full_url = f"{domain}{first_part}{second_part}/{raw_name}"
-    print(full_url)
-    return full_url, filename
+    full_url = f"{domain}{partial_url}"
+    print(f"{full_url = }")
+    return full_url, file_name
 
 
-def check_url(zippylink):
+async def async_render(url: str):
+    asession = AsyncHTMLSession()
+    browser = await pyppeteer.launch({
+        'ignoreHTTPSErrors': True,
+        'headless': True,
+        'handleSIGINT': False,
+        'handleSIGTERM': False,
+        'handleSIGHUP': False
+    })
+    asession._browser = browser
+    r = await asession.get(url, headers=headers)
+    await r.html.arender()
+    await asession.close()
+    return r.html
+
+
+def check_url(zippylink: str) -> str:
     """Check url."""
     try:
         # TODO : verify if useful

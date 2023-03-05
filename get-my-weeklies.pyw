@@ -89,7 +89,7 @@ class MyComicsList(tk.Tk):
                                       orient="vertical",
                                       command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.title("Télécharger All V2021-03")
+        self.title("Télécharger All V2023-03")
         self.geometry(f"{w}x{h}+{int(x)}+{int(y)}")
         self.comic_create = tk.Text(self.text_frame, height=3,
                                     bg="white", fg="black")
@@ -133,8 +133,9 @@ class MyComicsList(tk.Tk):
         """Run download."""
         sys.stdout = StdRedirector(self.output_text)
         current_comic = self.load_comic()
-        comics_list = [row[0].lower().replace(' ', '-') for row in current_comic]  # noqa: E501
-        thread1 = threading.Thread(target=get_weekly_comics, args=[comics_list])  # noqa: E501
+        # comics_list = [row[0].lower().replace(' ', '-') for row in current_comic]
+        comics_list = [row[0].lower() for row in current_comic]
+        thread1 = threading.Thread(target=get_weekly_comics, args=[comics_list])
         thread1.start()
 
     def add_comic(self, event=None, comic_text=None, from_db=False):

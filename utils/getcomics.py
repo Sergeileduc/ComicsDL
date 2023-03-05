@@ -3,12 +3,14 @@
 """Module to parse getcomics.info."""
 
 import re  # regex
+from datetime import datetime
+
 import requests  # html
 from requests.exceptions import HTTPError
-from datetime import datetime
-from utils.htmlsoup import url2soup, get_href_with_name
+
+from utils.htmlsoup import url2soup
 from utils import zpshare
-from utils import tools
+from utils.tools import bytes_2_human_readable, NamedUrl
 from utils.urltools import getfinalurl
 from urllib.parse import quote_plus
 from utils.zpshare import check_url
@@ -28,9 +30,39 @@ getcomicsurls = ['https://getcomics.info/tag/dc-week/',
 user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'  # noqa: E501
 
 
-def find_last_weekly(url):
-    """Find las weekly post."""
-    lastPost = url2soup(url).find('article', class_='type-post')
+def get_weekly_comics(my_list: list):
+    """Compare remote and local list of comics and download."""
+    print('Initialisation...')
+    print('Je vais chercher les mots clés :')
+    print(my_list)
+
+    for url in getcomicsurls:
+        # Other soup selectors
+        # select_one("section.post-contents > ul")\
+        # find_all('span', style="color: #ff0000;")
+        remote_comics_list = comics_list(url)
+        # print(f"{remote_comics_list = }")
+        for newcomic in remote_comics_list:
+            try:
+                for my_comics in my_list:
+                    if my_comics in newcomic.name:
+                        download_comic(newcomic.url)
+            except Exception as e:
+                print(e)
+                pass
+    print("C'est tout. Vous pouvez fermer.")
+
+
+def find_last_weekly(url) -> NamedUrl:
+    """Find las weekly post.
+
+    Args:
+        url (str): url of all weekly posts
+
+    Returns:
+        NamedUrl: Title and url of last weekly post
+    """
+    last_post = url2soup(url).find('article', class_='type-post')
     # Check if today's archive is there, and retrieve its url
     # print(f"Latest weekly post: {lastPost.time['datetime']}")
     # TODO : code for auotmate, maybe uncode later
@@ -42,17 +74,37 @@ def find_last_weekly(url):
     #     # print ('Continue anyway...')
     #     # quit()
     #     pass
-    postTitle = lastPost.h1.a.text
-    postUrl = lastPost.h1.a['href']
-    return postTitle, postUrl
+    # post_title = last_post.h1.a.text
+    # post_url = last_post.h1.a['href']
+    # return post_title, post_url
+    return NamedUrl(name=last_post.h1.a.text,
+                    url=last_post.h1.a['href'])
 
 
-def comics_list(url):
-    """Get comics in a weekly pack."""
-    weeklyUrl = find_last_weekly(url)[1]
-    content = url2soup(weeklyUrl).select_one("section.post-contents")
-    liste_a = content.find_all('a', style="color: #ff0000;")
-    return get_href_with_name(liste_a, 'Download')
+def comics_list(url: str) -> list[NamedUrl]:
+    """Get list of Name/URL for comics posts in the weekly pack.
+
+    Args:
+        url (str): url of getcomics weeklies page.
+
+    Returns:
+        list[NamedUrl]: liste of all comics (NamedUrl with name and url keys)
+    """
+    weekly_url = find_last_weekly(url).url
+    content = url2soup(weekly_url).select_one("section.post-contents")
+    posts_links = content.select("ul > li > strong")
+
+    res_list: list(NamedUrl) = []
+    for p in posts_links:
+        try:
+            name = p.contents[0].lower()  # Text on the post link
+            a = p.select_one('span > a')
+            if a.has_attr('href') and a.text == "Download":
+                url = a.get('href')
+            res_list.append(NamedUrl(name=name, url=url))
+        except Exception as e:
+            print(e)
+    return res_list
 
 
 def _find_dl_buttons(url):
@@ -60,13 +112,17 @@ def _find_dl_buttons(url):
     return url2soup(url).select("div.aio-pulse > a")
 
 
-def down_com(url):
-    """Find Zippyshare Button, find download url, download."""
-    final_url = getfinalurl(url)
-    print("Trying " + final_url)
+def download_comic(url: str):
+    """Find Zippyshare Button, find download url, download.
+
+    Args:
+        url (str): getcomics "post" url for a comicbook
+    """
+    final_url: str = getfinalurl(url)  # handle possible redirecteions
+    print(f"download_comic funciton with : {final_url}")
     try:
         buttons = find_buttons(final_url)
-        zippylink = find_zippy_button(buttons)
+        zippylink = find_zippyshare_url(buttons)
         finalzippy = check_url(zippylink)
     except ZippyButtonError as e:
         print(e)
@@ -76,37 +132,32 @@ def down_com(url):
         print(e)
         raise
     try:
-        print(finalzippy)
+        print(f"{finalzippy = }")
         down_com_zippy(finalzippy)
     except Exception as e:
         print(e)
         print("error in down_com_zippy")
 
 
-def down_com_zippy(url):
-    """Download from zippyshare."""
-    soup = url2soup(url)
-    # Other beautiful soup selectors :
-    # select("script[type='text/javascript']")
-    # select("table[class='folderlogo'] > tr > td")[0]
-    # find("div", style=re.compile("margin-left"))
-    # find("script", type="text/javascript")
-    # find("div", style=re.compile("width: 303px;"))
-    # find("script", type="text/javascript")
-    # downButton = soup.find('a', id="dlbutton").find_next_sibling().text
-    downButton = soup.find('a', id="dlbutton").find_next_sibling().string
+def down_com_zippy(url: str):
+    """Download from zippyshare page.
+
+    Args:
+        url (str): zippyshare page url.
+    """
+    print(f"down_com_zippy function with : {url}")
     try:
-        fullURL, fileName = zpshare.get_file_url(url, downButton)
-        print(f"Downloading from zippyshare into : {fileName}")
-        r = requests.get(fullURL, stream=True)
-        size = tools.bytes_2_human_readable(int(r.headers['Content-length']))
-        print(size)
+        full_url, filename = zpshare.get_file_filename_url(url)
+        print(f"Downloading from zippyshare into : {filename}")
+        r = requests.get(full_url, stream=True)
+        size = bytes_2_human_readable(int(r.headers['Content-length']))
+        print(f"{size = }")
     except Exception as e:
         print(e)
         print("Can't get download link on zippyshare page")
 
     # Download from url & trim it a little bit
-    with open(fileName, 'wb') as f:
+    with open(filename, 'wb') as f:
         try:
             for block in r.iter_content(1024):
                 f.write(block)
@@ -116,30 +167,6 @@ def down_com_zippy(url):
             print("Error while writing file")
     r.close()
     print('Done\n--')
-    return
-
-
-def get_weekly_comics(mylist):
-    """Compare remote and local list of comics and download."""
-    print('Initialisation...')
-    print('Je vais chercher les mots clés :')
-    print(mylist)
-
-    for url in getcomicsurls:
-        # Other soup selectors
-        # select_one("section.post-contents > ul")\
-        # find_all('span', style="color: #ff0000;")
-        remoteComicsList = comics_list(url)
-        for newcomic in remoteComicsList:
-            try:
-                for myComic in mylist:
-                    if myComic in newcomic:
-                        down_com(newcomic)
-                        pass
-            except Exception as e:
-                print(e)
-                pass
-    print("C'est tout. Vous pouvez fermer.")
 
 
 def getresults(url):
@@ -191,13 +218,24 @@ def searchurl(user_search, mode, page):
     return url
 
 
-def find_buttons(url):
+def find_buttons(url: str) -> list:
     """Find download buttons in html soup, return list of buttons."""
     return url2soup(url).select("div.aio-pulse > a")
 
 
-def find_zippy_button(buttons):
-    """Find the button for zippyshare."""
+def find_zippyshare_url(buttons) -> str:
+    """Find zippyshare page URL in the buttons.
+
+    Args:
+        buttons (list): list of "buttons" (soup) on getcomics post page.
+
+    Raises:
+        ZippyButtonError: empty list
+        ZippyButtonError: no zippyshare button/url found.
+
+    Returns:
+        str: URL of the zippyshare page
+    """
     if not buttons:
         print("Empty list !")
         raise ZippyButtonError("Empty button list !")
