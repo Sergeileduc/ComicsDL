@@ -66,13 +66,14 @@ class Getcomics(tk.Tk):
                         foreground=self.fg, background=self.color1,
                         relief='raised', font=("Verdana", 12))
         style.configure('pages.TButton', font=("Verdana", 12), relief='raised',
-                        background=self.dark3, foreground=self.fg,
+                        # background=self.color1,
+                        # foreground=self.fg,
                         border=2, highlightthickness=0)
         style.map('pages.TButton',
                   foreground=[('active', 'black')],
                   background=[('active', self.fg)])
         style.configure('dl.TButton',
-                        background=self.color1, foreground=self.fg,
+                        # background=self.color1, foreground=self.fg,
                         highlightthickness=0, font=("Verdana", 12, 'bold'))
         style.map('dl.TButton',
                   foreground=[('active', 'black')],
