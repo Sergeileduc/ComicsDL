@@ -203,7 +203,7 @@ class Getcomics(tk.Tk):
         search_mode = self.choices.index(self.mode.get())
         self.search_list = getresults(
             getcomics.searchurl(self.user_search.get(), search_mode, self.page)
-            )
+        )
         # button_list = list()
         for i in self.search_list:
             title = f'{i["title"]} ({i["size"]})'
@@ -213,7 +213,7 @@ class Getcomics(tk.Tk):
                 bg=self.button_dark, fg=self.fg,
                 activebackground=self.gray98, activeforeground='black',
                 highlightthickness=0, font=("Verdana", 10)
-                )
+            )
             new_button.config(
                 command=lambda button=new_button: self.add_to_dl(button))
             new_button.pack(fill='both', expand=1, pady=0)
