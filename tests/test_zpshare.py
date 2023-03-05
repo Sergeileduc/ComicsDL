@@ -10,6 +10,7 @@ from utils.zpshare import (get_file_url, _remove_tag,
                            regex_abcd)
 
 
+# This way of comuting URL is DEPRECATED for the moment
 # Read abcd from file and make a list of tuples
 df = pd.read_csv('tests/test_zpshare/expected_abcd.csv', header=None)
 abcd = [tuple(row) for row in df.values]
@@ -22,6 +23,7 @@ def button_html(datadir):
     return contents
 
 
+@pytest.mark.deprecated("This way of finding URL with a b c d values is DEPRECATED")
 @pytest.mark.parametrize("field,expected", abcd)
 def test_search_regex_name(button_html, field, expected):
     """Doc."""
