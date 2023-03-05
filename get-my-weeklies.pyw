@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""GUI to download selected comics in getcomics.info weekly packs."""
+
 import sys
 import os
 import tkinter as tk
@@ -7,13 +9,15 @@ import tkinter.messagebox as msg
 import sqlite3
 import threading
 
-from utils.getcomics import getWeeklyComics
+from utils.getcomics import get_weekly_comics
 
 exit_thread = False
 exit_success = False
 
 
-class Std_redirector(object):
+class StdRedirector(object):
+    """Redirect std output in a widget."""
+
     def __init__(self, widget):
         self.widget = widget
 
@@ -26,8 +30,9 @@ class Std_redirector(object):
         pass
 
 
-# Our comicsList
 class MyComicsList(tk.Tk):
+    """GUI, made with tk.Tk."""
+    
     def __init__(self, comic=None):
         super().__init__()
 
@@ -44,10 +49,10 @@ class MyComicsList(tk.Tk):
         hs = self.winfo_screenheight()  # height of the screen
 
         # Calculate x and y coordinates for the Tk root window
-        x = (ws/2) - (w/2)
-        y = (hs/2) - (h/2)
-        longtext = "Ajoutez ou supprimez les séries à chercher dans " \
-            "les derniers posts \n\"Weekly\" de Getcomics.info"
+        x = (ws / 2) - (w / 2)
+        y = (hs / 2) - (h / 2)
+        longtext = ("Ajoutez ou supprimez les séries à chercher dans "
+                    "les derniers posts \n\"Weekly\" de Getcomics.info")
         # ascii_dctrad = """
 # ██████╗  ██████╗    ████████╗██████╗  █████╗ ██████╗
 # ██╔══██╗██╔════╝    ╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗
@@ -65,32 +70,33 @@ class MyComicsList(tk.Tk):
 
         self.comic_canvas = tk.Canvas(self)
         self.message = tk.Label(
-                self, text=longtext, anchor=tk.W, justify=tk.CENTER,
-                wraplength=250, font=("Helvetica", 12))
-        self.asciititle = tk.Label(
-                self, text=ascii_title, anchor=tk.W, justify=tk.LEFT,
-                font=("Courier", 4))
+            self, text=longtext, anchor=tk.W, justify=tk.CENTER,
+            wraplength=250, font=("Helvetica", 12))
+        self.ascii_title = tk.Label(self, text=ascii_title,
+                                    anchor=tk.W, justify=tk.LEFT,
+                                    font=("Courier", 4))
         self.comic_frame = tk.Frame(self.comic_canvas)
         self.text_frame = tk.Frame(self)
         self.output_text = tk.Text(self, bg="black", fg="white")
-        self.button = tk.Button(
-                self, text="Télécharger les comics", command=self.run)
-        self.scrollbar = tk.Scrollbar(
-                self.comic_canvas, orient="vertical",
-                command=self.comic_canvas.yview)
+        self.button = tk.Button(self,
+                                text="Télécharger les comics",
+                                command=self.run)
+        self.scrollbar = tk.Scrollbar(self.comic_canvas,
+                                      orient="vertical",
+                                      command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
         self.title("Télécharger All V2019-07")
         self.geometry(f"{w}x{h}+{int(x)}+{int(y)}")
-        self.comic_create = tk.Text(
-                self.text_frame, height=3, bg="white", fg="black")
+        self.comic_create = tk.Text(self.text_frame, height=3,
+                                    bg="white", fg="black")
 
-        self.asciititle.pack()
+        self.ascii_title.pack()
         self.message.pack()
         self.comic_canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         self.canvas_frame = self.comic_canvas.create_window(
-                (0, 0), window=self.comic_frame, anchor="n")
+            (0, 0), window=self.comic_frame, anchor="n")
 
         # self.text_frame.pack(side=tk.BOTTOM, fill=tk.X)
         self.text_frame.pack()
@@ -120,12 +126,12 @@ class MyComicsList(tk.Tk):
         self.comic_canvas.bind("<Configure>", self.comic_width)
 
     def run(self):
-        sys.stdout = Std_redirector(self.output_text)
+        sys.stdout = StdRedirector(self.output_text)
         current_comic = self.load_comic()
-        comicslist = list()
+        comics_list = list()
         for row in current_comic:
-            comicslist.append(row[0].lower().replace(' ', '-'))
-        thread1 = threading.Thread(target=getWeeklyComics, args=[comicslist])
+            comics_list.append(row[0].lower().replace(' ', '-'))
+        thread1 = threading.Thread(target=get_weekly_comics, args=[comics_list])
         thread1.start()
 
     # add comic - create new button and add comic in the database
@@ -158,7 +164,7 @@ class MyComicsList(tk.Tk):
 
             delete_comic_query = "DELETE FROM comics_dc WHERE comic=?"
             delete_comic_data = (comic.cget("text"),)
-            self.runQuery(delete_comic_query, delete_comic_data)
+            self.run_query(delete_comic_query, delete_comic_data)
 
             event.widget.destroy()
 
@@ -187,7 +193,7 @@ class MyComicsList(tk.Tk):
 
     def mouse_scroll(self, event):
         if event.delta:
-            self.comic_canvas.yview_scroll(-1*(event.delta/120), "units")
+            self.comic_canvas.yview_scroll(-1 * (event.delta / 120), "units")
         else:
             if event.num == 5:
                 move = 1
@@ -200,16 +206,16 @@ class MyComicsList(tk.Tk):
     def save_comic(self, comic):
         insert_comic_query = "INSERT INTO comics_dc VALUES (?)"
         insert_comic_data = (comic,)
-        self.runQuery(insert_comic_query, insert_comic_data)
+        self.run_query(insert_comic_query, insert_comic_data)
 
     # read database
     def load_comic(self):
         load_comic_query = "SELECT comic FROM comics_dc"
-        my_comic = self.runQuery(load_comic_query, receive=True)
+        my_comic = self.run_query(load_comic_query, receive=True)
         return my_comic
 
     @staticmethod
-    def runQuery(sql, data=None, receive=False):
+    def run_query(sql, data=None, receive=False):
         conn = sqlite3.connect(".comics.db")
         cursor = conn.cursor()
         if data:
@@ -225,32 +231,32 @@ class MyComicsList(tk.Tk):
         conn.close()
 
     @staticmethod
-    def firstTimeDB():
+    def first_time_db():
         # Create_tables = "CREATE TABLE comics_dc (comic TEXT)"
         create_table1 = "CREATE TABLE IF NOT EXISTS comics_dc (comic TEXT)"
-        MyComicsList.runQuery(create_table1)
+        MyComicsList.run_query(create_table1)
         create_table2 = "CREATE TABLE IF NOT EXISTS comics_marvel (comic TEXT)"
-        MyComicsList.runQuery(create_table2)
+        MyComicsList.run_query(create_table2)
         create_table3 = "CREATE TABLE IF NOT EXISTS comics_indies (comic TEXT)"
-        MyComicsList.runQuery(create_table3)
+        MyComicsList.run_query(create_table3)
         create_table4 = "CREATE TABLE IF NOT EXISTS comics_image (comic TEXT)"
-        MyComicsList.runQuery(create_table4)
+        MyComicsList.run_query(create_table4)
 
         default_comic_data = ("--- Ajoutez vos séries de comics ---",)
         default_dc_query = "INSERT INTO comics_dc VALUES (?)"
-        MyComicsList.runQuery(default_dc_query, default_comic_data)
+        MyComicsList.run_query(default_dc_query, default_comic_data)
         default_marvel_query = "INSERT INTO comics_marvel VALUES (?)"
-        MyComicsList.runQuery(default_marvel_query, default_comic_data)
+        MyComicsList.run_query(default_marvel_query, default_comic_data)
         default_indie_query = "INSERT INTO comics_indies VALUES (?)"
-        MyComicsList.runQuery(default_indie_query, default_comic_data)
+        MyComicsList.run_query(default_indie_query, default_comic_data)
         default_image_query = "INSERT INTO comics_image VALUES (?)"
-        MyComicsList.runQuery(default_image_query, default_comic_data)
+        MyComicsList.run_query(default_image_query, default_comic_data)
 
 # thread1 = threading.Thread(target=call_gen)
 
 
 if __name__ == "__main__":
     if not os.path.isfile(".comics.db"):
-        MyComicsList.firstTimeDB()
+        MyComicsList.first_time_db()
     comicsList = MyComicsList()
     comicsList.mainloop()

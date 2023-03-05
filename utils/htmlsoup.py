@@ -35,7 +35,7 @@ def html2soup(html):
 
 
 # Get a lit of all links in input html
-def getaALLhref(html, tag):
+def get_all_href(html, tag):
     urllist = list()
     soup = html2soup(html)
     for link in soup.find_all(tag):
@@ -45,7 +45,7 @@ def getaALLhref(html, tag):
 
 
 # Get href urls based text
-def getHrefwithName(liste_a, name):
+def get_href_with_name(liste_a, name):
     urllist = list()
     for a in liste_a:
         if a.has_attr('href') and a.text == name:
@@ -54,15 +54,15 @@ def getHrefwithName(liste_a, name):
 
 
 # Get inner html from tag
-def getTagData(html, tag, classname):
+def get_tag_data(html, tag, classname):
     soup = BeautifulSoup(html, 'html.parser')
     # prettysoup = soup.prettify()
-    list = soup.find_all(tag, class_=classname)
-    return list
+    my_list = soup.find_all(tag, class_=classname)
+    return my_list
 
 
 # Find all 'tag' in html
-def getAllTag(html, tag):
+def get_all_tag(html, tag):
     soup = BeautifulSoup(html, 'html.parser')
-    list = soup.find_all(tag)
-    return list
+    my_list = soup.find_all(tag)
+    return my_list

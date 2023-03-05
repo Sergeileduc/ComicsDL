@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""Some functions with urls."""
 
 import requests
 from requests.exceptions import HTTPError
@@ -12,6 +13,7 @@ headers = {'User-Agent': user_agent}
 
 # Find the final url, if redirections occurs
 def getfinalurl(url):
+    """Follow redirections and get final url."""
     try:
         response = requests.get(url)
         if response.history:
@@ -26,7 +28,7 @@ def getfinalurl(url):
             # print("Request was not redirected")
             return url
     except HTTPError:
-            print("downCom got HTTPError")
+            print("down_com got HTTPError")
             return url
             raise
 
@@ -37,5 +39,5 @@ def getfinalurl(url):
 #         finalurl = urllib.request.urlopen(req).geturl()
 #         return finalurl
 #     except HTTPError:
-#         print("downCom got HTTPError from Request")
+#         print("down_com got HTTPError from Request")
 #         raise

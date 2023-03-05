@@ -1,11 +1,14 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""Unit tests for utils/getcomics."""
 
 import unittest
-from utils.getcomics import findLastWeekly, comicsList, searchurl, getresults
+from utils.getcomics import find_last_weekly, comics_list
+from utils.getcomics import searchurl, getresults
 
 
 class TestFonctionGet(unittest.TestCase):
+    """Tests for getcomics module."""
 
     getcomicsurls = ['https://getcomics.info/tag/dc-week/',
                      'http://getcomics.info/tag/marvel-now/',
@@ -15,10 +18,9 @@ class TestFonctionGet(unittest.TestCase):
 
     # Chaque méthode dont le nom commence par 'test_'
     # est un test.
-    def test_findLastWeekly_DC(self):
-
-        myurl = findLastWeekly(self.getcomicsurls[0])
-
+    def test_find_last_weekly_DC(self):
+        """Test find_last_weekly."""
+        myurl = find_last_weekly(self.getcomicsurls[0])
         print(myurl)
 
         # Le test le plus simple est un test d'égalité. On se
@@ -27,39 +29,46 @@ class TestFonctionGet(unittest.TestCase):
         # le test échoue.
         # self.assertEqual(myurl, result)
 
-    def test_findLastWeekly_Marvel(self):
-        myurl = findLastWeekly(self.getcomicsurls[1])
+    def test_find_last_weekly_marvel(self):
+        """Test find_last_weekly."""
+        myurl = find_last_weekly(self.getcomicsurls[1])
         print(myurl)
         # self.assertEqual(myurl, result)
 
-    def test_findLastWeekly_Indie(self):
-        myurl = findLastWeekly(self.getcomicsurls[2])
+    def test_find_last_weekly_indie(self):
+        """Test find_last_weekly."""
+        myurl = find_last_weekly(self.getcomicsurls[2])
         print(myurl)
         # self.assertEqual(myurl, result)
 
-    def test_findLastWeekly_Image(self):
-        myurl = findLastWeekly(self.getcomicsurls[3])
+    def test_find_last_weekly_image(self):
+        """Test find_last_weekly."""
+        myurl = find_last_weekly(self.getcomicsurls[3])
         print(myurl)
         # self.assertEqual(myurl, result)
 
     def test_comicsList(self):
+        """Test comics_list()."""
         print("Comics list DC")
-        result = comicsList(self.getcomicsurls[0])
+        result = comics_list(self.getcomicsurls[0])
         print(result)
 
     def test_searchurl_1(self):
+        """Test searchurl()."""
         myurl = searchurl("Batman", 0, 2)
         expected = "https://getcomics.info/tag/batman/page/2/"
         print(myurl)
         self.assertEqual(myurl, expected)
 
     def test_searchurl_2(self):
+        """Test searchurl()."""
         myurl = searchurl("New X-Men", 1, 3)
         expected = "https://getcomics.info/page/3/?s=new+x-men"
         print(myurl)
         self.assertEqual(myurl, expected)
 
     def test_get_results(self):
+        """Test getresults."""
         searchurl = "https://getcomics.info/tag/batman/page/2/"
         searchlist = getresults(searchurl)
         print(searchlist)

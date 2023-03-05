@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 # -*-coding:utf-8 -*-
+"""Get all new comics in getcomics weeklies."""
 
 import os
-# import subprocess
+import subprocess
 import copy
 from utils import htmlsoup, getcomics
 
@@ -12,52 +13,55 @@ from utils.const import note, howto, howtodl, consistof
 from utils.const import lower, indieweek, bloat
 
 
-# Find last weekly and display
-def printLastWeeklies():
-    printLastWeek(DC_URL, "DC")
-    printLastWeek(MARVEL_URL, "Marvel")
-    printLastWeek(IMAGE_URL, "Image")
-    printLastWeek(INDIE_URL, "Indé")
+def print_last_weeklies():
+    """Find last weeklies and print."""
+    print_last_week(DC_URL, "DC")
+    print_last_week(MARVEL_URL, "Marvel")
+    print_last_week(IMAGE_URL, "Image")
+    print_last_week(INDIE_URL, "Indé")
 
 
-# Def print last weekly date
-def printLastWeek(url, editor):
+def print_last_week(url, editor):
+    """Print time since last weekly pack."""
     soup = htmlsoup.url2soup(url)
-    lastPost = soup.find_all('article', class_='type-post')[0]
-    title = lastPost.h1.a.text
-    time = lastPost.find('time')
+    last_post = soup.find_all('article', class_='type-post')[0]
+    title = last_post.h1.a.text
+    time = last_post.find('time')
     print(f'{editor}\t : {title} :\t{time.text}')
 
 
-# Print getcomics weekly post in file f
-def printWeek(url, f, editor):
+def print_week(url, f, editor):
+    """Write all comics of 'editor' weekly pack in file f."""
     global flag
     flag = False
-    postTitle, weeklyUrl = getcomics.findLastWeekly2(url)
+    post_title, weekly_url = getcomics.find_last_weekly2(url)
 
     # Missing post already been done
-    if "Missing" in postTitle and flag:
+    if "Missing" in post_title and flag:
         pass
     # Missing post not done yet
-    elif "Missing" in postTitle and not flag:
-        f.write(postTitle + '\n')
+    elif "Missing" in post_title and not flag:
+        f.write(post_title + '\n')
         f.write("=====================\n")
-        printMultipleEditors(weeklyUrl, f)
+        print_multiple_editors(weekly_url, f)
         flag = True
     elif editor == "Indé week":
-        printMultipleEditors(weeklyUrl, f)
+        print_multiple_editors(weekly_url, f)
     else:
-        printOneEditor(weeklyUrl, f, editor)
+        print_one_editor(weekly_url, f, editor)
 
 
-# For Marvel, DC, or Image weeklies
-def printOneEditor(url, f, editor):
+def print_one_editor(url, f, editor):
+    """Write all comics in an editor weekly pack in file f.
+
+    For Marvel, DC, or Image weeklies
+    """
     soup = htmlsoup.url2soup(url)
     var = soup.select_one('section.post-contents > ul').find_all('strong')
 
     f.write(editor + '\n')
     f.write("=====================\n")
-    for s in var:
+    for s in var:  # var is a list of 'strong' divs
         s_copy = copy.copy(s)
         for span in s_copy:
             s_copy.span.decompose()
@@ -73,8 +77,11 @@ def printOneEditor(url, f, editor):
     f.write("" + '\n')
 
 
-# For Indie week+
-def printMultipleEditors(url, f):
+def print_multiple_editors(url, f):
+    """Write all comics in an Indies weekly pack in file f.
+
+    For Indie week+.
+    """
     soup = htmlsoup.url2soup(url).select_one('section.post-contents')
 
     # List of comics publishers
@@ -114,37 +121,37 @@ def printMultipleEditors(url, f):
     f.write('\n')
 
 
-# Generate output file
-def generateweekly():
+def generate_weekly():
+    """Write all new comics in a file."""
     global flag
     flag = False
     try:
-        os.remove("liste-comics-semaine.txt")
+        os.remove('liste-comics-semaine.txt')
     except OSError:
         pass
 
     with open("liste-comics-semaine.txt", "w") as f:
-        printWeek(DC_URL, f, "DC week")
-        printWeek(MARVEL_URL, f, "Marvel week")
+        print_week(DC_URL, f, "DC week")
+        print_week(MARVEL_URL, f, "Marvel week")
         f.write("Indé week" + '\n')
         f.write("=====================" + '\n')
-        printWeek(IMAGE_URL, f, "Image week")
-        printWeek(INDIE_URL, f, "Indé week")
+        print_week(IMAGE_URL, f, "Image week")
+        print_week(INDIE_URL, f, "Indé week")
 
 
 # MAIN
 print("Les derniers 'weekly packs' de Getcomics sont :")
 print("----------------")
-printLastWeeklies()
+print_last_weeklies()
 print("----------------")
 
 Join = input('Voulez-vous continuer ? (y/n) ?\n')
 if Join.lower() == 'yes' or Join.lower() == 'y':
     print("Processing")
-    generateweekly()
+    generate_weekly()
     print("Done")
-    # cmd = 'zenity --text-info --title="Sorties de la semaine"  ' \
-    #       '--width=800 --height=600 --filename=liste-comics-semaine.txt'
-    # subprocess.call(cmd, shell=True)
+    cmd = 'zenity --text-info --title="Sorties de la semaine"  ' \
+          '--width=800 --height=600 --filename=liste-comics-semaine.txt'
+    subprocess.call(cmd, shell=True)
 else:
     print("Exit")

@@ -2,7 +2,7 @@
 # -*-coding:utf-8 -*-
 import os
 import sys
-from utils.getcomics import getWeeklyComics
+from utils.getcomics import get_weekly_comics
 import time
 
 getcomicsurls = [
@@ -36,7 +36,7 @@ except IOError:
     sys.exit(1)
 
 try:
-    getWeeklyComics(myComicsList)
+    get_weekly_comics(myComicsList)
     time.sleep(20)
 except NameError as e:
     print(e)

@@ -8,7 +8,7 @@ import base64
 from urllib.parse import unquote, urlparse
 # from urllib.error import HTTPError
 # perso
-from utils.tools import searchRegexName
+from utils.tools import search_regex_name
 from utils.htmlsoup import url2soup
 
 BASE = "https://getcomics.info/go.php-url=/"
@@ -27,7 +27,7 @@ regex_rawname = (r'.*?getElementById.*?href = '
                  r'\".*?\" \+ \(.*?\) \+ \"(?P<name>.*?)\"')
 
 
-def _removetag(filename):
+def _remove_tag(filename):
     if re.match(regex_tag, filename):
         # print("match")
         return re.sub(regex_tag, r"\1\2\4", filename)
@@ -35,31 +35,31 @@ def _removetag(filename):
         return filename
 
 
-def getFileUrl(url, button):
+def get_file_url(url, button):
     print("Found zippyshare : " + url)
-    first_part = searchRegexName(button, regex_first, 'first')
-    a = int(searchRegexName(button, regex_abcd, 'a'))
-    b = int(searchRegexName(button, regex_abcd, 'b'))
-    c = int(searchRegexName(button, regex_abcd, 'c'))
-    d = int(searchRegexName(button, regex_abcd, 'd'))
+    first_part = search_regex_name(button, regex_first, 'first')
+    a = int(search_regex_name(button, regex_abcd, 'a'))
+    b = int(search_regex_name(button, regex_abcd, 'b'))
+    c = int(search_regex_name(button, regex_abcd, 'c'))
+    d = int(search_regex_name(button, regex_abcd, 'd'))
 
-    raw_name = searchRegexName(button, regex_rawname, 'name')
+    raw_name = search_regex_name(button, regex_rawname, 'name')
     # unquote replace special characters like %2c, etc..
-    filename = _removetag(unquote(raw_name).strip('/'))
+    filename = _remove_tag(unquote(raw_name).strip('/'))
     # Calculating the id and forming url
     # that is an extremely dirty way, I know
     second_part = a % b + c % d
 
     parsed_url = urlparse(url)
     domain = f"{parsed_url.scheme}://{parsed_url.netloc}"
-    fullURL = f"{domain}{first_part}{second_part}{raw_name}"
-    print(fullURL)
-    return fullURL, filename
+    full_url = f"{domain}{first_part}{second_part}{raw_name}"
+    print(full_url)
+    return full_url, filename
 
 
-def checkurl(zippylink):
+def check_url(zippylink):
     try:
-        # TODO : verify if usefull
+        # TODO : verify if useful
         if str(zippylink).startswith(BASE):
             print("Abracadabra !")
             finalzippy = base64.b64decode(zippylink[len(BASE):]).decode()
@@ -73,9 +73,9 @@ def checkurl(zippylink):
 
 
 # TODO : maybe underscore for internal use only
-def find_zippy_download_button(zippyurl):
+def find_zippy_download_button(zippy_url):
     try:
-        soup = url2soup(zippyurl)
+        soup = url2soup(zippy_url)
         # downButton = soup.select('script[type="text/javascript"]')
         return soup.find('a', id="dlbutton").find_next_sibling().text
     except Exception:
