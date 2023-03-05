@@ -130,18 +130,22 @@ class DCTradapp(tk.Tk):
         # container.grid_rowconfigure(0, weight=1)
         # container.grid_columnconfigure(0, weight=1)
 
-        self.frames = {"DCRebirth": DCRebirth(parent=container,
-                                              controller=self,
-                                              headers=self.headers),
-                       "DCPage": DCPage(parent=container,
-                                        controller=self,
-                                        headers=self.headers),
-                       "Indes": Indes(parent=container,
-                                      controller=self,
-                                      headers=self.headers),
-                       "Marvel": Marvel(parent=container,
-                                        controller=self,
-                                        headers=self.headers)}
+        self.frames = {"DCRebirth": HeaderGrid(parent=container,
+                                               controller=self,
+                                               headers=self.headers,
+                                               start=0),
+                       "DCPage": HeaderGrid(parent=container,
+                                            controller=self,
+                                            headers=self.headers,
+                                            start=10),
+                       "Indes": HeaderGrid(parent=container,
+                                           controller=self,
+                                           headers=self.headers,
+                                           start=20),
+                       "Marvel": HeaderGrid(parent=container,
+                                            controller=self,
+                                            headers=self.headers,
+                                            start=30)}
 
         self.frames["DCRebirth"].grid(row=0, column=0, sticky="nsew")
         self.frames["DCPage"].grid(row=0, column=0, sticky="nsew")
@@ -155,12 +159,10 @@ class DCTradapp(tk.Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
-    # make list of headerPic objects:
     def _make_header_list(self, dctradurl):
-        # global headers
+        """Return list of headerPic objects."""
         headers = []
         my_list = _return_soup(dctradpage).select('span.btn-cover a')
-        # list = _return_soup(dctradpage).find_all('span', class_="btn-cover")
         for l in my_list:
             url = l['href']
             imgurl = urljoin(dctrad_base, l.img['src'])
@@ -182,62 +184,17 @@ class DCTradapp(tk.Tk):
         return image_list
 
 
-class DCRebirth(tk.Frame):
-    """Tk frame DC Rebirth."""
+class HeaderGrid(tk.Frame):
+    """Tk frame for 3x3 header grid.
 
-    def __init__(self, parent, controller, headers):
+    start is the start index in the headers list.
+    """
+
+    def __init__(self, parent, controller, headers, start=0):
         """Init frame."""
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        for index, header in enumerate(headers[:9]):
-            i, j = divmod(index, 3)
-            header.generate_tk_image()
-            btn = tk.Button(
-                self, image=header.img, bg='SteelBlue3', relief='flat',
-                command=lambda url=header.url: open_url(url))
-            btn.grid(row=i, column=j)
-
-
-class DCPage(tk.Frame):
-    """Tk frame DC."""
-
-    def __init__(self, parent, controller, headers):
-        """Init frame."""
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
-        for index, header in enumerate(headers[10:19]):
-            i, j = divmod(index, 3)
-            header.generate_tk_image()
-            btn = tk.Button(
-                self, image=header.img, bg='SteelBlue3', relief='flat',
-                command=lambda url=header.url: open_url(url))
-            btn.grid(row=i, column=j)
-
-
-class Indes(tk.Frame):
-    """Tk frame DC Indies."""
-
-    def __init__(self, parent, controller, headers):
-        """Init frame."""
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
-        for index, header in enumerate(headers[20:29]):
-            i, j = divmod(index, 3)
-            header.generate_tk_image()
-            btn = tk.Button(
-                self, image=header.img, bg='SteelBlue3', relief='flat',
-                command=lambda url=header.url: open_url(url))
-            btn.grid(row=i, column=j)
-
-
-class Marvel(tk.Frame):
-    """Tk frame Marvel."""
-
-    def __init__(self, parent, controller, headers):
-        """Init frame."""
-        tk.Frame.__init__(self, parent)
-        self.controller = controller
-        for index, header in enumerate(headers[30:39]):
+        for index, header in enumerate(headers[start:start+9]):
             i, j = divmod(index, 3)
             header.generate_tk_image()
             btn = tk.Button(
