@@ -20,9 +20,9 @@ basesearch = 'https://getcomics.info'
 tagsearch = 'https://getcomics.info/tag/'
 
 getcomicsurls = ['https://getcomics.info/tag/dc-week/',
-                 'http://getcomics.info/tag/marvel-now/',
-                 'https://getcomics.info/tag/indie-week/',
-                 'https://getcomics.info/tag/image-week/'
+                 #  'http://getcomics.info/tag/marvel-now/',
+                 #  'https://getcomics.info/tag/indie-week/',
+                 #  'https://getcomics.info/tag/image-week/'
                  ]
 
 user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'  # noqa: E501
@@ -93,7 +93,8 @@ def down_com_zippy(url):
     # find("script", type="text/javascript")
     # find("div", style=re.compile("width: 303px;"))
     # find("script", type="text/javascript")
-    downButton = soup.find('a', id="dlbutton").find_next_sibling().text
+    # downButton = soup.find('a', id="dlbutton").find_next_sibling().text
+    downButton = soup.find('a', id="dlbutton").find_next_sibling().string
     try:
         fullURL, fileName = zpshare.get_file_url(url, downButton)
         print(f"Downloading from zippyshare into : {fileName}")
@@ -146,7 +147,7 @@ def getresults(url):
 
     Returns names and urls of posts returned by input url.
     """
-    searchlist = list()
+    searchlist = []
     try:
         res = url2soup(url).select("div.post-info")
         for d in res:
@@ -160,10 +161,10 @@ def getresults(url):
                           "size": size}
                 searchlist.append(result)
         # print(searchlist)
-        return searchlist
     except HTTPError as e:
         print(e)
         print("something wrong happened")
+    return searchlist
 
 
 def searchurl(user_search, mode, page):

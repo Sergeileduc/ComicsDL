@@ -53,8 +53,8 @@ class MyComicsList(tk.Tk):
         hs = self.winfo_screenheight()  # height of the screen
 
         # Calculate x and y coordinates for the Tk root window
-        x = (ws/2) - (w/2)
-        y = (hs/2) - (h/2)
+        x = (ws / 2) - (w / 2)
+        y = (hs / 2) - (h / 2)
         longtext = ("Ajoutez ou supprimez les séries à chercher dans "
                     "les derniers posts \n\"Weekly\" de Getcomics.info")
         # ascii_dctrad = """
@@ -89,7 +89,7 @@ class MyComicsList(tk.Tk):
                                       orient="vertical",
                                       command=self.comic_canvas.yview)
         self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.title("Télécharger All V2019-07")
+        self.title("Télécharger All V2021-03")
         self.geometry(f"{w}x{h}+{int(x)}+{int(y)}")
         self.comic_create = tk.Text(self.text_frame, height=3,
                                     bg="white", fg="black")

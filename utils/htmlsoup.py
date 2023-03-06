@@ -6,11 +6,14 @@ from bs4 import BeautifulSoup  # html parser
 import requests
 from requests.exceptions import HTTPError
 
+user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'  # noqa: E501
+headers = {'user-agent': user_agent}
+
 
 def url2soup(url):
     """Return hml soup."""
     try:
-        res = requests.get(url)
+        res = requests.get(url, headers=headers)
         res.raise_for_status()
         soup = BeautifulSoup(res.text, 'html.parser')
         res.close()

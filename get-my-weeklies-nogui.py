@@ -8,14 +8,7 @@ import time
 
 from utils.getcomics import get_weekly_comics
 
-getcomicsurls = [
-    'https://getcomics.info/tag/dc-week/',
-    'http://getcomics.info/tag/marvel-now/',
-    'https://getcomics.info/tag/indie-week/',
-    'https://getcomics.info/tag/image-week/']
-
-myComicsList = list()
-# myComicsList = ['batman', 'superman', 'fathom, 'deadpool]
+myComicsList = []
 
 config = 'liste-comics.txt'
 
