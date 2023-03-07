@@ -8,15 +8,24 @@ import tkinter.scrolledtext as tkst
 import urllib.error
 import urllib.request
 from tkinter import ttk
+from typing import NamedTuple
 
 import requests
 
 from utils import getcomics
-from utils.getcomics import ZippyButtonError, find_buttons, find_zippyshare_url, getresults
+from utils.getcomics import (ZippyButtonError, find_buttons, find_zippyshare_url,
+                             getresults, PostInfos)
 from utils.std_redirect import StdRedirector
 from utils.tools import bytes_2_human_readable, convert2bytes
 from utils.urltools import getfinalurl
 from utils.zpshare import check_url, get_file_filename_url
+
+
+class DownloadInQueue(NamedTuple):
+    title: str
+    url: str
+    size: str = None
+    button: tk.Button = None
 
 
 # Main program interface and code
@@ -75,7 +84,7 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
                   foreground=[('active', 'black')],
                   background=[('active', self.fg)])
 
-        self.page = 1
+        self.page: int = 1
         self.current_percent = tk.IntVar()
         self.current_percent.set(0)
         self.percent = tk.IntVar()
@@ -83,14 +92,14 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
         self.percent.set(0)
         self.dl_bytes.set(0)
         self.max_percent = 100
-        self.list_size = 0
+        self.list_size: int = 0
         self.choices = ['Recherche par TAG', 'Recherche simple']
         self.mode = tk.StringVar()
         self.mode.set('Recherche simple')
         self.user_search = tk.StringVar()
-        self.button_list = []
-        self.search_list = []
-        self.download_list = []
+        self.button_list: list[tk.Button] = []
+        self.search_results_list: list[PostInfos] = []
+        self.download_list: list[DownloadInQueue] = []
         self.my_list = []
         self.wm_geometry(f"{size_x}x{size_y}+{pos_x}+{pos_y}")
         self.title(self.title_string)
@@ -185,51 +194,46 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
         # self.search_comics(None)
 
     @staticmethod
-    def destroy_list(widget_list):
+    def destroy_list(widget_list: list[tk.Widget]) -> None:
         """Destroy a list of widgets (like buttons)."""
         for w in widget_list:
             w.destroy()
         widget_list.clear()
 
     # Search comics function
-    def search_comics(self, event):
+    def search_comics(self, event) -> None:
         """Search comic on getcomics.info."""
-        self.search_list.clear()
+        self.search_results_list.clear()
         self.destroy_list(self.button_list)
         search_mode = self.choices.index(self.mode.get())
         search_url = getcomics.searchurl(self.user_search.get(), search_mode, self.page)
-        print(search_url)
-        self.search_list = getresults(search_url)
-        # button_list = list()
-        for i in self.search_list:
-            title = f'{i["title"]} ({i["size"]})'
-            new_button = tk.Button(
-                self.results_frame, text=title, width=self.result_width,
-                relief='flat', border=0,
-                bg=self.button_dark, fg=self.fg,
-                activebackground=self.gray98, activeforeground='black',
-                highlightthickness=0, font=("Verdana", 10)
-            )
-            new_button.config(
-                command=lambda button=new_button: self.add_to_dl(button))
+        self.search_results_list = getresults(search_url)
+
+        for res in self.search_results_list:
+            title = f'{res.title} ({res.size})'
+            new_button = tk.Button(self.results_frame, text=title, width=self.result_width,
+                                   relief='flat', border=0, bg=self.button_dark, fg=self.fg,
+                                   activebackground=self.gray98, activeforeground='black',
+                                   highlightthickness=0, font=("Verdana", 10),
+                                   )
+            new_button.config(command=lambda button=new_button: self.add_to_dl(button))
             new_button.pack(fill='both', expand=1, pady=0)
             self.button_list.append(new_button)
 
-    def dl_com(self, liste):
-        """Download one comic."""
+    def dl_com(self, dl_list: list[DownloadInQueue]) -> None:
         try:
-            thread1 = threading.Thread(target=self.down_all_com, args=[liste])
+            thread1 = threading.Thread(target=self.down_all_com, args=[dl_list])
             thread1.start()
         except Exception as exc:
             print(exc)
 
-    def add_to_dl(self, button):
+    def add_to_dl(self, button: tk.Button) -> None:
         """Click to add to DL list."""
         index = self.button_list.index(button)
         comic = button.cget('text')
-        if comic not in (item["title"] for item in self.download_list):
-            if self.search_list[index]["size"] is not None:
-                size_bytes = convert2bytes(self.search_list[index]["size"])
+        if comic not in (item.title for item in self.download_list):
+            if self.search_results_list[index].size:
+                size_bytes = convert2bytes(self.search_results_list[index].size)
                 self.list_size += size_bytes
             new_dl = tk.Button(self.dl_frame, text=button.cget('text').title(),
                                width=self.result_width, anchor='w',
@@ -240,55 +244,54 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
                                font=("Verdana", 10))
             new_dl.config(command=lambda button=new_dl: self.remove_dl(button))
             new_dl.pack(fill='both', expand=1, pady=0)
-            self.download_list.append(
-                {"url": self.search_list[index]["url"],
-                 "title": self.search_list[index]["title"],
-                 "button": new_dl,
-                 "size": self.search_list[index]["size"]})
+            self.download_list.append(DownloadInQueue(title=self.search_results_list[index].title,
+                                                      url=self.search_results_list[index].url,
+                                                      size=self.search_results_list[index].size,
+                                                      button=new_dl))
             total_size = bytes_2_human_readable(self.list_size)
             print(f"Taille de la file d'attente (donnée indicative) : "
                   f"{total_size}")
         else:
             print("Already in your DL list")
 
-    def remove_dl(self, button):
+    def remove_dl(self, button: tk.Button) -> None:
         """Click to remove an item function."""
-        for i in self.download_list:
-            if button == i["button"]:
-                if i["size"] is not None:
-                    bytes_ = convert2bytes(i["size"])
+        for to_download in self.download_list:
+            if button == to_download.button:
+                if to_download.size:
+                    bytes_ = convert2bytes(to_download.size)
                     self.list_size -= bytes_
-                self.download_list.remove(i)
+                self.download_list.remove(to_download)
         button.destroy()
         total_size = bytes_2_human_readable(self.list_size)
-        print(f"Taille de la file d'attente (donnée indicative) : "
-              f"{total_size}")
+        print(f"Taille de la file d'attente (donnée indicative) : {total_size}")
 
-    def down_all_com(self, liste):
+    def down_all_com(self, dl_list: list[DownloadInQueue]) -> None:
         """Download all comics in the list."""
         self.dl_bytes.set(0)
-        for dl in liste:
+        for dl in dl_list:
             try:
-                self.down_com(dl["url"])
-            except Exception as exc:
-                print(exc)
-                print("Something went wrong")
+                self.down_com(dl.url)
+            except Exception as e:
+                print("down_all_com got an Error :")
+                print(f"{type(e).__name__} : {e}")
         print("Terminé, vous pouvez quitter")
 
-    def down_com(self, url):
+    def down_com(self, url: str) -> None:
         """Find Zippyshare Button, find download url, download."""
         final_url = getfinalurl(url)
-        print("Trying " + final_url)
+        print(f"Trying {final_url}")
         try:
             buttons = find_buttons(final_url)
             zippylink = find_zippyshare_url(buttons)
             finalzippy = check_url(zippylink)
-        except ZippyButtonError as err:
-            print(err)
+        except ZippyButtonError as e:
+            print("down_com got ZiipyButtonError")
+            print(f"{type(e).__name__} : {e}")
             return
-        except urllib.error.HTTPError as err:
+        except urllib.error.HTTPError as e:
             print("down_com got HTTPError")
-            print(err)
+            print(f"{type(e).__name__} : {e}")
             raise
         try:
             print(finalzippy)
@@ -297,19 +300,19 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
             print(exc)
             print("error in down_com_zippy")
 
-    def down_com_zippy(self, url: str):
+    def down_com_zippy(self, url: str) -> None:
         """Download from zippyshare."""
         self.progress["value"] = 0
         try:
             full_url, filename = get_file_filename_url(url)
-            print("Download from zippyshare into : " + filename)
+            print(f"Download from zippyshare into : {filename} from {full_url}")
             r = requests.get(full_url, stream=True)
             size = int(r.headers['Content-length'])  # Size in bytes
             print(bytes_2_human_readable(size))
-        except Exception as exc:
+        except Exception as e:
             size = 0
-            print(exc)
-            print("Can't get download link on zippyshare page")
+            print("'down_com_zippy' Error : Can't get download link on zippyshare page :\n"
+                  f"{type(e).__name__} : {e}")
 
         # Download from url & trim it a little bit
         with open(filename, 'wb') as f:
@@ -328,17 +331,17 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
                 print("Error while writing file")
             try:
                 r.close()
-            except Exception:
-                pass
+            except Exception as e:
+                print(e)
             print('Done\n')
 
-    def go_to_next_page(self):
+    def go_to_next_page(self) -> None:
         """Search next page and pack prev button."""
         self.page = self.page + 1
         self.search_comics(None)
         self.prev_page.pack(side='left', padx=(50, 0))
 
-    def go_to_prev_page(self):
+    def go_to_prev_page(self) -> None:
         """Search previous page."""
         if self.page > 1:
             self.page = self.page - 1

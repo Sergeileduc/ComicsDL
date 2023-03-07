@@ -4,6 +4,7 @@
 
 import re  # regex
 from datetime import datetime
+from typing import NamedTuple
 
 import requests  # html
 from requests.exceptions import HTTPError
@@ -16,7 +17,7 @@ from urllib.parse import quote_plus
 from utils.zpshare import check_url
 # from utils.getcomics_exceptions import NoZippyButton
 
-today = datetime.today().strftime("%Y-%m-%d")
+today = datetime.now().strftime("%Y-%m-%d")
 
 basesearch = 'https://getcomics.info'
 tagsearch = 'https://getcomics.info/tag/'
@@ -30,7 +31,15 @@ getcomicsurls = ['https://getcomics.info/tag/dc-week/',
 user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36'  # noqa: E501
 
 
-def get_weekly_comics(my_list: list):
+class PostInfos(NamedTuple):
+    """Store informations on a post, with url, title, and size.
+    """
+    url: str
+    title: str
+    size: str = None
+
+
+def get_weekly_comics(my_list: list) -> None:
     """Compare remote and local list of comics and download."""
     print('Initialisation...')
     print('Je vais chercher les mots clés :')
@@ -48,8 +57,7 @@ def get_weekly_comics(my_list: list):
                     if my_comics in newcomic.name:
                         download_comic(newcomic.url)
             except Exception as e:
-                print(e)
-                pass
+                print(f"Error in 'get_weekly_comics : {e}")
     print("C'est tout. Vous pouvez fermer.")
 
 
@@ -95,15 +103,17 @@ def comics_list(url: str) -> list[NamedUrl]:
     posts_links = content.select("ul > li > strong")
 
     res_list: list(NamedUrl) = []
-    for p in posts_links:
+    for post in posts_links:
         try:
-            name = p.contents[0].lower()  # Text on the post link
-            a = p.select_one('span > a')
+            name: str = post.contents[0].lower()  # Text on the post link
+            a = post.select_one('span > a')
             if a.has_attr('href') and a.text == "Download":
-                url = a.get('href')
+                url: str = a.get('href')
             res_list.append(NamedUrl(name=name, url=url))
+        except TypeError:
+            pass
         except Exception as e:
-            print(e)
+            print(f"comics_list Error : {e}")
     return res_list
 
 
@@ -112,7 +122,7 @@ def _find_dl_buttons(url):
     return url2soup(url).select("div.aio-pulse > a")
 
 
-def download_comic(url: str):
+def download_comic(url: str) -> None:
     """Find Zippyshare Button, find download url, download.
 
     Args:
@@ -125,21 +135,19 @@ def download_comic(url: str):
         zippylink = find_zippyshare_url(buttons)
         finalzippy = check_url(zippylink)
     except ZippyButtonError as e:
-        print(e)
-        return
+        print(f"download_comic got Error : {e}")
     except HTTPError as e:
-        print("down_com got HTTPError")
-        print(e)
+        print(f"download_comic got Error : {e}")
         raise
     try:
         print(f"{finalzippy = }")
         down_com_zippy(finalzippy)
     except Exception as e:
-        print(e)
         print("error in down_com_zippy")
+        print(f"download_comic got Error : {e}")
 
 
-def down_com_zippy(url: str):
+def down_com_zippy(url: str) -> None:
     """Download from zippyshare page.
 
     Args:
@@ -149,12 +157,12 @@ def down_com_zippy(url: str):
     try:
         full_url, filename = zpshare.get_file_filename_url(url)
         print(f"Downloading from zippyshare into : {filename}")
-        r = requests.get(full_url, stream=True)
-        size = bytes_2_human_readable(int(r.headers['Content-length']))
+        r: requests.Response = requests.get(full_url, stream=True)
+        size: str = bytes_2_human_readable(int(r.headers['Content-length']))
         print(f"{size = }")
     except Exception as e:
-        print(e)
         print("Can't get download link on zippyshare page")
+        print(f"down_com_zippy error : {e}")
 
     # Download from url & trim it a little bit
     with open(filename, 'wb') as f:
@@ -163,59 +171,67 @@ def down_com_zippy(url: str):
                 f.write(block)
         except KeyboardInterrupt:
             pass
-        except IOError:
-            print("Error while writing file")
+        except IOError as e:
+            print(f"down_com_zippy : Error while writing file : {e}")
     r.close()
     print('Done\n--')
 
 
-def getresults(url):
+def getresults(url: str) -> list[PostInfos]:
     """Search Getcomics.
 
     Returns names and urls of posts returned by input url.
+
+    Args:
+        url (str): getcomics search url.
+
+    Returns:
+        list: list of posts in format dict : {"url": url, "title": title, "size": size}
     """
-    searchlist = []
+    searchlist: list[PostInfos] = []
     try:
         res = url2soup(url).select("div.post-info")
         for d in res:
             if d.h1.a.has_attr('href'):
                 size = None
-                searchsize = re.search(r'\d+ [KMGT]B', d.p.text, re.M | re.I)
-                if searchsize:
-                    size = searchsize.group(0)
-                result = {"url": d.h1.a.get("href"),
-                          "title": d.h1.a.text,
-                          "size": size}
+                if searchsize := re.search(r'\d+ [KMGT]B', d.p.text, re.M | re.I):
+                    size: str = searchsize[0]
+                result = PostInfos(url=d.h1.a.get("href"),
+                                   title=d.h1.a.text,
+                                   size=size)
                 searchlist.append(result)
-        # print(searchlist)
     except HTTPError as e:
         print(e)
         print("something wrong happened")
     return searchlist
 
 
-def searchurl(user_search, mode, page):
-    """Return a getcomics research URL."""
+def searchurl(user_search: str, mode: int, page: int) -> str:
+    """Return a getcomics research URL.
+
+    Args:
+        user_search (str): input user search (example: 'Iron Man')
+        mode (int): search mode (classic: 1 or by tag: 0)
+        page (int): index of the page
+
+    Returns:
+        str: url for getting search results.
+    """
+
     # Research with tag (https://getcomics.info/tag/......)
     if mode == 0:
         # Page 1 (no page number on this one)
-        if page == 1:
-            url = f"{tagsearch}{user_search.lower().replace(' ', '-')}"
-        # Other pages
-        else:
-            url = (f"{tagsearch}{user_search.lower().replace(' ', '-')}"
-                   f"/page/{page}/")
+        return (
+            f"{tagsearch}{user_search.lower().replace(' ', '-')}"
+            if page == 1
+            else f"{tagsearch}{user_search.lower().replace(' ', '-')}/page/{page}/"
+        )
+
     # Classic research https://getcomics.info/?s=
+    elif page == 1:
+        return f"{basesearch}/?s={quote_plus(user_search.lower())}"
     else:
-        # Page 1
-        if page == 1:
-            # url = basesearch + '/?s=' + user_search.lower().replace(' ', '+')
-            url = f"{basesearch}/?s={quote_plus(user_search.lower())}"
-        # Other pages
-        else:
-            url = (f"{basesearch}/page/{page}/?s="
-                   f"{quote_plus(user_search.lower())}")
-    return url
+        return f"{basesearch}/page/{page}/?s={quote_plus(user_search.lower())}"
 
 
 def find_buttons(url: str) -> list:

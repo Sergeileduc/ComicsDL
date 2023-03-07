@@ -2,9 +2,9 @@
 # -*-coding:utf-8 -*-
 """Download selected comics in getcomics.info weekly packs."""
 
-import os
 import sys
 import time
+from pathlib import Path
 
 from utils.getcomics import get_weekly_comics
 
@@ -13,7 +13,7 @@ config = 'liste-comics.txt'
 
 # Read configfile
 try:
-    configfile = os.path.join(os.path.dirname(__file__), config)
+    configfile = Path(__file__).parent / config
     user_list = []
     with open(configfile, 'r') as f:
         user_list = f.read().splitlines()

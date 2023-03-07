@@ -12,18 +12,21 @@ headers = {'user-agent': user_agent}
 
 
 def url2soup(url: str) -> BeautifulSoup:
-    """Return hml soup."""
+    """Return hml soup.
+
+    Args:
+        url (str): url of page to scrape with bs4
+
+    Returns:
+        BeautifulSoup: soup of the page with the given URL
+    """
     try:
-        res = requests.get(url, headers=headers)
+        res: requests.Response = requests.get(url, headers=headers)
         res.raise_for_status()
         soup = BeautifulSoup(res.text, 'html.parser')
         res.close()
         return soup
-    except ValueError as e:
-        print("url2soup error")
-        print(e)
-        raise
-    except HTTPError as e:
+    except (ValueError, HTTPError) as e:
         print("url2soup error")
         print(e)
         raise
@@ -42,8 +45,7 @@ def html2soup(html: str) -> BeautifulSoup:
     Returns:
         BeautifulSoup
     """
-    soup = BeautifulSoup(html, 'html.parser')
-    return soup
+    return BeautifulSoup(html, 'html.parser')
 
 
 def get_all_href(html: str, tag: str) -> list[str]:
@@ -56,32 +58,22 @@ def get_all_href(html: str, tag: str) -> list[str]:
     Returns:
         list: list of URLS/links found
     """
-    urllist = []
     soup = html2soup(html)
-    for link in soup.find_all(tag):
-        if link.has_attr('href'):
-            urllist.append(link['href'])
-    return urllist
+    return [link['href'] for link in soup.find_all(tag) if link.has_attr('href')]
 
 
 def get_href_with_name(liste_a: list | bs4.ResultSet, name: str) -> list[str]:
     """Get list of urls if text element is <name>"""
-    urllist = []
-    for a in liste_a:
-        if a.has_attr('href') and a.text == name:
-            urllist.append(a['href'])
-    return urllist
+    return [a['href'] for a in liste_a if a.has_attr('href') and a.text == name]
 
 
-def find_all_tag_with_class(html: str, tag: str, classname: str) -> list:
+def find_all_tag_with_class(html: str, tag: str, classname: str) -> bs4.element.ResultSet:
     """Get inner html from tag."""
     soup = BeautifulSoup(html, 'html.parser')
-    my_list = soup.find_all(tag, class_=classname)
-    return my_list
+    return soup.find_all(tag, class_=classname)
 
 
-def find_all_tag(html: str, tag: str) -> list:
+def find_all_tag(html: str, tag: str) -> bs4.element.ResultSet:
     """Find all 'tag' in html."""
     soup = BeautifulSoup(html, 'html.parser')
-    my_list = soup.find_all(tag)
-    return my_list
+    return soup.find_all(tag)

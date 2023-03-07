@@ -5,7 +5,7 @@
 import re
 from typing import NamedTuple
 
-defs = {'KB': 1024, 'MB': 1024**2, 'GB': 1024**3, 'TB': 1024**4}
+defs: dict[str, int] = {'KB': 1024, 'MB': 1024**2, 'GB': 1024**3, 'TB': 1024**4}
 
 
 class NamedUrl(NamedTuple):
@@ -13,13 +13,19 @@ class NamedUrl(NamedTuple):
     url: str = None
 
 
-# Convert to bytes
-def convert2bytes(size: str):
-    """Convert size string with unit into bytes."""
+def convert2bytes(size: str) -> int:
+    """Convert size string with unit into bytes.
+
+    Args:
+        size (str): size (example : "34.3 MB")
+
+    Returns:
+        int: result in bytes (x1024 between units: example : 35_966_156)
+    """
     parts = size.split()
     size = parts[0]
     unit = parts[1]
-    return int(size) * defs[unit]
+    return int(float(size) * defs[unit])
 
 
 # Convert with corret unit
@@ -68,10 +74,10 @@ def bytes_2_human_readable(number_of_bytes: int) -> str:
 def search_regex(html: str, regex: str, n: int):
     """Regex search."""
     url_pattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
-    return url_pattern.search(str(html)).group(n)
+    return url_pattern.search(html)[n]
 
 
 def search_regex_name(html: str, regex: str, name: str):
     """Regex search with group name."""
     url_pattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
-    return url_pattern.search(str(html)).group(name)
+    return url_pattern.search(html)[name]

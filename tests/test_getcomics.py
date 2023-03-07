@@ -45,4 +45,4 @@ def test_get_results():
     """Test getresults."""
     searchurl = "https://getcomics.info/tag/batman/page/2/"
     searchlist = getresults(searchurl)
-    print(searchlist)
+    print(*searchlist, sep='\n')

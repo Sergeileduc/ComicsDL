@@ -15,10 +15,10 @@ exit_thread = False
 exit_success = False
 
 
-class StdRedirector(object):
+class StdRedirector:
     """Redirect std output in a widget."""
 
-    def __init__(self, widget):
+    def __init__(self, widget: tk.Text):
         """Init Stdredirector (debug) widget."""
         self.widget = widget
 
@@ -41,30 +41,20 @@ class MyComicsList(tk.Tk):
         super().__init__()
 
         # List MyComicsList[] initialisation
-        if not comic:
-            self.comic = []
-        else:
-            self.comic = comic
-
-        w = 300  # width for the Tk
-        h = 600  # height for the Tk
+        self.comics_buttons = comic or []
+        w: int = 300  # width for the Tk
+        h: int = 600  # height for the Tk
         # Get screen width and height
-        ws = self.winfo_screenwidth()  # width of the screen
-        hs = self.winfo_screenheight()  # height of the screen
+        ws: int = self.winfo_screenwidth()  # width of the screen
+        hs: int = self.winfo_screenheight()  # height of the screen
 
         # Calculate x and y coordinates for the Tk root window
-        x = (ws / 2) - (w / 2)
-        y = (hs / 2) - (h / 2)
-        longtext = ("Ajoutez ou supprimez les séries à chercher dans "
-                    "les derniers posts \n\"Weekly\" de Getcomics.info")
-        # ascii_dctrad = """
-# ██████╗  ██████╗    ████████╗██████╗  █████╗ ██████╗
-# ██╔══██╗██╔════╝    ╚══██╔══╝██╔══██╗██╔══██╗██╔══██╗
-# ██║  ██║██║            ██║   ██████╔╝███████║██║  ██║
-# ██║  ██║██║            ██║   ██╔══██╗██╔══██║██║  ██║
-# ██████╔╝╚██████╗       ██║   ██║  ██║██║  ██║██████╔╝
-# ╚═════╝  ╚═════╝       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ """
-        ascii_title = """
+        x: float = (ws / 2) - (w / 2)
+        y: float = (hs / 2) - (h / 2)
+        longtext: str = ("Ajoutez ou supprimez les séries à chercher dans "
+                         "les derniers posts \n\"Weekly\" de Getcomics.info")
+
+        ascii_title: str = """
 ██████╗ ███████╗████████╗ ██████╗ ██████╗ ███╗   ███╗██╗ ██████╗███████╗
 ██╔════╝ ██╔════╝╚══██╔══╝██╔════╝██╔═══██╗████╗ ████║██║██╔════╝██╔════╝
 ██║  ███╗█████╗     ██║   ██║     ██║   ██║██╔████╔██║██║██║     ███████╗
@@ -72,35 +62,40 @@ class MyComicsList(tk.Tk):
 ╚██████╔╝███████╗   ██║   ╚██████╗╚██████╔╝██║ ╚═╝ ██║██║╚██████╗███████║
  ╚═════╝ ╚══════╝   ╚═╝    ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚═╝ ╚═════╝╚══════╝"""
 
-        self.comic_canvas = tk.Canvas(self)
-        self.message = tk.Label(
-            self, text=longtext, anchor=tk.W, justify=tk.CENTER,
-            wraplength=250, font=("Helvetica", 12))
-        self.ascii_title = tk.Label(self, text=ascii_title,
-                                    anchor=tk.W, justify=tk.LEFT,
-                                    font=("Courier", 4))
-        self.comic_frame = tk.Frame(self.comic_canvas)
-        self.text_frame = tk.Frame(self)
-        self.output_text = tk.Text(self, bg="black", fg="white")
-        self.button = tk.Button(self,
-                                text="Télécharger les comics",
-                                command=self.run)
-        self.scrollbar = tk.Scrollbar(self.comic_canvas,
-                                      orient="vertical",
-                                      command=self.comic_canvas.yview)
-        self.comic_canvas.configure(yscrollcommand=self.scrollbar.set)
+        # Basic window stuff.
         self.title("Télécharger All V2023-03")
         self.geometry(f"{w}x{h}+{int(x)}+{int(y)}")
-        self.comic_create = tk.Text(self.text_frame, height=3,
-                                    bg="white", fg="black")
 
-        self.ascii_title.pack()
-        self.message.pack()
+        # Message and Logo
+        self.ascii_title = tk.Label(self, text=ascii_title, anchor=tk.W, justify=tk.LEFT,
+                                    font=("Courier", 4))
+        self.welcome_message = tk.Label(self, text=longtext, anchor=tk.W, justify=tk.CENTER,
+                                        wraplength=250, font=("Helvetica", 12))
+
+        # Comics scrollable list / input textbox / download button
+        self.comic_canvas = tk.Canvas(self)
+        self.comic_frame = tk.Frame(self.comic_canvas)
+        self.text_frame = tk.Frame(self)  # add comic frame (will contain a text widget)
+        self.output_text = tk.Text(self, bg="black", fg="white")  # std text widget
+        self.button = tk.Button(self, text="Télécharger les comics",  # 'Télécharger' button
+                                command=self.run)
+        self.scrollbar_comics = tk.Scrollbar(self.comic_canvas,
+                                             orient="vertical",
+                                             command=self.comic_canvas.yview)
+        self.comic_canvas.configure(yscrollcommand=self.scrollbar_comics.set)
+
+        self.comic_create = tk.Text(self.text_frame,  # Text input to add a comic
+                                    height=3, bg="white", fg="black")
+
+        # PACKING
+        self.ascii_title.pack()  # pack to root
+        self.welcome_message.pack()  # pack to root
         self.comic_canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.scrollbar_comics.pack(side=tk.RIGHT, fill=tk.Y)
 
-        self.canvas_frame = self.comic_canvas.create_window(
-            (0, 0), window=self.comic_frame, anchor="n")
+        self.canvas_frame = self.comic_canvas.create_window((0, 0),
+                                                            window=self.comic_frame,
+                                                            anchor="n")
 
         # self.text_frame.pack(side=tk.BOTTOM, fill=tk.X)
         self.text_frame.pack()
@@ -114,10 +109,9 @@ class MyComicsList(tk.Tk):
 
         self.comic_create.focus_set()
 
-        self.colour_schemes = [
-            {"bg": "lightgrey", "fg": "black"}, {"bg": "grey", "fg": "white"}]
+        self.colour_schemes = [{"bg": "lightgrey", "fg": "black"}, {"bg": "grey", "fg": "white"}]
 
-        current_comic = self.load_comic()
+        current_comic = self.load_comics_database()
         for comic in current_comic:
             comic_text = comic[0]
             self.add_comic(None, comic_text, True)
@@ -132,54 +126,53 @@ class MyComicsList(tk.Tk):
     def run(self):
         """Run download."""
         sys.stdout = StdRedirector(self.output_text)
-        current_comic = self.load_comic()
+        current_comic = self.load_comics_database()
         # comics_list = [row[0].lower().replace(' ', '-') for row in current_comic]
         comics_list = [row[0].lower() for row in current_comic]
         thread1 = threading.Thread(target=get_weekly_comics, args=[comics_list])
         thread1.start()
 
-    def add_comic(self, event=None, comic_text=None, from_db=False):
+    def add_comic(self, event=None, comic_text: str = None, from_db=False):
         """Add comic - create new button and add comic in the database."""
         if not comic_text:
             comic_text = self.comic_create.get(1.0, tk.END).strip()
 
         if len(comic_text) > 0:
-            new_comic = tk.Label(self.comic_frame, text=comic_text, pady=10)
+            new_comic: tk.Label = tk.Label(self.comic_frame, text=comic_text, pady=10)
 
-            self.set_comic_colour(len(self.comic), new_comic)
+            self.set_comic_colour(len(self.comics_buttons), new_comic)
 
             new_comic.bind("<Button-1>", self.remove_comic)
             new_comic.pack(side=tk.TOP, fill=tk.X)
 
-            self.comic.append(new_comic)
+            self.comics_buttons.append(new_comic)
 
             if not from_db:
                 self.save_comic(comic_text)
 
         self.comic_create.delete(1.0, tk.END)
 
-    def remove_comic(self, event):
+    def remove_comic(self, event: tk.Event):
         """Remove comic - delete button and remove from database."""
-        comic = event.widget
+        comic_button: tk.Label = event.widget
         if msg.askyesno(
                 "Confirmation de suppressions",
-                f"Supprimer {comic.cget('text')} de la liste ?"):
-            self.comic.remove(event.widget)
+                f"Supprimer {comic_button.cget('text')} de la liste ?"):
+            self.comics_buttons.remove(comic_button)
 
-            delete_comic_query = "DELETE FROM comics_dc WHERE comic=?"
-            delete_comic_data = (comic.cget("text"),)
+            delete_comic_query = "DELETE FROM comics WHERE comic=?"
+            delete_comic_data = (comic_button.cget("text"),)
             self.run_query(delete_comic_query, delete_comic_data)
 
-            event.widget.destroy()
-
+            comic_button.destroy()
             self.recolour_comic()
 
     def recolour_comic(self):
         """Recolor comics recursively."""
-        for index, comic in enumerate(self.comic):
+        for index, comic in enumerate(self.comics_buttons):
             self.set_comic_colour(index, comic)
 
-    def set_comic_colour(self, position, comic):
+    def set_comic_colour(self, position: int, comic):
         """Recolour comics (odd or even in the list)."""
         _, comic_style_choice = divmod(position, 2)
 
@@ -191,28 +184,32 @@ class MyComicsList(tk.Tk):
     def _on_frame_configure(self, event=None):
         self.comic_canvas.configure(scrollregion=self.comic_canvas.bbox("all"))
 
-    def _comic_width(self, event):
+    def _comic_width(self, event: tk.Event):
         canvas_width = event.width
         self.comic_canvas.itemconfig(self.canvas_frame, width=canvas_width)
 
-    def _mouse_scroll(self, event):
+    def _mouse_scroll(self, event: tk.Event):
         if event.delta:
             self.comic_canvas.yview_scroll(-1 * (event.delta / 120), "units")
         else:
             move = 1 if event.num == 5 else -1
             self.comic_canvas.yview_scroll(move, "units")
 
-    def save_comic(self, comic):
+    @staticmethod
+    def save_comic(comic):
         """Add new comic in database."""
-        insert_comic_query = "INSERT INTO comics_dc VALUES (?)"
+        insert_comic_query = "INSERT INTO comics VALUES (?)"
         insert_comic_data = (comic,)
-        self.run_query(insert_comic_query, insert_comic_data)
+        MyComicsList.run_query(insert_comic_query, insert_comic_data)
 
-    def load_comic(self):
-        """Read database."""
-        load_comic_query = "SELECT comic FROM comics_dc"
-        my_comic = self.run_query(load_comic_query, receive=True)
-        return my_comic
+    @staticmethod
+    def load_comics_database() -> list:
+        """Read database.
+
+        Returns:
+            list: list of comics in the database (1-tuples)
+        """
+        return MyComicsList.run_query("SELECT comic FROM comics", receive=True)
 
     @staticmethod
     def run_query(sql, data=None, receive=False):
@@ -234,24 +231,12 @@ class MyComicsList(tk.Tk):
     @staticmethod
     def first_time_db():
         """Create database tables."""
-        create_table1 = "CREATE TABLE IF NOT EXISTS comics_dc (comic TEXT)"
+        create_table1 = "CREATE TABLE IF NOT EXISTS comics (comic TEXT)"
         MyComicsList.run_query(create_table1)
-        create_table2 = "CREATE TABLE IF NOT EXISTS comics_marvel (comic TEXT)"
-        MyComicsList.run_query(create_table2)
-        create_table3 = "CREATE TABLE IF NOT EXISTS comics_indies (comic TEXT)"
-        MyComicsList.run_query(create_table3)
-        create_table4 = "CREATE TABLE IF NOT EXISTS comics_image (comic TEXT)"
-        MyComicsList.run_query(create_table4)
 
         default_comic_data = ("--- Ajoutez vos séries de comics ---",)
-        default_dc_query = "INSERT INTO comics_dc VALUES (?)"
+        default_dc_query = "INSERT INTO comics VALUES (?)"
         MyComicsList.run_query(default_dc_query, default_comic_data)
-        default_marvel_query = "INSERT INTO comics_marvel VALUES (?)"
-        MyComicsList.run_query(default_marvel_query, default_comic_data)
-        default_indie_query = "INSERT INTO comics_indies VALUES (?)"
-        MyComicsList.run_query(default_indie_query, default_comic_data)
-        default_image_query = "INSERT INTO comics_image VALUES (?)"
-        MyComicsList.run_query(default_image_query, default_comic_data)
 
 # thread1 = threading.Thread(target=call_gen)
 

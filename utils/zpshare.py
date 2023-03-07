@@ -5,11 +5,11 @@
 import asyncio
 import base64
 import re
-from urllib.parse import unquote, urlparse
+from urllib.parse import unquote
 
 import pyppeteer
 import requests
-from requests_html import AsyncHTMLSession
+from requests_html import AsyncHTMLSession, HTMLResponse, HTML
 from requests.exceptions import HTTPError
 
 from utils.htmlsoup import url2soup
@@ -28,7 +28,16 @@ regex_tag = r"(.+)(\ \([1|2][9|0]\d{2}\))(.*)(\..{3})"
 regex_rawname = r"/d/.*./*.?/(?P<name>.*)"
 
 
-def _remove_tag(filename):
+def _remove_tag(filename: str) -> str:
+    """Remove "tags" in the name of the file.
+    Like (Teams) (Format) (size) etc...
+
+    Args:
+        filename (str): the original filename
+
+    Returns:
+        str: the filename without all the tags
+    """
     if re.match(regex_tag, filename):
         # print("match")
         return re.sub(regex_tag, r"\1\2\4", filename)
@@ -45,27 +54,29 @@ def get_file_filename_url(url: str) -> tuple[str, str]:
     Returns:
         tuple[str, str]: full download URL, filename
     """
-    print("Found zippyshare : " + url)
-    # session = HTMLSession()
-    # print("HTML session created")
-    # r = session.get(url, headers=headers)
-    # session.close()
-    # print("HTML session closed")
-    # r.html.render()
-    # print("r.html.render() is OK")
-    html = asyncio.run(async_render(url))
+    print(f"Found zippyshare : {url}")
+    html: HTML = asyncio.run(async_render(url, selector='div.right'))
     button = html.find("a#dlbutton", first=True)
-    partial_url = button.attrs["href"]
-    raw_name = search_regex_name(partial_url, regex_rawname, 'name')
-    file_name = _remove_tag(unquote(raw_name).strip('/'))
-    parsed_url = urlparse(url)
-    domain = f"{parsed_url.scheme}://{parsed_url.netloc}"
-    full_url = f"{domain}{partial_url}"
-    print(f"{full_url = }")
+    partial_url: str | None = button.attrs.get("href")
+    full_url: str = html._make_absolute(partial_url)
+    raw_name: str = search_regex_name(partial_url, regex_rawname, 'name')
+    file_name: str = _remove_tag(unquote(raw_name).strip('/'))
+    print(f"{full_url = }, {file_name = }")
     return full_url, file_name
 
 
-async def async_render(url: str):
+async def async_render(url: str, selector: str = None, timeout: int = None) -> HTML:
+    """Render a webpage (or a portion of a page, using the selector)
+
+    Args:
+        url (str): url of the webpage
+        selector (str, optional): CSS selector to only render portion of the page.
+            Defaults to None.. Defaults to None.
+        timeout (int, optional): timeout in seconds. Defaults to None.
+
+    Returns:
+        HTML: HTML object ready for parsing.
+    """
     asession = AsyncHTMLSession()
     browser = await pyppeteer.launch({
         'ignoreHTTPSErrors': True,
@@ -75,7 +86,10 @@ async def async_render(url: str):
         'handleSIGHUP': False
     })
     asession._browser = browser
-    r = await asession.get(url, headers=headers)
+    r: HTMLResponse = await asession.get(url, headers=headers, timeout=timeout)
+    if selector:
+        selected = r.html.find(selector, first=True)
+        r.html.html = str(selected)  # 1st html is an HTML object, 2nd is str or bytes.
     await r.html.arender()
     await asession.close()
     return r.html
@@ -84,26 +98,24 @@ async def async_render(url: str):
 def check_url(zippylink: str) -> str:
     """Check url."""
     try:
-        # TODO : verify if useful
-        if str(zippylink).startswith(BASE):
-            finalzippy = base64.b64decode(zippylink[len(BASE):]).decode()
-        else:
-            finalzippy = requests.get(zippylink).url
-        return finalzippy
+        return (
+            base64.b64decode(zippylink[len(BASE):]).decode()
+            if zippylink.startswith(BASE)
+            else requests.get(zippylink).url
+        )
     except HTTPError as e:
         print("can't obtain final zippyshare url")
         print(e)
         raise
 
 
-def find_zippy_download_button(zippy_url):
+def find_zippy_download_button(zippy_url: str):
     """Find download button on zippyshare page."""
     try:
         soup = url2soup(zippy_url)
         return soup.find('a', id="dlbutton").find_next_sibling()
-    except Exception:
-        raise DownloadButtonError("Error on zp page : "
-                                  "No download button found")
+    except Exception as e:
+        raise DownloadButtonError("Error on zp page : " "No download button found") from e
 
 
 class DownloadButtonError(Exception):
