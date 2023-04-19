@@ -2,20 +2,19 @@
 # -*-coding:utf-8 -*-
 """Module to parse getcomics.info."""
 
-import re  # regex
+import re
 from datetime import datetime
+from time import sleep
 from typing import NamedTuple
 
-import requests  # html
+import requests
 from requests.exceptions import HTTPError
+from tqdm import tqdm
 
 from utils.htmlsoup import url2soup
-from utils import zpshare
-from utils.tools import bytes_2_human_readable, NamedUrl
+from utils.tools import bytes_2_human_readable, NamedUrl, remove_tag
 from utils.urltools import getfinalurl
-from urllib.parse import quote_plus
-from utils.zpshare import check_url
-# from utils.getcomics_exceptions import NoZippyButton
+from urllib.parse import quote_plus, unquote
 
 today = datetime.now().strftime("%Y-%m-%d")
 
@@ -117,66 +116,6 @@ def comics_list(url: str) -> list[NamedUrl]:
     return res_list
 
 
-def _find_dl_buttons(url):
-    """Find download buttons in a getcomics pages."""
-    return url2soup(url).select("div.aio-pulse > a")
-
-
-def download_comic(url: str) -> None:
-    """Find Zippyshare Button, find download url, download.
-
-    Args:
-        url (str): getcomics "post" url for a comicbook
-    """
-    final_url: str = getfinalurl(url)  # handle possible redirecteions
-    print(f"download_comic funciton with : {final_url}")
-    try:
-        buttons = find_buttons(final_url)
-        zippylink = find_zippyshare_url(buttons)
-        finalzippy = check_url(zippylink)
-    except ZippyButtonError as e:
-        print(f"download_comic got Error : {e}")
-    except HTTPError as e:
-        print(f"download_comic got Error : {e}")
-        raise
-    try:
-        print(f"{finalzippy = }")
-        down_com_zippy(finalzippy)
-    except Exception as e:
-        print("error in down_com_zippy")
-        print(f"download_comic got Error : {e}")
-
-
-def down_com_zippy(url: str) -> None:
-    """Download from zippyshare page.
-
-    Args:
-        url (str): zippyshare page url.
-    """
-    print(f"down_com_zippy function with : {url}")
-    try:
-        full_url, filename = zpshare.get_file_filename_url(url)
-        print(f"Downloading from zippyshare into : {filename}")
-        r: requests.Response = requests.get(full_url, stream=True)
-        size: str = bytes_2_human_readable(int(r.headers['Content-length']))
-        print(f"{size = }")
-    except Exception as e:
-        print("Can't get download link on zippyshare page")
-        print(f"down_com_zippy error : {e}")
-
-    # Download from url & trim it a little bit
-    with open(filename, 'wb') as f:
-        try:
-            for block in r.iter_content(1024):
-                f.write(block)
-        except KeyboardInterrupt:
-            pass
-        except IOError as e:
-            print(f"down_com_zippy : Error while writing file : {e}")
-    r.close()
-    print('Done\n--')
-
-
 def getresults(url: str) -> list[PostInfos]:
     """Search Getcomics.
 
@@ -204,6 +143,55 @@ def getresults(url: str) -> list[PostInfos]:
         print(e)
         print("something wrong happened")
     return searchlist
+
+
+def _find_dl_buttons(url):
+    """Find download buttons in a getcomics pages."""
+    return url2soup(url).select("div.aio-pulse > a")
+
+
+def download_comic(url: str) -> None:
+    """Find Zippyshare Button, find download url, download.
+
+    Args:
+        url (str): getcomics "post" url for a comicbook
+    """
+    final_url: str = getfinalurl(url)  # handle possible redirecteions
+    print(f"download_comic function with : {final_url}")
+    try:
+        direct_url, name, size = getcomics_directlink(final_url)
+    except DLurlError as e:
+        print(f"download_comic got Error : {e}")
+    except HTTPError as e:
+        print(f"download_comic got Error : {e}")
+        raise
+    try:
+        print(f"{direct_url = }")
+        _write_comics(direct_url, name, size)
+    except Exception as e:
+        print("error in write comics")
+        print(f"download_comic got Error : {e}")
+
+
+def _write_comics(url: str, name: str, size: int) -> None:
+    try:
+        r: requests.Response = requests.get(url, stream=True)
+        print(f"size = {bytes_2_human_readable(size)}")
+    except Exception as e:
+        print("Can't get download link")
+        print(f"_write_comics error {e}")
+
+    # Download from url & trim it a little bit
+    with open(remove_tag(name), 'wb') as f:
+        try:
+            for block in tqdm(iterable=r.iter_content(1024), total=size / 1024):
+                f.write(block)
+        except KeyboardInterrupt:
+            pass
+        except IOError as e:
+            print(f"_write_comics : Error while writing file : {e}")
+    r.close()
+    print('Done\n--')
 
 
 def searchurl(user_search: str, mode: int, page: int) -> str:
@@ -234,44 +222,36 @@ def searchurl(user_search: str, mode: int, page: int) -> str:
         return f"{basesearch}/page/{page}/?s={quote_plus(user_search.lower())}"
 
 
+def getcomics_directlink(comic_url: str):
+    """Get download links in a getcomics post."""
+    # BeautifulSoup will transform raw HTML in a tree easy to parse
+    soup = url2soup(comic_url)
+    direct_download = soup.find('a', class_='aio-red')
+
+    # temp_url is not the final cbz or cbr download url
+    temp_url = direct_download.get('href')
+
+    # We follow temp_url to find final URL
+    sleep(1)
+
+    with requests.Session() as session:
+        r = session.get(temp_url, allow_redirects=False, timeout=3)  # noqa:E501
+
+    if r.status_code == 200:
+        size: int = int(r.headers['Content-length'])
+        name: str = unquote(r.url.split("/")[-1])
+        return r.url, name, size
+    elif r.status == 302:
+        return r.headers['location']
+    else:
+        raise DLurlError
+
+
 def find_buttons(url: str) -> list:
     """Find download buttons in html soup, return list of buttons."""
     return url2soup(url).select("div.aio-pulse > a")
 
 
-def find_zippyshare_url(buttons) -> str:
-    """Find zippyshare page URL in the buttons.
-
-    Args:
-        buttons (list): list of "buttons" (soup) on getcomics post page.
-
-    Raises:
-        ZippyButtonError: empty list
-        ZippyButtonError: no zippyshare button/url found.
-
-    Returns:
-        str: URL of the zippyshare page
-    """
-    if not buttons:
-        print("Empty list !")
-        raise ZippyButtonError("Empty button list !")
-    # found = False
-    zippylink = None
-    for button in buttons:
-        # if 'zippyshare' in str(button).lower() \
-        #       and 'href' in button.a.attrs:
-        if 'zippyshare' in button.get("href") \
-                or 'zippyshare' in button.get('title').lower():
-            zippylink = button.get("href")
-    if zippylink:
-        return zippylink
-    else:
-        raise ZippyButtonError("No zippyshare button was found")
-
-
-class ZippyButtonError(Exception):
-    """Exception for zippyshare."""
-
-    def __init__(self, msg):
-        """Init error with msg."""
-        super().__init__(self, msg)
+class DLurlError(Exception):
+    "raised when program cannot find the dl url"
+    pass

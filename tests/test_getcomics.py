@@ -5,7 +5,8 @@
 import pytest
 
 from utils.getcomics import find_last_weekly, comics_list
-from utils.getcomics import searchurl, getresults
+from utils.getcomics import searchurl, getresults, getcomics_directlink
+from utils.tools import remove_tag
 
 
 @pytest.fixture(scope="module",
@@ -46,3 +47,12 @@ def test_get_results():
     searchurl = "https://getcomics.info/tag/batman/page/2/"
     searchlist = getresults(searchurl)
     print(*searchlist, sep='\n')
+
+
+@pytest.mark.parametrize("url, expected_name",
+                         [("https://getcomics.org/dc/superman-lost-2-2023/",
+                           "Superman - Lost 02 (of 10) (2023).cbr")])
+def test_get_file_url(url: str, expected_name: str):
+    """Test get_file_url()."""
+    _, name, _ = getcomics_directlink(url)
+    assert remove_tag(name) == expected_name

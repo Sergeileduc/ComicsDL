@@ -5,20 +5,18 @@ import sys
 import threading
 import tkinter as tk
 import tkinter.scrolledtext as tkst
-import urllib.error
-import urllib.request
 from tkinter import ttk
 from typing import NamedTuple
 
 import requests
+from requests.exceptions import HTTPError
+from tqdm import tqdm
 
 from utils import getcomics
-from utils.getcomics import (ZippyButtonError, find_buttons, find_zippyshare_url,
-                             getresults, PostInfos)
+from utils.getcomics import getcomics_directlink, DLurlError, getresults, PostInfos
 from utils.std_redirect import StdRedirector
-from utils.tools import bytes_2_human_readable, convert2bytes
+from utils.tools import bytes_2_human_readable, convert2bytes, remove_tag
 from utils.urltools import getfinalurl
-from utils.zpshare import check_url, get_file_filename_url
 
 
 class DownloadInQueue(NamedTuple):
@@ -271,56 +269,52 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
         self.dl_bytes.set(0)
         for dl in dl_list:
             try:
-                self.down_com(dl.url)
+                self.download_comic(dl.url)
             except Exception as e:
                 print("down_all_com got an Error :")
                 print(f"{type(e).__name__} : {e}")
         print("Terminé, vous pouvez quitter")
 
-    def down_com(self, url: str) -> None:
-        """Find Zippyshare Button, find download url, download."""
-        final_url = getfinalurl(url)
-        print(f"Trying {final_url}")
+    def download_comic(self, url: str) -> None:
+        """Find download url, download.
+
+        Args:
+            url (str): getcomics "post" url for a comicbook
+        """
+        final_url: str = getfinalurl(url)  # handle possible redirecteions
+        print(f"download_comic function with : {final_url}")
         try:
-            buttons = find_buttons(final_url)
-            zippylink = find_zippyshare_url(buttons)
-            finalzippy = check_url(zippylink)
-        except ZippyButtonError as e:
-            print("down_com got ZiipyButtonError")
-            print(f"{type(e).__name__} : {e}")
-            return
-        except urllib.error.HTTPError as e:
-            print("down_com got HTTPError")
-            print(f"{type(e).__name__} : {e}")
+            direct_url, name, size = getcomics_directlink(final_url)
+        except DLurlError as e:
+            print(f"download_comic got Error : {e}")
+        except HTTPError as e:
+            print(f"download_comic got Error : {e}")
             raise
         try:
-            print(finalzippy)
-            self.down_com_zippy(finalzippy)
-        except Exception as exc:
-            print(exc)
-            print("error in down_com_zippy")
+            print(f"{direct_url = }")
+            print(f"{name = }")
+            print(f"{size = }")
+            self._write_comics(direct_url, name, size)
+        except Exception as e:
+            print("error in download_comic")
+            print(f"download_comic got Error : {e}")
 
-    def down_com_zippy(self, url: str) -> None:
-        """Download from zippyshare."""
+    def _write_comics(self, url: str, name: str, size: int) -> None:
         self.progress["value"] = 0
         try:
-            full_url, filename = get_file_filename_url(url)
-            print(f"Download from zippyshare into : {filename} from {full_url}")
-            r = requests.get(full_url, stream=True)
-            size = int(r.headers['Content-length'])  # Size in bytes
-            print(bytes_2_human_readable(size))
+            r: requests.Response = requests.get(url, stream=True)
+            print(f"size = {bytes_2_human_readable(size)}")
         except Exception as e:
-            size = 0
-            print("'down_com_zippy' Error : Can't get download link on zippyshare page :\n"
-                  f"{type(e).__name__} : {e}")
+            print("Can't get download link")
+            print(f"_write_comics error {e}")
 
         # Download from url & trim it a little bit
-        with open(filename, 'wb') as f:
+        with open(remove_tag(name), 'wb') as f:
             try:
                 dl = 0
                 if self.list_size == 0:
                     self.list_size = 1
-                for block in r.iter_content(51200):
+                for block in tqdm(iterable=r.iter_content(51200), total=size / 51200):
                     dl += len(block)
                     self.current_percent.set(int(100 * dl / size))
                     self.dl_bytes.set(self.dl_bytes.get() + len(block))
@@ -328,7 +322,7 @@ class Getcomics(tk.Tk):  # pylint: disable=too-many-instance-attributes
                         int(100 * self.dl_bytes.get() / self.list_size))
                     f.write(block)
             except IOError:
-                print("Error while writing file")
+                print("_write_comics : Error while writing file")
             try:
                 r.close()
             except Exception as e:

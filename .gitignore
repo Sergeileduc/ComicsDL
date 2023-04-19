@@ -5,6 +5,7 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
+.coverage
 *.cbr
 *.cbz
 *.zip

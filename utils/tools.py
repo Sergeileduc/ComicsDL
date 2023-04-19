@@ -81,3 +81,23 @@ def search_regex_name(html: str, regex: str, name: str):
     """Regex search with group name."""
     url_pattern = re.compile(regex, re.MULTILINE | re.IGNORECASE)
     return url_pattern.search(html)[name]
+
+
+def remove_tag(filename: str) -> str:
+    """Remove "tags" in the name of the file.
+    Like (Teams) (Format) (size) etc...
+
+    Args:
+        filename (str): the original filename
+
+    Returns:
+        str: the filename without all the tags
+    """
+
+    # Regex to detect name, (year) (tag).extension
+    regex_tag = r"(.+)(\ \([1|2][9|0]\d{2}\))(.*)(\..{3})"
+    if re.match(regex_tag, filename):
+        # print("match")
+        return re.sub(regex_tag, r"\1\2\4", filename)
+    else:
+        return filename

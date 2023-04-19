@@ -1,5 +1,0 @@
-
-    document.getElementById('dlbutton').href = "/d/T3CXRVue/" + (45372 % 51245 + 45372 % 913) + "/Batman%20088%20%282020%29%20%28Digital%29%20%28Zone-Empire%29.cbr";
-    if (document.getElementById('fimage')) {
-        document.getElementById('fimage').href = "/i/T3CXRVue/" + (45372 % 51245 + 45372 % 913) + "/Batman%20088%20%282020%29%20%28Digital%29%20%28Zone-Empire%29.cbr";
-    }

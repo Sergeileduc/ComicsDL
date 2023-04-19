@@ -2,7 +2,7 @@ import contextlib
 import os
 import shutil
 import subprocess
-# import webbrowser
+import webbrowser
 from itertools import chain
 from pathlib import Path
 from platform import uname
@@ -130,13 +130,13 @@ def test(c):
     c.run("pytest tests/")
 
 
-# @task
-# def coverage(c):
-#     """Run unit-tests using pytest, with coverage reporting."""
-#     # use the browser defined in varenv $BROWSER
-#     # in WSL, if not set, example : export BROWSER='/mnt/c/Program Files/Google/Chrome/Application/chrome.exe'  # noqa: E501
-#     path = get_index_path()
-#     c.run('coverage run --source=cogs,utils --omit utils/bot_logging.py,utils/reddit.py -m pytest')  # noqa: E501
-#     c.run('coverage report -m')
-#     c.run('coverage html')
-#     webbrowser.open(path.as_uri())
+@task
+def coverage(c):
+    """Run unit-tests using pytest, with coverage reporting."""
+    # use the browser defined in varenv $BROWSER
+    # in WSL, if not set, example : export BROWSER='/mnt/c/Program Files/Google/Chrome/Application/chrome.exe'  # noqa: E501
+    path = get_index_path()
+    c.run('coverage run --source=cogs,utils --omit utils/bot_logging.py,utils/reddit.py -m pytest')  # noqa: E501
+    c.run('coverage report -m')
+    c.run('coverage html')
+    webbrowser.open(path.as_uri())
