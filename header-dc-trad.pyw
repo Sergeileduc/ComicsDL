@@ -135,10 +135,10 @@ class DCTradapp(tk.Tk):
         if self.logo:
             button5 = tk.Button(sidebar, image=self.cat_image_list[4],
                                 bg='SteelBlue4', relief='flat',
-                                command=self._refresh())
+                                command=self._refresh)
         else:
             button5 = tk.Button(sidebar, text="Rafraîchir",
-                                command=self._refresh())
+                                command=self._refresh)
         button5.pack(side='bottom')
 
         # the container is where we'll stack a bunch of frames
@@ -183,7 +183,7 @@ class DCTradapp(tk.Tk):
         frame.tkraise()
 
     def _refresh(self):
-        pass
+        print("refresh complete")
 
     # Make images from covers
     def _get_cat_covers(self):
