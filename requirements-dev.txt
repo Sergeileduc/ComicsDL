@@ -4,3 +4,4 @@ pytest
 pytest-datadir
 pytest-deprecate
 invoke
+coverage

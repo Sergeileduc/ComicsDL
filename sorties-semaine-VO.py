@@ -2,8 +2,7 @@
 # -*-coding:utf-8 -*-
 """Get all new comics in getcomics weeklies."""
 
-import os
-# import subprocess
+from pathlib import Path
 import tkinter as tk
 import tkinter.scrolledtext as scrolledtext
 from typing import TypeAlias
@@ -80,27 +79,29 @@ def print_multiple_editors(soup: Soup, f):
 def generate_weekly():
     """Write all new comics in a file."""
     try:
-        os.remove('liste-comics-semaine.txt')
+        Path('liste-comics-semaine.txt').unlink(missing_ok=True)
     except OSError:
         print("ignoring file suppression OSError")
 
     _, weekly_url = getcomics.find_last_weekly(DC_URL)
     soup: bs4.BeautifulSoup = htmlsoup.url2soup(weekly_url)
-    titles = soup.select("section.post-contents > h3")
+    # titles = soup.select("section.post-contents > h3")
+    titles = soup.select_one("section.post-contents").select("h3")
 
     with open("liste-comics-semaine.txt", "w") as f:
         for t in titles:
-            if t.text in ["DC COMICS", "MARVEL COMICS", "IMAGE COMICS"]:
+            if t.text in ("DC COMICS", "MARVEL COMICS", "IMAGE COMICS"):
                 print_one_editor(t.next_sibling, f, t.text)
-            elif t.text in ["INDIE COMICS"]:
+            elif t.text == "INDIE COMICS":
                 print_multiple_editors(t, f)
 
 
 # Select all the text in textbox
 def select_all(event):
-    text_widget.tag_add(tk.SEL, "1.0", tk.END)
-    text_widget.mark_set(tk.INSERT, "1.0")
-    text_widget.see(tk.INSERT)
+    widget = event.widget
+    widget.tag_add(tk.SEL, "1.0", tk.END)
+    widget.mark_set(tk.INSERT, "1.0")
+    widget.see(tk.INSERT)
     return 'break'
 
 
@@ -111,7 +112,7 @@ if __name__ == "__main__":
     print("----------------")
 
     Join = input('Voulez-vous continuer ? (y/n) ?\n')
-    if Join.lower() in ['yes', 'y']:
+    if Join.lower() in ('yes', 'y'):
         print("Processing")
         generate_weekly()
         print("Done")
@@ -119,8 +120,7 @@ if __name__ == "__main__":
         #       '--width=800 --height=600 --filename=liste-comics-semaine.txt'
         # subprocess.call(cmd, shell=True)
 
-        with open("liste-comics-semaine.txt", "r") as f:
-            txt = f.read()
+        txt = Path("liste-comics-semaine.txt").read_text()
 
         root = tk.Tk()
         root.title("Sorties Getcomics")

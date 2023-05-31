@@ -99,5 +99,5 @@ def remove_tag(filename: str) -> str:
     if re.match(regex_tag, filename):
         # print("match")
         return re.sub(regex_tag, r"\1\2\4", filename)
-    else:
-        return filename
+    # else
+    return filename

@@ -1,5 +1,4 @@
 import contextlib
-import os
 import shutil
 import subprocess
 import webbrowser
@@ -35,15 +34,15 @@ def get_platform():
         return 'windows'
     elif u.system == 'Linux' and 'microsoft' in u.release:
         return 'wsl'
-    else:
-        return 'linux'
+    # else
+    return 'linux'
 
 
 def get_index_path():
     """Get full path for ./htmlcov/index.html file."""
     platform = get_platform()
     if platform != "wsl":
-        return Path('.').resolve() / 'htmlcov' / 'index.html'
+        return Path().resolve() / 'htmlcov' / 'index.html'
     # TODO: this part with .strip().replace() is ugly...
     process = subprocess.run(['wslpath', '-w', '.'],
                              capture_output=True, text=True)
@@ -64,14 +63,11 @@ def cleantest(c):
     """Clean artifacts like *.pyc, __pycache__, .pytest_cache, etc..."""
     # Find .pyc or .pyo files and delete them
     exclude = ('venv', '.venv')
-    p = Path('.')
-    genpyc = (i for i in p.glob('**/*.pyc')
-              if not str(i.parent).startswith(exclude))
-    genpyo = (i for i in p.glob('**/*.pyo')
-              if not str(i.parent).startswith(exclude))
-    artifacts = chain(genpyc, genpyo)
+    p = Path()
+    artifacts = (i for i in p.glob('**/*.py[co]')
+                 if not str(i.parent).startswith(exclude))
     for art in artifacts:
-        os.remove(art)
+        art.unlink()
 
     # Delete caches folders
     cache1 = (i for i in p.glob('**/__pycache__')
@@ -85,8 +81,8 @@ def cleantest(c):
         shutil.rmtree(cache)
 
     # Delete coverage artifacts
+    Path('.coverage').unlink(missing_ok=True)
     with contextlib.suppress(FileNotFoundError):
-        os.remove('.coverage')
         shutil.rmtree('htmlcov')
 
 
@@ -94,7 +90,7 @@ def cleantest(c):
 def cleanbuild(c):
     """Clean dist/, build/ and egg-info/."""
     exclude = ('venv', '.venv')
-    p = Path('.')
+    p = Path()
     gen1 = (i for i in p.glob('**/dist')
             if not str(i.parent).startswith(exclude))
     gen2 = (i for i in p.glob('**/build')
@@ -110,12 +106,10 @@ def cleanbuild(c):
 def cleancomics(c):
     """Clean comics like *.cbz or *.cbr"""
     # Find .pyc or .pyo files and delete them
-    p = Path('.')
-    cbr = p.glob('**/*.cbr')
-    cbz = p.glob('**/*.cbz')
-    comics = chain(cbr, cbz)
+    p = Path()
+    comics = p.glob('**/*.cb[rz]')
     for c in comics:
-        os.remove(c)
+        c.unlink()
 
 
 @task(cleantest, cleanbuild, cleancomics)
@@ -136,7 +130,7 @@ def coverage(c):
     # use the browser defined in varenv $BROWSER
     # in WSL, if not set, example : export BROWSER='/mnt/c/Program Files/Google/Chrome/Application/chrome.exe'  # noqa: E501
     path = get_index_path()
-    c.run('coverage run --source=cogs,utils --omit utils/bot_logging.py,utils/reddit.py -m pytest')  # noqa: E501
+    c.run('coverage run -m pytest')  # noqa: E501
     c.run('coverage report -m')
     c.run('coverage html')
     webbrowser.open(path.as_uri())

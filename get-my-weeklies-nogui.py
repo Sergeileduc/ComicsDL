@@ -14,14 +14,12 @@ config = 'liste-comics.txt'
 # Read configfile
 try:
     configfile = Path(__file__).parent / config
-    user_list = []
-    with open(configfile, 'r') as f:
+    with configfile.open("r") as f:
         user_list = f.read().splitlines()
     user_list.sort()
 
-    with open(configfile, 'w') as f:
-        for comic in user_list:
-            f.write(f'{comic}\n')
+    with configfile.open('w') as f:
+        f.writelines([string + '\n' for string in user_list])
 
     my_comics_list = [comic.lower() for comic in user_list]
 

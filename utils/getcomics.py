@@ -133,7 +133,7 @@ def getresults(url: str) -> list[PostInfos]:
         for d in res:
             if d.h1.a.has_attr('href'):
                 size = None
-                if searchsize := re.search(r'\d+ [KMGT]B', d.p.text, re.M | re.I):
+                if searchsize := re.search(r'\d+ [KMGT]B', d.p.text, re.MULTILINE | re.IGNORECASE):
                     size: str = searchsize[0]
                 result = PostInfos(url=d.h1.a.get("href"),
                                    title=d.h1.a.text,
@@ -218,8 +218,8 @@ def searchurl(user_search: str, mode: int, page: int) -> str:
     # Classic research https://getcomics.info/?s=
     elif page == 1:
         return f"{basesearch}/?s={quote_plus(user_search.lower())}"
-    else:
-        return f"{basesearch}/page/{page}/?s={quote_plus(user_search.lower())}"
+    # else
+    return f"{basesearch}/page/{page}/?s={quote_plus(user_search.lower())}"
 
 
 def getcomics_directlink(comic_url: str):
