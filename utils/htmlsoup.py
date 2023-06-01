@@ -23,9 +23,7 @@ def url2soup(url: str) -> BeautifulSoup:
     try:
         res: requests.Response = requests.get(url, headers=headers)
         res.raise_for_status()
-        soup = BeautifulSoup(res.text, 'html.parser')
-        res.close()
-        return soup
+        return BeautifulSoup(res.text, 'html.parser')
     except (ValueError, HTTPError) as e:
         print("url2soup error")
         print(e)
