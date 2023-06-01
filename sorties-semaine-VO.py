@@ -3,8 +3,7 @@
 """Get all new comics in getcomics weeklies."""
 
 from pathlib import Path
-import tkinter as tk
-import tkinter.scrolledtext as scrolledtext
+import customtkinter as ctk
 from typing import TypeAlias
 
 import bs4
@@ -19,8 +18,8 @@ from utils.const import DC_URL
 Soup: TypeAlias = bs4.BeautifulSoup | bs4.Tag
 
 
-def print_last_week(url: str):
-    """Print time since last weekly pack.
+def get_last_week(url: str):
+    """Get time since last weekly pack.
 
     Args:
         url (str): getcomics tag url (/tag/*-week)
@@ -30,7 +29,7 @@ def print_last_week(url: str):
     last_post = soup.find_all('article', class_='type-post')[0]
     title = last_post.h1.a.text
     time = last_post.find('time')
-    print(f'{title} :\t{time.text}')
+    return f'{title} :\t{time.text}'
 
 
 def print_one_editor(soup: Soup, f, editor: str):
@@ -99,16 +98,16 @@ def generate_weekly():
 # Select all the text in textbox
 def select_all(event):
     widget = event.widget
-    widget.tag_add(tk.SEL, "1.0", tk.END)
-    widget.mark_set(tk.INSERT, "1.0")
-    widget.see(tk.INSERT)
-    return 'break'
+    widget.tag_add(ctk.SEL, "1.0", ctk.END)
+    widget.mark_set(ctk.INSERT, "1.0")
+    widget.see(ctk.INSERT)
 
 
 if __name__ == "__main__":
     print("Le dernier 'weekly packs' de Getcomics est :")
     print("----------------")
-    print_last_week(DC_URL)
+    time = get_last_week(DC_URL)
+    print(time)
     print("----------------")
 
     Join = input('Voulez-vous continuer ? (y/n) ?\n')
@@ -122,18 +121,23 @@ if __name__ == "__main__":
 
         txt = Path("liste-comics-semaine.txt").read_text()
 
-        root = tk.Tk()
+        size_x = 800  # width
+        size_y = 600  # height
+        # Gets both half the screen width/height and window width/height
+        root = ctk.CTk()
+        pos_x = int(root.winfo_screenwidth() / 2 - size_x / 2)
+        pos_y = int(root.winfo_screenheight() / 2 - size_y / 2)
+        root.wm_geometry(f"{size_x}x{size_y}+{pos_x}+{pos_y}")
         root.title("Sorties Getcomics")
 
-        text_widget = scrolledtext.ScrolledText(root, width=150)
-        text_widget.insert(tk.END, txt)
+        text_widget = ctk.CTkTextbox(root)
+        text_widget.insert("0.0", txt)
         text_widget.pack(expand=True, fill='both')
 
         # Add the binding
         text_widget.bind("<Control-Key-a>", select_all)
         text_widget.bind("<Control-Key-A>", select_all)  # just in case caps lock is on  # noqa: E501
-
-        tk.mainloop()
+        root.mainloop()
 
     else:
         print("Exit")
