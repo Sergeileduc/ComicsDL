@@ -9,12 +9,12 @@ from typing import NamedTuple
 
 import requests
 from requests.exceptions import HTTPError
+from urllib.parse import quote_plus, unquote
 from tqdm import tqdm
 
-from utils.htmlsoup import url2soup
-from utils.tools import bytes_2_human_readable, NamedUrl, remove_tag
-from utils.urltools import getfinalurl
-from urllib.parse import quote_plus, unquote
+from .htmlsoup import url2soup
+from .tools import bytes_2_human_readable, NamedUrl, remove_tag
+from .urltools import getfinalurl
 
 today = datetime.now().strftime("%Y-%m-%d")
 

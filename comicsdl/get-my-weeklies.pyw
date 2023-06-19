@@ -10,27 +10,7 @@ import tkinter as tk
 import tkinter.messagebox as msg
 
 from utils.getcomics import get_weekly_comics
-
-exit_thread = False
-exit_success = False
-
-
-class StdRedirector:
-    """Redirect std output in a widget."""
-
-    def __init__(self, widget: tk.Text):
-        """Init Stdredirector (debug) widget."""
-        self.widget = widget
-
-    def write(self, string):
-        """Insert stdout in widget."""
-        if not exit_thread:
-            self.widget.insert(tk.END, string)
-            self.widget.see(tk.END)
-
-    def flush(self):
-        """Flush."""
-        pass
+from utils.std_redirect import StdRedirector
 
 
 class MyComicsList(tk.Tk):

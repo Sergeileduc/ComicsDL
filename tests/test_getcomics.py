@@ -7,9 +7,9 @@ from time import sleep
 
 import pytest
 
-from utils.getcomics import find_last_weekly, comics_list
-from utils.getcomics import searchurl, getresults, getcomics_directlink
-from utils.tools import remove_tag
+from comicsdl.utils.getcomics import find_last_weekly, comics_list
+from comicsdl.utils.getcomics import searchurl, getresults, getcomics_directlink
+from comicsdl.utils.tools import remove_tag
 
 
 @pytest.fixture(scope="module",

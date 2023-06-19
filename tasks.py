@@ -1,4 +1,5 @@
 import contextlib
+import os
 import shutil
 import subprocess
 import webbrowser
@@ -13,8 +14,7 @@ from invoke import task
 `pip install invoke`
 # Usage
 > inv test
-> inv lint
-> inv coverage
+> inv build
 etc...
 # Autocompletion
 For auto completion, just run:
@@ -34,18 +34,17 @@ def get_platform():
         return 'windows'
     elif u.system == 'Linux' and 'microsoft' in u.release:
         return 'wsl'
-    # else
-    return 'linux'
+    else:
+        return 'linux'
 
 
 def get_index_path():
     """Get full path for ./htmlcov/index.html file."""
     platform = get_platform()
     if platform != "wsl":
-        return Path().resolve() / 'htmlcov' / 'index.html'
+        return Path('.').resolve() / 'htmlcov' / 'index.html'
     # TODO: this part with .strip().replace() is ugly...
-    process = subprocess.run(['wslpath', '-w', '.'],
-                             capture_output=True, text=True)
+    process = subprocess.run(['wslpath', '-w', '.'], capture_output=True, text=True)
     pathstr = process.stdout.strip().replace('\\', '/')
     return Path(pathstr) / 'htmlcov/index.html'
 
@@ -55,7 +54,7 @@ def get_index_path():
 @task
 def lint(c):
     """flake8 - static check for python files"""
-    c.run("flake8")
+    c.run("flake8 .")
 
 
 @task
@@ -63,59 +62,58 @@ def cleantest(c):
     """Clean artifacts like *.pyc, __pycache__, .pytest_cache, etc..."""
     # Find .pyc or .pyo files and delete them
     exclude = ('venv', '.venv')
-    p = Path()
-    artifacts = (i for i in p.glob('**/*.py[co]')
-                 if not str(i.parent).startswith(exclude))
+    p = Path('.')
+    genpyc = (i for i in p.glob('**/*.pyc') if not str(i.parent).startswith(exclude))
+    genpyo = (i for i in p.glob('**/*.pyo') if not str(i.parent).startswith(exclude))
+    artifacts = chain(genpyc, genpyo)
     for art in artifacts:
-        art.unlink()
+        os.remove(art)
 
     # Delete caches folders
-    cache1 = (i for i in p.glob('**/__pycache__')
-              if not str(i.parent).startswith(exclude))
-    cache2 = (i for i in p.glob('**/.pytest_cache')
-              if not str(i.parent).startswith(exclude))
-    cache3 = (i for i in p.glob('**/.mypy_cache')
-              if not str(i.parent).startswith(exclude))
+    cache1 = p.glob('**/__pycache__')
+    cache2 = p.glob('**/.pytest_cache')
+    cache3 = p.glob('**/.mypy_cache')
     caches = chain(cache1, cache2, cache3)
     for cache in caches:
         shutil.rmtree(cache)
 
     # Delete coverage artifacts
-    Path('.coverage').unlink(missing_ok=True)
     with contextlib.suppress(FileNotFoundError):
+        os.remove('.coverage')
         shutil.rmtree('htmlcov')
 
 
 @task
 def cleanbuild(c):
-    """Clean dist/, build/ and egg-info/."""
-    exclude = ('venv', '.venv')
-    p = Path()
-    gen1 = (i for i in p.glob('**/dist')
-            if not str(i.parent).startswith(exclude))
-    gen2 = (i for i in p.glob('**/build')
-            if not str(i.parent).startswith(exclude))
-    gen3 = (i for i in p.glob('**/*.egg-info')
-            if not str(i.parent).startswith(exclude))
-    builds = chain(gen1, gen2, gen3)
-    for b in builds:
-        shutil.rmtree(b)
+    """Clean dist and build"""
+    with contextlib.suppress(FileNotFoundError):
+        shutil.rmtree('build')
+    with contextlib.suppress(FileNotFoundError):
+        shutil.rmtree('dist')
 
 
 @task
 def cleancomics(c):
-    """Clean comics like *.cbz or *.cbr"""
-    # Find .pyc or .pyo files and delete them
-    p = Path()
+    """Clean .cbz and .cbr files"""
+    p = Path('.')
     comics = p.glob('**/*.cb[rz]')
-    for c in comics:
-        c.unlink()
+    for comic in comics:
+        comic.unlink()
+
+
+@task
+def cleandoc(c):
+    """Clean documentation files."""
+    p = Path('.').resolve() / "docs" / "build"
+    print(p)
+    with contextlib.suppress(FileNotFoundError):
+        shutil.rmtree(p)
 
 
 @task(cleantest, cleanbuild, cleancomics)
 def clean(c):
     """Equivalent to both cleanbuild and cleantest..."""
-    print("Cleaning !")
+    pass
 
 
 @task
@@ -128,9 +126,77 @@ def test(c):
 def coverage(c):
     """Run unit-tests using pytest, with coverage reporting."""
     # use the browser defined in varenv $BROWSER
-    # in WSL, if not set, example : export BROWSER='/mnt/c/Program Files/Google/Chrome/Application/chrome.exe'  # noqa: E501
+    # in WSL, if not set, example :  export BROWSER='/mnt/c/Program Files/Google/Chrome/Application/chrome.exe'  # noqa: E501
     path = get_index_path()
-    c.run('coverage run -m pytest')  # noqa: E501
-    c.run('coverage report -m')
-    c.run('coverage html')
+    # c.run('coverage run --source=tests -m pytest')
+    # c.run('coverage report -m')
+    # c.run('coverage html')
+    c.run('pytest --cov . --cov-report html')
     webbrowser.open(path.as_uri())
+
+
+@task(cleandoc)
+def doc(c):
+    c.run("pushd docs && make html && popd")
+    path = Path('.').resolve() / "docs" / "build" / "html" / "index.html"
+    webbrowser.open(path.as_uri())
+
+
+@task(cleanbuild)
+def pyinstaller(c):
+    """Build comicsdl with pyinstaller"""
+    c.run('pyinstaller download-comics.spec')
+    # clean tcl
+    p = Path('.').resolve() / "dist" / "download-comics"
+    tzs = p.glob("tcl/tzdata/*/")
+    # print(*tzs, sep='\n')
+    for tz in tzs:
+        if tz.is_dir() and 'Europe' not in tz.name:
+            shutil.rmtree(tz)
+        if tz.is_file() and tz.name not in ["CET", "GMT", "GMT-0", "GMT+0", "GMT0",
+                                            "Greenwich", "UTC"]:
+            tz.unlink()
+
+    euro_tzs = p.glob('**/tcl/tzdata/Europe/*')
+    for tz in euro_tzs:
+        if tz.name != "Paris":
+            tz.unlink()
+
+    encodings = p.glob("tcl/encoding/*")
+    # print(*encodings, sep='\n')
+    for enc in encodings:
+        # print(enc.name)
+        if "ascii" not in enc.name and "iso88" not in enc.name and "utf-8" not in enc.name:
+            enc.unlink()
+
+
+@task
+def run(c):
+    """Run the .exe"""
+    c.run(".\dist\download-comics\download-comics.exe")
+
+
+@task
+def cleantcl(c):
+    """Clean the dist"""
+    p = Path('.').resolve() / "dist" / "download-comics"
+    tzs = p.glob("tcl/tzdata/*/")
+    # print(*tzs, sep='\n')
+    for tz in tzs:
+        if tz.is_dir() and 'Europe' not in tz.name:
+            shutil.rmtree(tz)
+        if tz.is_file() and tz.name not in ["CET", "GMT", "GMT-0", "GMT+0", "GMT0",
+                                            "Greenwich", "UTC"]:
+            tz.unlink()
+
+    euro_tzs = p.glob('**/tcl/tzdata/Europe/*')
+    for tz in euro_tzs:
+        if tz.name != "Paris":
+            tz.unlink()
+
+    encodings = p.glob("tcl/encoding/*")
+    # print(*encodings, sep='\n')
+    for enc in encodings:
+        # print(enc.name)
+        if "ascii" not in enc.name and "iso88" not in enc.name and "utf-8" not in enc.name:
+            enc.unlink()

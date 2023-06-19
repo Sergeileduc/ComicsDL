@@ -1,0 +1,29 @@
+import tkinter as tk
+import sys
+
+
+class StdoutRedirector:
+    def __init__(self, text_widget):
+        self.text_widget = text_widget
+
+    def write(self, message):
+        self.text_widget.insert(tk.END, message)
+        self.text_widget.see(tk.END)  # Fait défiler automatiquement vers la fin du texte
+
+
+# Créer une fenêtre Tkinter
+root = tk.Tk()
+root.title("Redirection de la sortie standard")
+
+# Créer un widget Text pour afficher les messages
+text_widget = tk.Text(root)
+text_widget.pack()
+
+# Rediriger la sortie standard vers le widget Text
+sys.stdout = StdoutRedirector(text_widget)
+
+# Exemple de message de sortie
+print("Ceci est un message de sortie standard.")
+
+# Lancer la boucle principale de Tkinter
+root.mainloop()

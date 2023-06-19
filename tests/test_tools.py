@@ -1,6 +1,6 @@
 import pytest
 
-from utils.tools import remove_tag
+from comicsdl.utils.tools import remove_tag
 
 
 @pytest.mark.parametrize("old_name, new_name",

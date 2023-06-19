@@ -204,7 +204,6 @@ class Getcomics(ctk.CTk):
         """Destroy a list of widgets (like buttons)."""
         for w in widget_list:
             w.destroy()
-            print("Destroyed", w)
         widget_list.clear()
 
     # Search comics function
