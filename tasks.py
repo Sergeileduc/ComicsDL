@@ -144,8 +144,9 @@ def doc(c):
 
 @task(cleanbuild)
 def pyinstaller(c):
-    """Build comicsdl with pyinstaller"""
+    """Build comicsdl with pyinstaller, clean the dist, and make a zip archive."""
     c.run('pyinstaller download-comics.spec')
+
     # clean tcl
     p = Path('.').resolve() / "dist" / "download-comics"
     tzs = p.glob("tcl/tzdata/*/")
@@ -169,6 +170,30 @@ def pyinstaller(c):
         if "ascii" not in enc.name and "iso88" not in enc.name and "utf-8" not in enc.name:
             enc.unlink()
 
+    msgs = p.glob("tcl/msgs/*")
+    # print(*msgs, sep='\n')
+    for msg in msgs:
+        if msg.name != "fr.msg":
+            msg.unlink()
+
+    # clean tk
+    tkmsgs = p.glob("tk/msgs/*")
+    # print(*tkmsgs, sep='\n')
+    for tkmsg in tkmsgs:
+        if tkmsg.name not in ["en_gb.msg", "en.msg", "fr.msg"]:
+            tkmsg.unlink()
+
+    # make the zip file
+    dist = Path(__file__).parent / "dist"
+    shutil.make_archive("download-comics", "zip", dist)
+
+
+@task
+def zip(c):
+    """make the zip"""
+    dist = Path(__file__).parent / "dist"
+    shutil.make_archive("download-comics", "zip", dist)
+
 
 @task
 def run(c):
@@ -177,7 +202,7 @@ def run(c):
 
 
 @task
-def cleantcl(c):
+def cleantcltk(c):
     """Clean the dist"""
     p = Path('.').resolve() / "dist" / "download-comics"
     tzs = p.glob("tcl/tzdata/*/")
@@ -200,3 +225,16 @@ def cleantcl(c):
         # print(enc.name)
         if "ascii" not in enc.name and "iso88" not in enc.name and "utf-8" not in enc.name:
             enc.unlink()
+
+    msgs = p.glob("tcl/msgs/*")
+    # print(*msgs, sep='\n')
+    for msg in msgs:
+        if msg.name != "fr.msg":
+            msg.unlink()
+
+    # clean tk
+    tkmsgs = p.glob("tk/msgs/*")
+    # print(*tkmsgs, sep='\n')
+    for tkmsg in tkmsgs:
+        if tkmsg.name not in ["en_gb.msg", "en.msg", "fr.msg"]:
+            tkmsg.unlink()
