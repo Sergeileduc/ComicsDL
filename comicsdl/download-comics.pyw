@@ -5,6 +5,8 @@ import sys
 import threading
 import customtkinter as ctk
 import tkinter as tk
+from pathlib import Path
+from tkinter import filedialog
 from typing import NamedTuple
 
 import requests
@@ -37,7 +39,7 @@ class TopBarFrame(ctk.CTkFrame):
         self.search_entry = ctk.CTkEntry(self, textvariable=self.user_search, justify='center',
                                          placeholder_text="Rechercher un comicbook")
         self.search_entry.pack(side='left', expand=True, fill="x")
-        self.choice_menu.pack(side='right')
+        self.choice_menu.pack(side='right', padx=(10, 0))
         self.search_entry.focus_set()
         self.search_entry.bind("<Return>", self.master.search_comics)
 
@@ -154,7 +156,31 @@ class MainFrame(ctk.CTkFrame):
         print(f"Taille de la file d'attente (donnée indicative) : {total_size}")
 
 
+class FolderDialogFrame(ctk.CTkFrame):
+    def __init__(self, master, *args, **kwargs):
+        super().__init__(master, *args, **kwargs)
+        # Bouton pour choisir un dossier
+        self.master = master
+        self.folder_var = ctk.StringVar(self, value=self.master.download_folder)
+        self.button_folder = ctk.CTkButton(self,
+                                           text="Choisir un dossier",
+                                           command=self.select_folder)
+        self.label = ctk.CTkLabel(self, textvariable=self.folder_var, fg_color="transparent")
+        self.button_folder.pack(side="left")
+        self.label.pack(side="left", padx=20)
+
+    def select_folder(self):
+        folder = filedialog.askdirectory(initialdir=self.master.download_folder)
+        self.folder_var.set(folder)
+        if folder:
+            self.master.download_folder = Path(folder)
+            print("Dossier sélectionné :", self.master.download_folder)
+        else:
+            print("Aucun dossier sélectionné.")
+
 # Main program interface and code
+
+
 class Getcomics(ctk.CTk):
     """GUI made with tk.TK."""
 
@@ -169,6 +195,7 @@ class Getcomics(ctk.CTk):
         pos_x = int(self.winfo_screenwidth() / 2 - size_x / 2)
         pos_y = int(self.winfo_screenheight() / 2 - size_y / 2)
 
+        self.download_folder: Path = Path.home() / "Downloads"
         self.page: int = 1
         self.current_percent = ctk.DoubleVar(value=0.0)
         self.percent = ctk.DoubleVar(value=0.0)
@@ -178,7 +205,8 @@ class Getcomics(ctk.CTk):
         self.top_bar = TopBarFrame(self, fg_color="transparent")
         self.main_frame = MainFrame(self, fg_color="transparent")
 
-        self.bottom_bar = ctk.CTkFrame(self)
+        self.bottom_bar = ctk.CTkFrame(self, fg_color="transparent")
+        self.folder_choice = FolderDialogFrame(self, fg_color="transparent")
         self.output_text = ctk.CTkTextbox(self.bottom_bar, height=100)
         self.progress = ctk.CTkProgressBar(self.bottom_bar, orientation="horizontal",
                                            variable=self.current_percent,
@@ -192,6 +220,7 @@ class Getcomics(ctk.CTk):
                              padx=20, pady=(0, 5))
 
         self.bottom_bar.pack(fill='x')
+        self.folder_choice.pack(padx=10, pady=(0, 10), fill='x')
         self.progress.pack(padx=10, pady=(0, 10), fill='both', expand=True)
         self.progress2.pack(padx=10, pady=(0, 10), fill='both', expand=True)
         self.output_text.pack(padx=10, pady=(0, 10), fill='both', expand=True)
@@ -280,7 +309,8 @@ class Getcomics(ctk.CTk):
             print(f"_write_comics error {e}")
 
         # Download from url & trim it a little bit
-        with open(remove_tag(name), 'wb') as f:
+        path = self.download_folder / remove_tag(name)
+        with open(path, 'wb') as f:
             try:
                 dl = 0
                 if self.main_frame.list_size == 0:
