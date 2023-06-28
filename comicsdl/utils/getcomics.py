@@ -232,10 +232,10 @@ def getcomics_directlink(comic_url: str):
     temp_url = direct_download.get('href')
 
     # We follow temp_url to find final URL
-    sleep(1)
+    sleep(0.5)
 
     with requests.Session() as session:
-        r = session.get(temp_url, allow_redirects=False, timeout=3)  # noqa:E501
+        r = session.head(temp_url, allow_redirects=False, timeout=3)
 
     if r.status_code == 200:
         size: int = int(r.headers['Content-length'])
